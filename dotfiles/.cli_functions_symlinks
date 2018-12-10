@@ -1,0 +1,31 @@
+### cli functions and symlinks ###
+# export the user's home like
+# 'export USER_HOME="/Users/<your-user-home>"; '
+# export the m1well's toolsuite home like
+# 'export M1WELL_TOOLSUITE_HOME="/Users/<path-to-toolsuite>"; '
+
+### functions
+
+# tree
+## example ...
+#|__Cycles
+#| |__.DS_Store
+#| |__CyclesCards.json
+#| |__Carbon
+#| | |__Carbon.json
+function tree {
+  find ${1:-.} -print | sed -e 's;[^/]*/;|_;g;s;_|; |;g'
+}
+
+# print color codes
+function colorcodes {
+  for code in {000..255}; do
+    print -P -- "$code: %F{$code}Test%f";
+  done
+}
+
+### symlinks
+
+ln -sf ${M1WELL_TOOLSUITE_HOME}/env-setup/dotfiles/.vimrc ${USER_HOME}/.vimrc
+ln -sf ${M1WELL_TOOLSUITE_HOME}/env-setup/dotfiles/.cheatsheet ${USER_HOME}/.cheatsheet
+ln -sf ${M1WELL_TOOLSUITE_HOME}/env-setup/terminal/m1well.zsh-theme ${USER_HOME}/.oh-my-zsh/themes/m1well.zsh-theme

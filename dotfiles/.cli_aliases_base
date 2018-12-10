@@ -1,0 +1,23 @@
+### cli aliases base ###
+# export the user's home like
+# 'export USER_HOME="/Users/<your-user-home>"; '
+
+alias vv="vim"
+alias aa="atom"
+
+alias ..,,="cd .. && ls -al"
+alias ,,="ls -al"
+alias ..="cd .."
+alias ....="cd .. && cd .."
+alias ......="cd .. && cd .. && cd .."
+alias ........="cd .. && cd .. && cd .. && cd .."
+alias cc="clear"
+
+alias atomzshrc="atom ${USER_HOME}/.zshrc"
+alias sourcezshrc="source ${USER_HOME}/.zshrc"
+
+# generate a uuid
+alias uuid="uuidgen | tr '[:upper:]' '[:lower:]'"
+
+# grep given string recursively (add string and path)
+alias greprec="grep -in --directories=recurse"

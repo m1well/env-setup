@@ -1,0 +1,10 @@
+### macOS
+.DS_Store
+
+### individual cli files
+dotfiles/.cli_aliases_private
+dotfiles/.cli_aliases_projects
+
+### dev files
+.dev
+.test
