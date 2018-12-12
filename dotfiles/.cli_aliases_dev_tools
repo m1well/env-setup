@@ -1,11 +1,11 @@
 ### cli aliases dev tools ###
 
-# disable zsh correct at docker commands
-alias docker="nocorrect docker"
+# docker
+alias docker="nocorrect docker" # disable zsh correct at docker commands
 alias dopsa="docker ps -a"
 alias doi="docker images"
 
-# git aliases
+# git
 alias gitpod="git checkout develop && git pull origin develop"
 alias gitpom="git checkout master && git pull origin master"
 alias gitrd="git rebase develop"
@@ -13,9 +13,9 @@ alias gitrc="git rebase --continue"
 alias gitaca="git add . && git commit --amend"
 alias gitcane="git commit --amend --no-edit --reset-author"
 
-# gradle aliases
+# gradle
 alias gradlewcb="./gradlew clean build"
 alias gradlewcbd="./gradlew clean buildDocker"
 
-# start java
+# java
 alias jj="java -jar"
