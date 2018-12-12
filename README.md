@@ -50,6 +50,9 @@ This is my actual config file for vim.<br>
 
 #### m1well.zsh-theme ([link](/terminal/m1well.zsh-theme))
 This is my actual zsh theme.<br>
+If you want another username or hostname just add following statement to your `.cli_private` file:<br>
+`export ZSH_USER_PROMPT="my-name@my-hostname";` (just change the names)<br>
+Then source again your rc file.<br>
 
 ## Copyright
 Copyright :copyright: 2018 Michael Wellner ([@m1well](http://www.twitter.m1well.de))<br>
