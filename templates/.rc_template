@@ -1,0 +1,10 @@
+. ${M1WELL_TOOLSUITE_HOME}/env-setup/dotfiles/.cli_aliases_base
+. ${M1WELL_TOOLSUITE_HOME}/env-setup/dotfiles/.cli_aliases_dev_tools
+. ${M1WELL_TOOLSUITE_HOME}/env-setup/dotfiles/.cli_functions_symlinks
+. ${M1WELL_TOOLSUITE_HOME}/env-setup/dotfiles/.cli_aliases_m1well_toolsuite
+. ${M1WELL_TOOLSUITE_HOME}/env-setup/dotfiles/.cli_private
+. ${M1WELL_TOOLSUITE_HOME}/env-setup/dotfiles/.cli_projects
+
+######################################################
+
+##### .zshrc file #####

@@ -26,6 +26,4 @@ function colorcodes {
 
 ### symlinks
 
-ln -sf ${M1WELL_TOOLSUITE_HOME}/env-setup/dotfiles/.vimrc ${USER_HOME}/.vimrc
 ln -sf ${M1WELL_TOOLSUITE_HOME}/env-setup/dotfiles/.cheatsheet ${USER_HOME}/.cheatsheet
-ln -sf ${M1WELL_TOOLSUITE_HOME}/env-setup/terminal/m1well.zsh-theme ${USER_HOME}/.oh-my-zsh/themes/m1well.zsh-theme
