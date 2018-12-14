@@ -4,8 +4,8 @@
 #description            : This script provides an environment setup.
 #author                 : Michael Wellner (@m1well) twitter.m1well.de
 #date of creation       : 20181210
-#date of last change    : 20181212
-#version                : 1.0.0
+#date of last change    : 20181214
+#version                : 1.1.0
 #usage                  : m1well-toolsuite.sh [-i|-u]
 #notes                  : prerequisits
 #                       : debian / ubuntu (e.g. a docker container) -- run this to get git: "apt-get update && apt-get -y install git"

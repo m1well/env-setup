@@ -2,9 +2,6 @@
 # export the user's home like
 # 'export USER_HOME="/Users/<your-user-home>"; '
 
-alias vv="vim"
-alias aa="atom"
-
 alias ..,,="cd .. && ls -al"
 alias ,,="ls -al"
 alias ..="cd .."

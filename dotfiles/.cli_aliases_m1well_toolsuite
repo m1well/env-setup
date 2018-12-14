@@ -1,6 +1,6 @@
 ### cli aliases m1well toolsuite ###
 # export the m1well's toolsuite home like
-# 'export M1WELL_TOOLSUITE_HOME="/Users/<path-to-toolsuite>"; '
+# 'export M1WELL_TOOLSUITE_HOME="/Users/<your-user-home>/<path-to-toolsuite>"; '
 
 alias m1well-update="bash ${M1WELL_TOOLSUITE_HOME}/env-setup/m1well-toolsuite.sh -u"
 alias cheat="bash ${M1WELL_TOOLSUITE_HOME}/cheatsheet/cheatsheet.sh"
