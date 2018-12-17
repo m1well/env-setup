@@ -1,4 +1,4 @@
-### cli aliases dev tools ###
+### cli dev tools ###
 
 # docker
 alias docker="nocorrect docker" # disable zsh correct at docker commands

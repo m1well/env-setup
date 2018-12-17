@@ -1,4 +1,4 @@
-### cli aliases base ###
+### cli base ###
 # export the user's home like
 # 'export USER_HOME="/Users/<your-user-home>"; '
 

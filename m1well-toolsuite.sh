@@ -55,14 +55,25 @@ copyIndividualCliFiles() {
   cp templates/.cli_projects dotfiles/.cli_projects
 }
 generateRcFile() {
-  sed -i .original -e "s|&&userhome&&|${USER_HOME}|g" ${RC_TEMPLATE_FILE}
-  sed -i .temp -e "s|&&toolsuitehome&&|${TOOLSUITE_HOME}|g" ${RC_TEMPLATE_FILE}
-  sed -i .temp -e "s|&&gitname&&|${GIT_USER_NAME}|g" ${RC_TEMPLATE_FILE}
-  sed -i .temp -e "s|&&gitemail&&|${GIT_USER_EMAIL}|g" ${RC_TEMPLATE_FILE}
+  case "$OSTYPE" in
+    linux*)
+      cp ${RC_TEMPLATE_FILE} ${RC_TEMPLATE_FILE}.original
+      sed -e "s|&&userhome&&|${USER_HOME}|g" ${RC_TEMPLATE_FILE}
+      sed -e "s|&&toolsuitehome&&|${TOOLSUITE_HOME}|g" ${RC_TEMPLATE_FILE}
+      sed -e "s|&&gitname&&|${GIT_USER_NAME}|g" ${RC_TEMPLATE_FILE}
+      sed -e "s|&&gitemail&&|${GIT_USER_EMAIL}|g" ${RC_TEMPLATE_FILE}
+      ;;
+    darwin*)
+      sed -i .original -e "s|&&userhome&&|${USER_HOME}|g" ${RC_TEMPLATE_FILE}
+      sed -i .temp -e "s|&&toolsuitehome&&|${TOOLSUITE_HOME}|g" ${RC_TEMPLATE_FILE}
+      sed -i .temp -e "s|&&gitname&&|${GIT_USER_NAME}|g" ${RC_TEMPLATE_FILE}
+      sed -i .temp -e "s|&&gitemail&&|${GIT_USER_EMAIL}|g" ${RC_TEMPLATE_FILE}
+      rm templates/.rc_template.temp
+      ;;
+  esac
   cat ${USER_HOME}/${RC_FILE} >> ${RC_TEMPLATE_FILE}
   mv ${RC_TEMPLATE_FILE} ${USER_HOME}/${RC_FILE}
   mv ${RC_TEMPLATE_FILE}.original ${RC_TEMPLATE_FILE}
-  rm templates/.rc_template.temp
 }
 disableVim() {
   sed '/.vimrc/s/^/# /g' -i dotfiles/.cli_private

@@ -1,7 +1,6 @@
 (sleep $(echo "{1} * 60" | bc) && terminal-notifier -title "TIMER" -message "You already finished {1} minutes") & # set timer on given minute and get a popup message
 ab -n 10000 -c 10 {1} # apachebench load test with 10000 requests with 10 connections
 alias # show all aliases
-cat /dev/urandom | env LC_CTYPE=C tr -cd '0-9' | head -c {1} # generate random number with given digits
 cf app {1} # show status of a given app
 cf apps # show all apps in the space
 cf events {1} # show events of a given app
@@ -34,6 +33,7 @@ docker system prune -f # remove unused images
 docker-compose build && docker-compose up -d # build docker images if they have changed and then run them
 du -sh * | sort -h # human readable disk usage of content in actual directory - sorted
 du -sh {1} # human readable disk usage sum of a given directory
+echo $(cat /dev/urandom | env LC_CTYPE=C tr -cd '0-9' | head -c {1}) # generate random number with given digits
 find . -type d -exec chmod 755 {} \; # change dir mod recursively
 find . -type f -exec chmod 644 {} \; # change file mod recursively
 find . -type f -name "{1}" -exec rm -f {} \; # delete files recursively with given name/regex

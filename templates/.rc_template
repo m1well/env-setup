@@ -16,4 +16,4 @@ export GIT_STANDARD_USER_EMAIL="&&gitemail&&"
 ######################################################
 
 
-##### .zshrc file #####
+##### rc file #####

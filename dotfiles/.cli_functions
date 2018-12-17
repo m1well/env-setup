@@ -1,13 +1,11 @@
-### cli functions and symlinks ###
+### cli functions ###
 # export the user's home like
 # 'export USER_HOME="/Users/<your-user-home>"; '
 # export the m1well's toolsuite home like
 # 'export M1WELL_TOOLSUITE_HOME="/Users/<your-user-home>/<path-to-toolsuite>"; '
 
-### functions
-
 # check if a command is available
-isCommandAvailable () {
+isCommandAvailable() {
   if command -v "${1}" >/dev/null; then return 0 ; fi
   return 1
 }
@@ -46,9 +44,9 @@ colorcodes() {
 
 # get year and calendarweek
 cal() {
-  wk=$(date +"%V")
+  local wk=$(date +"%V")
   echo "actual calendar week:"
-  echo "  ${wk}"
+  echo " ${wk}"
   if isCommandAvailable "cal" ; then
     echo "calendar month:"
     command cal
@@ -59,5 +57,28 @@ cal() {
 uuid() {
   if isCommandAvailable "uuidgen" ; then
     uuidgen | tr '[:upper:]' '[:lower:]'
+  else
+    echo "error: uuidgen has to be installed"
+  fi
+}
+
+# generate random number with given digits
+rand() {
+  if [ $# -ne 0 ] ; then
+    echo $(cat /dev/urandom | env LC_CTYPE=C tr -cd '0-9' | head -c ${1})
+  else
+    echo "error: set number of digits - e.g. rand 5"
+  fi
+}
+
+# set a terminal timer (terminal-notifier has to be installed)
+timer() {
+  if [ $# -ne 0 ] ; then
+    if isCommandAvailable "terminal-notifier" ; then
+      (sleep $(echo "${1} * 60" | bc) && terminal-notifier -title "TIMER" -message "You already finished ${1} minutes") &
+      echo "set timer to ${1} minutes"
+    else
+      echo "error: terminal-notifier has to be installed"
+    fi
   fi
 }

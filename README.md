@@ -22,16 +22,16 @@ in the m1well-toolsuite: `bash m1well-toolsuite.sh -u` <br>
 This is the dotfile of my own written cheatsheet tool.<br>
 source: [cheatsheet](https://github.com/m1well/cheatsheet)<br>
 
-#### .cli_aliases_base ([link](/dotfiles/.cli_aliases_base))
+#### .cli_base ([link](/dotfiles/.cli_base))
 This is my actual file for base aliases.<br>
 
-#### .cli_functions_symlinks ([link](/dotfiles/.cli_functions_symlinks))
-This is my actual file for some useful functions and symlinks.<br>
+#### .cli_functions ([link](/dotfiles/.cli_functions))
+This is my actual file for some useful functions.<br>
 
-#### .cli_aliases_dev_tools ([link](/dotfiles/.cli_aliases_dev_tools))
+#### .cli_dev_tools ([link](/dotfiles/.cli_dev_tools))
 This is my actual file for dev tool aliase (like git, gradle, docker, ...).<br>
 
-#### .cli_aliases_m1well_toolsuite ([link](/dotfiles/.cli_aliases_m1well_toolsuite))
+#### .cli_m1well_toolsuite ([link](/dotfiles/.cli_m1well_toolsuite))
 This is my actual file for aliases regarding to my own written toolsuite.<br>
 source: [cheatsheet](https://github.com/m1well/cheatsheet)<br>
 source: [versions](https://github.com/m1well/versions)<br>
