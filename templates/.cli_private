@@ -1,5 +1,13 @@
 ### cli private ###
 # here you can store private stuff which isn't tracked via git.
 
+# export git config on each git call
+git() {
+  command git config --global user.name "${GIT_STANDARD_USER_NAME}"
+  command git config --global user.email "${GIT_STANDARD_USER_EMAIL}"
+  # you can extend the git config here
+  command git "$@" # this has to be the last line
+}
+
 ln -sf ${M1WELL_TOOLSUITE_HOME}/env-setup/dotfiles/.vimrc ${USER_HOME}/.vimrc
 ln -sf ${M1WELL_TOOLSUITE_HOME}/env-setup/terminal/m1well.zsh-theme ${USER_HOME}/.oh-my-zsh/themes/m1well.zsh-theme

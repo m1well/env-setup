@@ -10,8 +10,5 @@ alias ......="cd .. && cd .. && cd .."
 alias ........="cd .. && cd .. && cd .. && cd .."
 alias cc="clear"
 
-# generate a uuid (uuidgen has to be installed)
-alias uuid="uuidgen | tr '[:upper:]' '[:lower:]'"
-
 # grep given string recursively (add search-string and path)
 alias greprec="grep -in --directories=recurse"

@@ -1,0 +1,63 @@
+### cli functions and symlinks ###
+# export the user's home like
+# 'export USER_HOME="/Users/<your-user-home>"; '
+# export the m1well's toolsuite home like
+# 'export M1WELL_TOOLSUITE_HOME="/Users/<your-user-home>/<path-to-toolsuite>"; '
+
+### functions
+
+# check if a command is available
+isCommandAvailable () {
+  if command -v "${1}" >/dev/null; then return 0 ; fi
+  return 1
+}
+
+# source zshrc or bashrc if available
+src() {
+  local z=$(find ${USER_HOME}/ -type f -name ".zshrc" -maxdepth 1)
+  if [ "${z}" != "" ] ; then
+    source ${USER_HOME}/.zshrc
+    echo ">> sourced .zshrc <<"
+  fi
+  local b=$(find ${USER_HOME}/ -type f -name ".bashrc" -maxdepth 1)
+  if [ "${b}" != "" ] ; then
+    source ${USER_HOME}/.bashrc
+    echo ">> sourced .bashrc <<"
+  fi
+}
+
+# tree
+## example ...
+#|__Cycles
+#| |__.DS_Store
+#| |__CyclesCards.json
+#| |__Carbon
+#| | |__Carbon.json
+tree() {
+  find ${1:-.} -print | sed -e 's;[^/]*/;|_;g;s;_|; |;g'
+}
+
+# print color codes
+colorcodes() {
+  for code in {000..255}; do
+    print -P -- "$code: %F{$code}Test%f";
+  done
+}
+
+# get year and calendarweek
+cal() {
+  wk=$(date +"%V")
+  echo "actual calendar week:"
+  echo "  ${wk}"
+  if isCommandAvailable "cal" ; then
+    echo "calendar month:"
+    command cal
+  fi
+}
+
+# generate a uuid (uuidgen has to be installed)
+uuid() {
+  if isCommandAvailable "uuidgen" ; then
+    uuidgen | tr '[:upper:]' '[:lower:]'
+  fi
+}

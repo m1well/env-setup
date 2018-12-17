@@ -4,8 +4,8 @@
 #description            : This script provides an environment setup.
 #author                 : Michael Wellner (@m1well) twitter.m1well.de
 #date of creation       : 20181210
-#date of last change    : 20181214
-#version                : 1.1.0
+#date of last change    : 20181217
+#version                : 1.2.0
 #usage                  : m1well-toolsuite.sh [-i|-u]
 #notes                  : prerequisits
 #                       : debian / ubuntu (e.g. a docker container) -- run this to get git: "apt-get update && apt-get -y install git"
@@ -54,18 +54,15 @@ copyIndividualCliFiles() {
   cp templates/.cli_private dotfiles/.cli_private
   cp templates/.cli_projects dotfiles/.cli_projects
 }
-addExports() {
-  echo "##### m1well-toolsuite #####" >> ${USER_HOME}/${TEMP_FILE}
-  echo "" >> ${USER_HOME}/${TEMP_FILE}
-  echo "export USER_HOME=\"${USER_HOME}\";" >> ${USER_HOME}/${TEMP_FILE}
-  echo "export M1WELL_TOOLSUITE_HOME=\"${TOOLSUITE_HOME}\";" >> ${USER_HOME}/${TEMP_FILE}
-  echo "" >> ${USER_HOME}/${TEMP_FILE}
-}
-copyRcTemplate() {
-  addExports
-  cat templates/.rc_template >> ${USER_HOME}/${TEMP_FILE}
-  cat ${USER_HOME}/${RC_FILE} >> ${USER_HOME}/${TEMP_FILE}
-  mv ${USER_HOME}/${TEMP_FILE} ${USER_HOME}/${RC_FILE}
+generateRcFile() {
+  sed -i .original -e "s|&&userhome&&|${USER_HOME}|g" ${RC_TEMPLATE_FILE}
+  sed -i .temp -e "s|&&toolsuitehome&&|${TOOLSUITE_HOME}|g" ${RC_TEMPLATE_FILE}
+  sed -i .temp -e "s|&&gitname&&|${GIT_USER_NAME}|g" ${RC_TEMPLATE_FILE}
+  sed -i .temp -e "s|&&gitemail&&|${GIT_USER_EMAIL}|g" ${RC_TEMPLATE_FILE}
+  cat ${USER_HOME}/${RC_FILE} >> ${RC_TEMPLATE_FILE}
+  mv ${RC_TEMPLATE_FILE} ${USER_HOME}/${RC_FILE}
+  mv ${RC_TEMPLATE_FILE}.original ${RC_TEMPLATE_FILE}
+  rm templates/.rc_template.temp
 }
 disableVim() {
   sed '/.vimrc/s/^/# /g' -i dotfiles/.cli_private
@@ -77,16 +74,19 @@ disableZsh() {
 installation() {
   TEMP_FILE=".temp"
   RC_FILE=".zshrc"
+  RC_TEMPLATE_FILE="templates/.rc_template"
   USER_HOME=${HOME}
   TOOLSUITE_HOME=$(cd .. && pwd)
   copyIndividualCliFiles
+  read -p "git user name: " GIT_USER_NAME
+  read -p "git user email: " GIT_USER_EMAIL
   read -n1 -p "vim already installed?? (y/n)? "
   [ "$REPLY" != "y" ] && disableVim
   echo ""
   read -n1 -p "zsh already installed?? (y/n)? "
   [ "$REPLY" != "y" ] && disableZsh
   echo ""
-  copyRcTemplate
+  generateRcFile
   installTools
 }
 success() {

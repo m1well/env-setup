@@ -7,3 +7,5 @@ alias cheat="bash ${M1WELL_TOOLSUITE_HOME}/cheatsheet/cheatsheet.sh"
 alias versions="bash ${M1WELL_TOOLSUITE_HOME}/versions/versions.sh"
 alias randomizer="bash ${M1WELL_TOOLSUITE_HOME}/randomizer/randomizer.sh"
 alias list="bash ${M1WELL_TOOLSUITE_HOME}/bashlist/bashlist.sh"
+
+ln -sf ${M1WELL_TOOLSUITE_HOME}/env-setup/dotfiles/.cheatsheet ${USER_HOME}/.cheatsheet
