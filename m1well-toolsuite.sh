@@ -1,11 +1,11 @@
 #!/bin/bash
 ###
 #title                  : m1well-toolsuite.sh
-#description            : This script provides an environment setup.
+#description            : This script provides a setup for the m1well-toolsuite.
 #author                 : Michael Wellner (@m1well) twitter.m1well.de
 #date of creation       : 20181210
-#date of last change    : 20181217
-#version                : 1.2.0
+#date of last change    : 20181218
+#version                : 1.3.0
 #usage                  : m1well-toolsuite.sh [-i|-u]
 #notes                  : prerequisits
 #                       : debian / ubuntu (e.g. a docker container) -- run this to get git: "apt-get update && apt-get -y install git"
@@ -20,9 +20,8 @@ BR="\n"
 FONT_CYAN="\033[0;96m"
 FONT_GREEN="\033[0;92m"
 FONT_NONE="\033[0m"
-TAB=24
 HASHLINE="######################################################"
-HEADER="################## m1well env-setup ##################"
+HEADER="################## m1well toolsuite ##################"
 
 printStartLines() {
   printf "${FONT_CYAN}"
@@ -34,6 +33,12 @@ printStartLines() {
 printEndLines() {
   printf "${FONT_CYAN}"
   printf "${HASHLINE}${BR}"
+  printf "${FONT_NONE}"
+}
+printSuccess() {
+  printf "${FONT_GREEN}"
+  printf "##### now you have to source your rc file to finish:${BR}"
+  printf "##### \"source ${HOME}/${RC_FILE}\" ${BR}"
   printf "${FONT_NONE}"
 }
 printUsage() {
@@ -51,60 +56,61 @@ installTools() {
   git clone https://github.com/m1well/bashlist.git
 }
 copyIndividualCliFiles() {
-  cp templates/.cli_private dotfiles/.cli_private
-  cp templates/.cli_projects dotfiles/.cli_projects
+  cp templates/.cli_private cli/.cli_private
+  cp templates/.cli_projects cli/.cli_projects
+}
+commentOutLine() {
+  if [[ "${OSTYPE}" == darwin* ]]; then
+    sed -i -temp -e "/${2}/s/^/# /g" ${1}
+    rm ${1}-temp
+  else
+    sed -e "/${2}/s/^/# /g" ${1} > ${1}-temp
+    mv ${1}-temp ${1}
+  fi
+}
+replaceString() {
+  if [[ "${OSTYPE}" == darwin* ]]; then
+    sed -i -temp -e "s|${2}|${3}|g" ${1}
+    rm ${1}-temp
+  else
+    sed -e "s|${2}|${3}|g" ${1} > ${1}-temp
+    mv ${1}-temp ${1}
+  fi
 }
 generateRcFile() {
-  case "$OSTYPE" in
-    linux*)
-      cp ${RC_TEMPLATE_FILE} ${RC_TEMPLATE_FILE}.original
-      sed -e "s|&&userhome&&|${USER_HOME}|g" ${RC_TEMPLATE_FILE}
-      sed -e "s|&&toolsuitehome&&|${TOOLSUITE_HOME}|g" ${RC_TEMPLATE_FILE}
-      sed -e "s|&&gitname&&|${GIT_USER_NAME}|g" ${RC_TEMPLATE_FILE}
-      sed -e "s|&&gitemail&&|${GIT_USER_EMAIL}|g" ${RC_TEMPLATE_FILE}
-      ;;
-    darwin*)
-      sed -i .original -e "s|&&userhome&&|${USER_HOME}|g" ${RC_TEMPLATE_FILE}
-      sed -i .temp -e "s|&&toolsuitehome&&|${TOOLSUITE_HOME}|g" ${RC_TEMPLATE_FILE}
-      sed -i .temp -e "s|&&gitname&&|${GIT_USER_NAME}|g" ${RC_TEMPLATE_FILE}
-      sed -i .temp -e "s|&&gitemail&&|${GIT_USER_EMAIL}|g" ${RC_TEMPLATE_FILE}
-      rm templates/.rc_template.temp
-      ;;
-  esac
-  cat ${USER_HOME}/${RC_FILE} >> ${RC_TEMPLATE_FILE}
-  mv ${RC_TEMPLATE_FILE} ${USER_HOME}/${RC_FILE}
-  mv ${RC_TEMPLATE_FILE}.original ${RC_TEMPLATE_FILE}
+  cp ${RC_TEMPLATE_FILE} ${RC_TEMPLATE_FILE}.copy
+  replaceString ${RC_TEMPLATE_FILE}.copy "&&userhome&&" "${HOME}"
+  replaceString ${RC_TEMPLATE_FILE}.copy "&&toolsuitehome&&" "${TOOLSUITE_HOME}"
+  replaceString ${RC_TEMPLATE_FILE}.copy "&&gitname&&" "${GIT_USER_NAME}"
+  replaceString ${RC_TEMPLATE_FILE}.copy "&&gitemail&&" "${GIT_USER_EMAIL}"
+  cat ${HOME}/${RC_FILE} >> ${RC_TEMPLATE_FILE}.copy
+  mv ${RC_TEMPLATE_FILE}.copy ${HOME}/${RC_FILE}
 }
 disableVim() {
-  sed '/.vimrc/s/^/# /g' -i dotfiles/.cli_private
+  commentOutLine cli/.cli_private ".vimrc"
 }
 disableZsh() {
-  sed '/m1well.zsh-theme/s/^/# /g' -i dotfiles/.cli_private
+  commentOutLine cli/.cli_private "m1well.zsh-theme"
   RC_FILE=".bashrc" # if no zsh - then bashrc
+}
+askQuestion() {
+  read -n1 -p "${1} (y/n)? "
+  echo ""
 }
 installation() {
   TEMP_FILE=".temp"
   RC_FILE=".zshrc"
   RC_TEMPLATE_FILE="templates/.rc_template"
-  USER_HOME=${HOME}
   TOOLSUITE_HOME=$(cd .. && pwd)
   copyIndividualCliFiles
   read -p "git user name: " GIT_USER_NAME
   read -p "git user email: " GIT_USER_EMAIL
-  read -n1 -p "vim already installed?? (y/n)? "
-  [ "$REPLY" != "y" ] && disableVim
-  echo ""
-  read -n1 -p "zsh already installed?? (y/n)? "
-  [ "$REPLY" != "y" ] && disableZsh
-  echo ""
+  askQuestion "vim already installed?"
+  [[ ! $REPLY =~ ^[Yy]$ ]] && disableVim
+  askQuestion "zsh already installed?"
+  [[ ! $REPLY =~ ^[Yy]$ ]] && disableZsh
   generateRcFile
   installTools
-}
-success() {
-  printf "${FONT_GREEN}"
-  printf "##### now you have to source your rc file to finish:${BR}"
-  printf "##### \"source ${USER_HOME}/${RC_FILE}\" ${BR}"
-  printf "${FONT_NONE}"
 }
 update() {
   cd ..
@@ -124,13 +130,14 @@ printStartLines
 while getopts ":iuh" opt; do
   case $opt in
     i)
-      echo "installation" >&2
+      echo "installation (OSTYPE: ${OSTYPE})"
       installation
-      success
+      printSuccess
       ;;
     u)
-      echo "update" >&2
+      echo "update (OSTYPE: ${OSTYPE})"
       update
+      printSuccess
       ;;
     h | *)
       printUsage

@@ -2,8 +2,8 @@
 .DS_Store
 
 ### individual cli files
-dotfiles/.cli_private
-dotfiles/.cli_projects
+cli/.cli_private
+cli/.cli_projects
 
 ### dev files
 .dev

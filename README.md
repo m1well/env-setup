@@ -22,16 +22,19 @@ in the m1well-toolsuite: `bash m1well-toolsuite.sh -u` <br>
 This is the dotfile of my own written cheatsheet tool.<br>
 source: [cheatsheet](https://github.com/m1well/cheatsheet)<br>
 
-#### .cli_base ([link](/dotfiles/.cli_base))
+#### .vimrc ([link](/dotfiles/.vimrc))
+This is my actual config file for vim.<br>
+
+#### .cli_base ([link](/cli/.cli_base))
 This is my actual file for base aliases.<br>
 
-#### .cli_functions ([link](/dotfiles/.cli_functions))
-This is my actual file for some useful functions.<br>
-
-#### .cli_dev_tools ([link](/dotfiles/.cli_dev_tools))
+#### .cli_dev_tools ([link](/cli/.cli_dev_tools))
 This is my actual file for dev tool aliase (like git, gradle, docker, ...).<br>
 
-#### .cli_m1well_toolsuite ([link](/dotfiles/.cli_m1well_toolsuite))
+#### .cli_functions ([link](/cli/.cli_functions))
+This is my actual file for some useful functions.<br>
+
+#### .cli_m1well_toolsuite ([link](/cli/.cli_m1well_toolsuite))
 This is my actual file for aliases regarding to my own written toolsuite.<br>
 source: [cheatsheet](https://github.com/m1well/cheatsheet)<br>
 source: [versions](https://github.com/m1well/versions)<br>
@@ -44,9 +47,6 @@ And you can additionally seperate some working aliases etc in the projects file.
 During installation, they are getting copied from the templates to the dotfiles folder.<br>
 The advantage of these two files is, they aren't tracked via git (see ([.gitignore](.gitignore))) <br>
 so they stay forever because they aren't affected on a toolsuite update.<br>
-
-#### .vimrc ([link](/dotfiles/.vimrc))
-This is my actual config file for vim.<br>
 
 #### m1well.zsh-theme ([link](/terminal/m1well.zsh-theme))
 This is my actual zsh theme.<br>

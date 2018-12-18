@@ -1,5 +1,9 @@
 ### cli private ###
 # here you can store private stuff which isn't tracked via git.
+# export the user's home like
+# 'export USER_HOME="/Users/<your-user-home>"; '
+# export the m1well's toolsuite home like
+# 'export M1WELL_TOOLSUITE_HOME="/Users/<your-user-home>/<path-to-toolsuite>"; '
 
 # export git config on each git call
 git() {

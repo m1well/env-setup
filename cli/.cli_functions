@@ -1,8 +1,6 @@
 ### cli functions ###
 # export the user's home like
 # 'export USER_HOME="/Users/<your-user-home>"; '
-# export the m1well's toolsuite home like
-# 'export M1WELL_TOOLSUITE_HOME="/Users/<your-user-home>/<path-to-toolsuite>"; '
 
 # check if a command is available
 isCommandAvailable() {
@@ -12,12 +10,12 @@ isCommandAvailable() {
 
 # source zshrc or bashrc if available
 src() {
-  local z=$(find ${USER_HOME}/ -type f -name ".zshrc" -maxdepth 1)
+  local z=$(find ${USER_HOME}/ -maxdepth 1 -type f -name ".zshrc")
   if [ "${z}" != "" ] ; then
     source ${USER_HOME}/.zshrc
     echo ">> sourced .zshrc <<"
   fi
-  local b=$(find ${USER_HOME}/ -type f -name ".bashrc" -maxdepth 1)
+  local b=$(find ${USER_HOME}/ -maxdepth 1 -type f -name ".bashrc")
   if [ "${b}" != "" ] ; then
     source ${USER_HOME}/.bashrc
     echo ">> sourced .bashrc <<"
@@ -80,5 +78,7 @@ timer() {
     else
       echo "error: terminal-notifier has to be installed"
     fi
+  else
+    echo "timer needs an integer argument for the amount of minutes"
   fi
 }
