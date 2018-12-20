@@ -40,18 +40,12 @@ colorcodes() {
   done
 }
 
-# get year and calendarweek
-cal() {
-  local wk=$(date +"%V")
-  echo "actual calendar week:"
-  echo " ${wk}"
-  if isCommandAvailable "cal" ; then
-    echo "calendar month:"
-    command cal
-  fi
+# print calendarweek
+week() {
+  echo "calendar week: $(date +"%V")"
 }
 
-# generate a uuid (uuidgen has to be installed)
+# generate a uuid (uuid-runtime has to be installed)
 uuid() {
   if isCommandAvailable "uuidgen" ; then
     uuidgen | tr '[:upper:]' '[:lower:]'

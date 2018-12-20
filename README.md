@@ -17,10 +17,17 @@ Execute following statement in the env-setup folder to update all repos<br>
 in the m1well-toolsuite: `bash m1well-toolsuite.sh -u` <br>
 (All apps/repos have to stay in the master branch!) <br>
 
+#### test m1well-toolsuite
+To run some test just execute following statement in the rootfolder: <br>
+`bash test/m1well-test.sh` <br>
+
 ## explanation of the files
 #### .cheatsheet ([link](/dotfiles/.cheatsheet))
 This is the dotfile of my own written cheatsheet tool.<br>
 source: [cheatsheet](https://github.com/m1well/cheatsheet)<br>
+
+#### .m1well_cli_master ([link](/dotfiles/.m1well_cli_master))
+This file is my connection between the rc file and the files in the cli folder.<br>
 
 #### .vimrc ([link](/dotfiles/.vimrc))
 This is my actual config file for vim.<br>

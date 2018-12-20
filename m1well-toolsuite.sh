@@ -4,8 +4,8 @@
 #description            : This script provides a setup for the m1well-toolsuite.
 #author                 : Michael Wellner (@m1well) twitter.m1well.de
 #date of creation       : 20181210
-#date of last change    : 20181218
-#version                : 1.3.0
+#date of last change    : 20181220
+#version                : 1.4.0
 #usage                  : m1well-toolsuite.sh [-i|-u]
 #notes                  : prerequisits
 #                       : debian / ubuntu (e.g. a docker container) -- run this to get git: "apt-get update && apt-get -y install git"
@@ -55,6 +55,9 @@ installTools() {
   git clone https://github.com/m1well/randomizer.git
   git clone https://github.com/m1well/bashlist.git
 }
+copyCliMaster() {
+  cp dotfiles/.m1well_cli_master ${HOME}/.m1well_cli_master
+}
 copyIndividualCliFiles() {
   cp templates/.cli_private cli/.cli_private
   cp templates/.cli_projects cli/.cli_projects
@@ -102,6 +105,7 @@ installation() {
   RC_FILE=".zshrc"
   RC_TEMPLATE_FILE="templates/.rc_template"
   TOOLSUITE_HOME=$(cd .. && pwd)
+  copyCliMaster
   copyIndividualCliFiles
   read -p "git user name: " GIT_USER_NAME
   read -p "git user email: " GIT_USER_EMAIL

@@ -1,0 +1,6 @@
+. ${M1WELL_TOOLSUITE_HOME}/env-setup/cli/.cli_base
+. ${M1WELL_TOOLSUITE_HOME}/env-setup/cli/.cli_dev_tools
+. ${M1WELL_TOOLSUITE_HOME}/env-setup/cli/.cli_functions
+. ${M1WELL_TOOLSUITE_HOME}/env-setup/cli/.cli_m1well_toolsuite
+. ${M1WELL_TOOLSUITE_HOME}/env-setup/cli/.cli_private
+. ${M1WELL_TOOLSUITE_HOME}/env-setup/cli/.cli_projects
