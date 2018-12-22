@@ -4,8 +4,8 @@
 #description            : This script provides test for the m1well-toolsuite setup.
 #author                 : Michael Wellner (@m1well) twitter.m1well.de
 #date of creation       : 20181218
-#date of last change    : 20181220
-#version                : 0.2.0
+#date of last change    : 20181222
+#version                : 0.2.1
 #usage                  : m1well-test.sh
 #notes                  :
 ###
@@ -62,7 +62,6 @@ isCommandAvailable() {
   if command -v "${1}" >/dev/null; then
     return 0
   else
-    printf "aaa"
     isAliasAvailable "${1}"
   fi
   return 1
