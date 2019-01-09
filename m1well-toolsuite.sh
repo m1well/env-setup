@@ -4,8 +4,8 @@
 #description            : This script provides a setup for the m1well-toolsuite.
 #author                 : Michael Wellner (@m1well) twitter.m1well.de
 #date of creation       : 20181210
-#date of last change    : 20181220
-#version                : 1.4.0
+#date of last change    : 20190109
+#version                : 1.4.1
 #usage                  : m1well-toolsuite.sh [-i|-u]
 #notes                  : prerequisits
 #                       : debian / ubuntu (e.g. a docker container) -- run this to get git: "apt-get update && apt-get -y install git"
@@ -86,7 +86,9 @@ generateRcFile() {
   replaceString ${RC_TEMPLATE_FILE}.copy "&&toolsuitehome&&" "${TOOLSUITE_HOME}"
   replaceString ${RC_TEMPLATE_FILE}.copy "&&gitname&&" "${GIT_USER_NAME}"
   replaceString ${RC_TEMPLATE_FILE}.copy "&&gitemail&&" "${GIT_USER_EMAIL}"
-  cat ${HOME}/${RC_FILE} >> ${RC_TEMPLATE_FILE}.copy
+  if [ -e "${HOME}/${RC_FILE}" ]; then
+    cat ${HOME}/${RC_FILE} >> ${RC_TEMPLATE_FILE}.copy
+  fi
   mv ${RC_TEMPLATE_FILE}.copy ${HOME}/${RC_FILE}
 }
 disableVim() {
