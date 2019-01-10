@@ -61,5 +61,10 @@ If you want another username or hostname just add following statement to your `.
 `export ZSH_USER_PROMPT="my-name@my-hostname";` (just change the names)<br>
 Then source again your rc file.<br>
 
+#### m1well.plist ([link](/terminal/m1well.plist))
+This is my actual iterm2 profile.<br>
+If you want the installation process copies it to the right folder and then you can set it as default profile.<br>
+The font file is also getting copied for special zsh characters.<br>
+
 ## Copyright
 Copyright :copyright: 2018 Michael Wellner ([@m1well](http://www.twitter.m1well.de))<br>

@@ -4,8 +4,8 @@
 #description            : This script provides a setup for the m1well-toolsuite.
 #author                 : Michael Wellner (@m1well) twitter.m1well.de
 #date of creation       : 20181210
-#date of last change    : 20190109
-#version                : 1.4.1
+#date of last change    : 20190110
+#version                : 1.5.0
 #usage                  : m1well-toolsuite.sh [-i|-u]
 #notes                  : prerequisits
 #                       : debian / ubuntu (e.g. a docker container) -- run this to get git: "apt-get update && apt-get -y install git"
@@ -37,7 +37,9 @@ printEndLines() {
 }
 printSuccess() {
   printf "${FONT_GREEN}"
-  printf "##### now you have to source your rc file to finish:${BR}"
+  printf "##### succeeded ${BR}"
+  printf "##### if you added the iterm2 profile file you have to set it as default profile ${BR}"
+  printf "##### now you have to source your rc file to finish: ${BR}"
   printf "##### \"source ${HOME}/${RC_FILE}\" ${BR}"
   printf "${FONT_NONE}"
 }
@@ -94,6 +96,15 @@ generateRcFile() {
 disableVim() {
   commentOutLine cli/.cli_private ".vimrc"
 }
+disableIterm2Profile() {
+  USE_FONT=false
+  commentOutLine cli/.cli_private "m1well.plist"
+}
+copyFontIfNeeded() {
+  if [ "${USE_FONT}" = true ]; then
+    cp terminal/font/Inconsolata\ Nerd\ Font\ Complete\ Mono.otf ${USER_HOME}/Library/Fonts/Inconsolata\ Nerd\ Font\ Complete\ Mono.otf
+  fi
+}
 disableZsh() {
   commentOutLine cli/.cli_private "m1well.zsh-theme"
   RC_FILE=".bashrc" # if no zsh - then bashrc
@@ -107,12 +118,16 @@ installation() {
   RC_FILE=".zshrc"
   RC_TEMPLATE_FILE="templates/.rc_template"
   TOOLSUITE_HOME=$(cd .. && pwd)
+  USE_FONT=true
   copyCliMaster
   copyIndividualCliFiles
   read -p "git user name: " GIT_USER_NAME
   read -p "git user email: " GIT_USER_EMAIL
   askQuestion "vim already installed?"
   [[ ! $REPLY =~ ^[Yy]$ ]] && disableVim
+  askQuestion "iterm2 installed and want to use m1well profile?"
+  [[ ! $REPLY =~ ^[Yy]$ ]] && disableIterm2Profile
+  copyFontIfNeeded
   askQuestion "zsh already installed?"
   [[ ! $REPLY =~ ^[Yy]$ ]] && disableZsh
   generateRcFile
