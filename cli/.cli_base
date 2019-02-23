@@ -1,5 +1,6 @@
 ### cli base ###
 
+alias helloworld="echo \"Hello World!\""
 alias ..,,="cd .. && ls -al"
 alias ,,="ls -al"
 alias ..="cd .."
@@ -7,6 +8,9 @@ alias ....="cd .. && cd .."
 alias ......="cd .. && cd .. && cd .."
 alias ........="cd .. && cd .. && cd .. && cd .."
 alias cc="clear"
+alias xx="exit"
+
+alias chrome="open -a \"Google Chrome\""
 
 # grep given string recursively (add search-string and path)
 alias greprec="grep -in --directories=recurse"

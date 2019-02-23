@@ -45,10 +45,16 @@ week() {
   echo "calendar week: $(date +"%V")"
 }
 
-# generate a uuid (uuid-runtime has to be installed)
+# generate one uuid (uuid-runtime has to be installed) ore more (if number is given)
 uuid() {
   if isCommandAvailable "uuidgen" ; then
-    uuidgen | tr '[:upper:]' '[:lower:]'
+    if [ $# -ne 0 ] ; then
+      for i in in {1..$((${1}-1))}; do
+        uuidgen | tr '[:upper:]' '[:lower:]'
+      done
+    else
+      uuidgen | tr '[:upper:]' '[:lower:]'
+    fi
   else
     echo "error: uuidgen has to be installed"
   fi
@@ -74,5 +80,15 @@ timer() {
     fi
   else
     echo "timer needs an integer argument for the amount of minutes"
+  fi
+}
+
+# small lorem ipsum generator (1.000 characters)
+loremipsum() {
+  text="Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu f"
+  if [ $# -ne 0 ] ; then
+    echo ${text} | cut -c 1-${1}
+  else
+    echo "how many words do you want?"
   fi
 }
