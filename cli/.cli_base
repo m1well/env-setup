@@ -1,6 +1,9 @@
 ### cli base ###
+# export the user's home like
+# 'export USER_HOME="/Users/<your-user-home>"; '
 
 alias helloworld="echo \"Hello World!\""
+alias home="cd ${USER_HOME}";
 alias ..,,="cd .. && ls -al"
 alias ,,="ls -al"
 alias ..="cd .."

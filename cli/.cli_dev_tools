@@ -3,7 +3,10 @@
 # docker
 alias docker="nocorrect docker" # disable zsh correct at docker commands
 alias docc="docker ps -a"
+alias doccompd="docker-compose down"
+alias doccompu="docker-compose up -d"
 alias doci="docker images"
+alias docirm="docker image rm"
 
 # git
 alias gitaa="git add ."
