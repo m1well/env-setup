@@ -11,8 +11,9 @@ alias docirm="docker image rm"
 # git
 alias gitaa="git add ."
 alias gitaca="git add . && git commit --amend"
-alias gitcb="git checkout -b"
+alias gitc="git checkout"
 alias gitcane="git commit --amend --no-edit --reset-author"
+alias gitcb="git checkout -b"
 alias gitcom="git commit -m"
 alias gitconf="git config --list"
 alias gitpod="git checkout develop && git pull origin develop"
@@ -24,6 +25,13 @@ alias gitst="git status"
 # gradle
 alias grawcb="./gradlew clean build"
 alias grawcbd="./gradlew clean buildDocker"
+alias grawrapper="gradle wrapper --gradle-version "
 
 # java
 alias jj="java -jar"
+
+# cloud foundry
+alias cft="cf target"
+alias cfa="cf apps"
+alias cfs="cf services"
+alias cfr="cf routes"

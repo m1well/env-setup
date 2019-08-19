@@ -13,3 +13,5 @@ set showmatch           " highlight matching [{()}]
 set hlsearch            " highlight all search matches
 
 set t_Co=0              " number of colors
+
+set ignorecase          " make searches case insensitive

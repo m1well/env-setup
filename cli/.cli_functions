@@ -69,6 +69,11 @@ rand() {
   fi
 }
 
+# get aliases by name
+get_aliases() {
+  alias | grep "^${1}.*" --color=never
+}
+
 # set a terminal timer (terminal-notifier has to be installed)
 timer() {
   if [ $# -ne 0 ] ; then
@@ -90,5 +95,35 @@ loremipsum() {
     echo ${text} | cut -c 1-${1}
   else
     echo "how many words do you want?"
+  fi
+}
+
+# sync a file or folder into a backup folder
+backup_sync() {
+  if [ $# -ne 2 ]; then
+    echo "error: i need 2 parameters - one for file/folder and one for TARGET_FOLDER folder"
+  else
+    if [[ ! -d "${2}" ]] ; then
+      echo "error: no TARGET_FOLDER given"
+    else
+      SOURCE="${1}"
+      TARGET_FOLDER="${2}"
+      LOG_FILE="${USER_HOME}/backuplogs/$(date +%Y%m%d%H%M%S)_backup_sync.log"
+      ERROR_FILE="${USER_HOME}/backuplogs/$(date +%Y%m%d%H%M%S)_backup_sync_error.log"
+
+      echo "start backup sync from ${1} to ${2}"
+
+      # create backuplogs folder if not exists
+      mkdir -p "${USER_HOME}/backuplogs"
+
+      # some dev folder excludes - a bit like .gitignore
+      rsync -av --times --checksum --human-readable --itemize-changes --stats \
+        --exclude 'build' --exclude 'out' --exclude 'target' --exclude 'RemoteSystemsTempFiles' --exclude 'Servers' --exclude 'node_modules' --exclude '_site' \
+        --exclude '.gradle' --exclude '.idea' --exclude '.metadata' --exclude '.recommenders'  --exclude '.settings' \
+        --exclude '*.iml' --exclude '*.classpath' --exclude '*.project' --exclude '.DS_Store' \
+        --out-format="[%t] %o %l Bytes - %f (last modified: %M)" "${SOURCE}" "${TARGET_FOLDER}" \
+          > ${LOG_FILE} 2> ${ERROR_FILE}; [ -s ${ERROR_FILE} ] || rm -f ${ERROR_FILE}
+      echo "backup sync done"
+    fi
   fi
 }

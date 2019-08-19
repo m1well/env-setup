@@ -4,6 +4,7 @@ alias # show all aliases
 cf app {1} # show status of a given app
 cf apps # show all apps in the space
 cf events {1} # show events of a given app
+cf help -a # print out all cf commands
 cf login # login to cloud foundry
 cf login -a {1} # login to cf with a given api
 cf logs {1} # tail actual logs of a given app
@@ -11,6 +12,7 @@ cf logs {1} --recent # show recent logs of a given app
 cf marketplace # show the marketplace of the space
 cf services # show all services in the space
 cf target -s {1}# target cf to a given space
+curl "https://devops.datenkollektiv.de/renderBannerTxt?font=ogre&text={1}" # create small banner for given text
 date +"%V" # show actual calendar week number
 docker exec -it {1} /bin/bash # enter running docker container
 docker image history {1} # displays all build steps for the given docker image
@@ -25,6 +27,7 @@ docker run -d --name mysqldb -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root -e MYSQL_D
 docker run -d --name postgresdb -p 5432:5432 -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB={1} postgres:11.0-alpine # run a postgres db in a docker container with given db name
 docker run -d --name rabbitmq -p 15672:15672 -p 5672:5672 rabbitmq:3.7.7-management-alpine # run a rabbitmq in a docker container
 docker run -d --name redis -p 6379:6379 redis:5.0.0-alpine # run a redis in a docker container
+docker run -d --name sonarqube -p 9000:9000 -p 9092:9092 sonarqube:7.1-alpine # run sonarqube in a docker container
 docker run -d --name ubuntu -it ubuntu:18.04 # run an ubuntu os in a docker container
 docker stop {1} && docker rm {1} && docker ps -a # stop and remove a docker container and show all container
 docker system df # show docker disk usage (images, container, volumes)
