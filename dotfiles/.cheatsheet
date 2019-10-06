@@ -59,7 +59,7 @@ git push origin :refs/tags/{1} # delete a tag on the remote
 git rebase --abort # abort the rebase
 git rebase --continue # continue the rebase
 git rebase -i {1} # make an interactive rebase against a given branch
-git remote -v # show all remote branches
+git remote -v # show all remote urls
 git remote add origin {1} # add an origin remote
 git remote add upstream {1} # add an upstream remote
 git remote set-url origin {1} # change the url of the origin remote

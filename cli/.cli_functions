@@ -138,3 +138,16 @@ backup_sync() {
     fi
   fi
 }
+
+# get a random chuck norris joke one of a given category
+chucknorris() {
+  if [ $# -ne 0 ] ; then
+    echo "chuck norris:"
+    echo $(curl https://api.chucknorris.io/jokes/random\?categories\=${1} -s | jq -r '.value')
+  else
+    echo "chuck norris categories:"
+    echo $(curl https://api.chucknorris.io/jokes/categories -s)
+    echo "random chuck norris:"
+    echo $(curl https://api.chucknorris.io/jokes/random -s | jq -r '.value')
+  fi
+}
