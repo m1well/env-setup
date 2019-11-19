@@ -23,9 +23,21 @@ alias gitrd="git rebase develop"
 alias gitst="git status"
 
 # gradle
+alias grawrapper="gradle wrapper --gradle-version "
+alias grawc="./gradlew clean"
 alias grawcb="./gradlew clean build"
 alias grawcbd="./gradlew clean buildDocker"
-alias grawrapper="gradle wrapper --gradle-version "
+
+# maven
+alias mvnc="mvn clean"
+alias mvncp="mvn clean package"
+alias mvnci="mvn clean install"
+alias mvnwc="./mvnw clean"
+alias mvnwcp="./mvnw clean package"
+alias mvnwci="./mvnw clean install"
+
+# npm
+alias npmi="npm install"
 
 # java
 alias jj="java -jar"
