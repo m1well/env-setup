@@ -151,3 +151,57 @@ chucknorris() {
     echo $(curl https://api.chucknorris.io/jokes/random -s | jq -r '.value')
   fi
 }
+
+# find files
+fif() {
+  if [ $# -ne 0 ] ; then
+    local found=$(find . -maxdepth 1 -type f -name "*${1}*")
+    if (( ${#found[@]} )); then
+      echo ${found}
+    else
+      echo "Not found in this folder -> search recursively? (Y|n) [ENTER]"
+      read REPLY
+      if [[ $REPLY =~ ^[Yy]$ ]]; then
+        fifr ${1}
+      fi
+    fi
+  else
+    echo "error: search string missing!"
+  fi
+}
+
+# find files recoursively
+fifr() {
+  if [ $# -ne 0 ] ; then
+    find . -type f -name "*${1}*"
+  else
+    echo "error: search string missing!"
+  fi
+}
+
+# find directories
+fid() {
+  if [ $# -ne 0 ] ; then
+    local found=$(find . -maxdepth 1 -type d -name "*${1}*")
+    if (( ${#found[@]} )); then
+      echo ${found}
+    else
+      echo "Not found in this folder -> search recursively? (Y|n) [ENTER]"
+      read REPLY
+      if [[ $REPLY =~ ^[Yy]$ ]]; then
+        fidr ${1}
+      fi
+    fi
+  else
+    echo "error: search string missing!"
+  fi
+}
+
+# find directories recoursively
+fidr() {
+  if [ $# -ne 0 ] ; then
+    find . -type d -name "*${1}*"
+  else
+    echo "error: search string missing!"
+  fi
+}

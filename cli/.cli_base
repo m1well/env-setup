@@ -6,6 +6,7 @@ alias helloworld="echo \"Hello World!\""
 alias home="cd ${USER_HOME}";
 alias ..,,="cd .. && ls -al"
 alias ,,="ls -al"
+alias .-="cd - >/dev/null"
 alias ..="cd .."
 alias ....="cd .. && cd .."
 alias ......="cd .. && cd .. && cd .."
