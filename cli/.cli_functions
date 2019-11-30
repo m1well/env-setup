@@ -205,3 +205,21 @@ fidr() {
     echo "error: search string missing!"
   fi
 }
+
+# split files in N files
+fsplit() {
+  if [ $# -ne 0 ] ; then
+    echo "How much files do you want? [ENTER]"
+    read AMOUNT
+    echo "Which file suffix? (standard .txt) [ENTER]"
+    read SUFFIX
+    local filename=$(echo "${1}" | cut -d'.' -f1)
+    if [[ -z "${SUFFIX}" ]]; then
+      split -n ${AMOUNT} -d ${1} "${filename}_" --additional-suffix=.txt
+    else
+      split -n ${AMOUNT} -d ${1} "${filename}_" --additional-suffix=${SUFFIX}
+    fi
+  else
+    echo "error: source file missing!"
+  fi
+}

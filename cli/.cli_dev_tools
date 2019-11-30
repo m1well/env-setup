@@ -2,18 +2,20 @@
 
 # docker
 alias docker="nocorrect docker" # disable zsh correct at docker commands
-alias docc="docker ps -a"
 alias doccompd="docker-compose down"
 alias doccompu="docker-compose up -d"
 alias doci="docker images"
 alias docirm="docker image rm"
+alias docps="docker ps -a"
 
 # git
 alias gitaa="git add ."
-alias gitaca="git add . && git commit --amend"
-alias gitc="git checkout"
-alias gitcane="git commit --amend --no-edit --reset-author"
-alias gitcb="git checkout -b"
+alias gitaacoa="git add . && git commit --amend"
+alias gitbra="git rev-parse --abbrev-ref HEAD"
+alias gitch="git checkout"
+alias gitcoa="git commit --amend"
+alias gitcoaner="git commit --amend --no-edit --reset-author"
+alias gitchb="git checkout -b"
 alias gitcom="git commit -m"
 alias gitconf="git config --list"
 alias gitpod="git checkout develop && git pull origin develop"
@@ -23,6 +25,8 @@ alias gitrd="git rebase develop"
 alias gitst="git status"
 
 # gradle
+alias grac="gradle clean"
+alias gracb="gradle clean build"
 alias grawrapper="gradle wrapper --gradle-version "
 alias grawc="./gradlew clean"
 alias grawcb="./gradlew clean build"
