@@ -10,26 +10,26 @@ cf logs {1} --recent # show recent logs of a given app
 cf logs {1} # tail actual logs of a given app
 cf marketplace # show the marketplace of the space
 cf services # show all services in the space
-cf target -s {1}# target cf to a given space
+cf target -s {1} # target cf to a given space
 curl "https://devops.datenkollektiv.de/renderBannerTxt?font=ogre&text={1}" # create small banner for given text
 date +"%V" # show actual calendar week number
-docker-compose build && docker-compose up -d # build docker images if they have changed and then run them
-docker exec -it {1} /bin/bash # enter running docker container
-docker image history {1} # displays all build steps for the given docker image
+docker-compose build && docker-compose up -d # build images if they have changed and then run them
+docker exec -it {1} /bin/bash # enter running container
+docker image history {1} # displays all build steps for the given image
 docker images -a # show all images
-docker logs {1} # show the logs of a given docker container
-docker ps -a # show all docker container
-docker rm $(docker ps -a -q) # remove all not running docker container
-docker rmi $(docker images -q {1}) # delete docker image by exactly given name
-docker rmi $(docker images -q -f dangling=true) # remove unused docker images
-docker run -d --name mongodb -p 27017:27017 mongo:4.0 # run a mongo db in a docker container
-docker run -d --name mysqldb -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE={1} mysql:5.6 # run a mysql db in a docker container with given db name
-docker run -d --name postgresdb -p 5432:5432 -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB={1} postgres:11.0-alpine # run a postgres db in a docker container with given db name
+docker logs {1} # show the logs of a given container
+docker ps -a # show all container
+docker rm $(docker ps -a -q) # remove all not running container
+docker rmi $(docker images -q {1}) # delete image by exactly given name
+docker rmi $(docker images -q -f dangling=true) # remove unused images
+docker run -d --name mongodb -p 27017:27017 mongo:4.0 # run mongo db in a container
+docker run -d --name mysqldb -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE={1} mysql:5.6 # run mysql db in a container with given db name
+docker run -d --name postgresdb -p 5432:5432 -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB={1} postgres:11.0-alpine # run postgres db in a container with given db name
 docker run -d --name rabbitmq -p 15672:15672 -p 5672:5672 rabbitmq:3.7.7-management-alpine # run a rabbitmq in a docker container
-docker run -d --name redis -p 6379:6379 redis:5.0.0-alpine # run a redis in a docker container
-docker run -d --name sonarqube -p 9000:9000 -p 9092:9092 sonarqube:7.1-alpine # run sonarqube in a docker container
-docker run -d --name ubuntu -it ubuntu:18.04 # run an ubuntu os in a docker container
-docker stop {1} && docker rm {1} && docker ps -a # stop and remove a docker container and show all container
+docker run -d --name redis -p 6379:6379 redis:5.0.0-alpine # run redis in a container
+docker run -d --name sonarqube -p 9000:9000 -p 9092:9092 sonarqube:7.1-alpine # run sonarqube in a container
+docker run -d --name ubuntu -it ubuntu:18.04 # run ubuntu os in a container
+docker stop {1} && docker rm {1} && docker ps -a # stop and remove a container and show all running container
 docker system df # show docker disk usage (images, container, volumes)
 docker system info # display system-wide information
 docker system prune -f # remove unused images and unused networks
@@ -50,15 +50,15 @@ git checkout -b {1} # checkout actual branch with a new name
 git checkout . # checkout actual branch and reset all local changes
 git commit --amend # change last commit (files and message)
 git commit -m "{1}" # commit with a given message
-git log -3 --pretty=format:"%C(161)%h%Creset -%C(auto)%d%Creset %s %C(82)(%cd) %C(27)<%an>%Creset" --date=local # show last three commits with time and author
+git log -7 --pretty=format:"%C(161)%h%Creset -%C(auto)%d%Creset %s %C(82)(%cd) %C(27)<%an>%Creset" --date=local # show last 7 commits with time and author
 git pull origin # pull branch from origin
 git push origin --delete {1} # delete a branch on origin remote
 git push origin --force-with-lease # push branch to origin with lease
 git push origin :refs/tags/{1} # delete a tag on the remote
 git rebase --abort # abort the rebase
 git rebase --continue # continue the rebase
-git rebase -i {1}^ # make an interactive rebase against given commit hash
 git rebase -i {1} # make an interactive rebase against a given branch
+git rebase -i {1}^ # make an interactive rebase against given commit hash
 git remote add origin {1} # add an origin remote
 git remote add upstream {1} # add an upstream remote
 git remote set-url origin {1} # change the url of the origin remote
@@ -74,6 +74,10 @@ grep -ri {1} . | wc -l # grep given string recursively and count all occurrences
 grep -rin {1} . # grep given string recursively and show linenumbers
 jar tvf {1} # view contents of a jar file
 killall Docker && open /Applications/Docker.app # on macOS restart docker deamon
+mvn dependency:list -Dsort=true | grep "\[INFO\]   " | grep ":" | sort -u | grep "{1}" | cut -d " " -f 5 # get info of given maven dependency in current project
+mvn dependency:list -Dsort=true | grep "\[INFO\]   " | grep ":" | sort -u | wc -l # count distinct maven dependencies in current project
+npm ls --parseable --production | sort -u | wc -l # count distinct prod node_modules in current project
+npm ls --parseable | sort -u | wc -l # count distinct dev node modules in current project
 printenv {1} # print environment variable
 ps aux | grep -i "{1}" | grep -v "grep" | grep -v "cheatsheet" # find grepped process(es)
 ps aux | grep -i "{1}" | grep -v "grep" | grep -v "cheatsheet" | tr -s " " | cut -d " " -f 2 | xargs kill -9 # kill grepped process(es)
