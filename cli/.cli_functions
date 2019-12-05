@@ -227,8 +227,8 @@ fsplit() {
 # clean up docker images and volumes
 dockercleanup() {
   docker system df
-  docker rmi $(docker images -a | grep "<none>" | tr -s ' ' '_' | cut -d "_" -f 3)
   docker system prune -f
   docker volume prune -f
+  docker image prune -f
   docker system df
 }

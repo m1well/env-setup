@@ -1,27 +1,28 @@
+(sleep $(echo "{1} * 60" | bc) && terminal-notifier -title "TIMER" -message "You already finished {1} minutes") & # set timer on given minute and get a popup message
 ab -n 10000 -c 10 {1} # apachebench load test with 10000 requests with 10 connections
 alias # show all aliases
 cf app {1} # show status of a given app
 cf apps # show all apps in the space
 cf events {1} # show events of a given app
 cf help -a # print out all cf commands
-cf login -a {1} # login to cf with a given api
 cf login # login to cloud foundry
-cf logs {1} --recent # show recent logs of a given app
+cf login -a {1} # login to cf with a given api
 cf logs {1} # tail actual logs of a given app
+cf logs {1} --recent # show recent logs of a given app
 cf marketplace # show the marketplace of the space
 cf services # show all services in the space
 cf target -s {1} # target cf to a given space
 curl "https://devops.datenkollektiv.de/renderBannerTxt?font=ogre&text={1}" # create small banner for given text
 date +"%V" # show actual calendar week number
-docker-compose build && docker-compose up -d # build images if they have changed and then run them
 docker exec -it {1} /bin/bash # enter running container
 docker image history {1} # displays all build steps for the given image
 docker images -a # show all images
 docker logs {1} # show the logs of a given container
 docker ps -a # show all container
 docker rm $(docker ps -a -q) # remove all not running container
-docker rmi $(docker images -q {1}) # delete image by exactly given name
+docker rmi $(docker images -a | grep "{1}" | tr -s " " "#" | cut -d "#" -f 3) # delete image by given grep string
 docker rmi $(docker images -q -f dangling=true) # remove unused images
+docker rmi $(docker images -q {1}) # delete image by exactly given name
 docker run -d --name mongodb -p 27017:27017 mongo:4.0 # run mongo db in a container
 docker run -d --name mysqldb -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE={1} mysql:5.6 # run mysql db in a container with given db name
 docker run -d --name postgresdb -p 5432:5432 -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB={1} postgres:11.0-alpine # run postgres db in a container with given db name
@@ -33,21 +34,22 @@ docker stop {1} && docker rm {1} && docker ps -a # stop and remove a container a
 docker system df # show docker disk usage (images, container, volumes)
 docker system info # display system-wide information
 docker system prune -f # remove unused images and unused networks
-du -sh {1} # human readable disk usage sum of a given directory
+docker-compose build && docker-compose up -d # build images if they have changed and then run them
 du -sh * | sort -h # human readable disk usage of content in actual directory - sorted
+du -sh {1} # human readable disk usage sum of a given directory
 echo $(cat /dev/urandom | env LC_CTYPE=C tr -cd '0-9' | head -c {1}) # generate random number with given digits
 find . -name "*.java" -exec grep -ins --color=always -H -A 1 -B 1 "{1}" {} \; # grep given string in java files recursively and print out one line before and after
 find . -type d -exec chmod 755 {} \; # change dir mod recursively
 find . -type f -exec chmod 644 {} \; # change file mod recursively
-find . -type f -name "{1}" -exec rm -f {} \; # delete files recursively with given name/regex
 find . -type f -name "{1}" # find files recursively with given name/regex
+find . -type f -name "{1}" -exec rm -f {} \; # delete files recursively with given name/regex
 git add . # add all untracked files
 git add . && git commit --amend # git add all and amend the last commit
-git branch -av # show local and remote branches with last commit message
 git branch -D {1} # delete given branch locally
-git checkout {1} # checkout a given branch
+git branch -av # show local and remote branches with last commit message
 git checkout -b {1} # checkout actual branch with a new name
 git checkout . # checkout actual branch and reset all local changes
+git checkout {1} # checkout a given branch
 git commit --amend # change last commit (files and message)
 git commit -m "{1}" # commit with a given message
 git log -7 --pretty=format:"%C(161)%h%Creset -%C(auto)%d%Creset %s %C(82)(%cd) %C(27)<%an>%Creset" --date=local # show last 7 commits with time and author
@@ -59,11 +61,11 @@ git rebase --abort # abort the rebase
 git rebase --continue # continue the rebase
 git rebase -i {1} # make an interactive rebase against a given branch
 git rebase -i {1}^ # make an interactive rebase against given commit hash
+git remote -v # show all remote urls
 git remote add origin {1} # add an origin remote
 git remote add upstream {1} # add an upstream remote
 git remote set-url origin {1} # change the url of the origin remote
 git remote set-url upstream {1} # change the url of the upstream remote
-git remote -v # show all remote urls
 git reset HEAD~1 # reset last commit and put files to staging area
 git stash save {1} # stash the changes with a given message
 git status # show actual changes
@@ -81,7 +83,6 @@ npm ls --parseable | sort -u | wc -l # count distinct dev node modules in curren
 printenv {1} # print environment variable
 ps aux | grep -i "{1}" | grep -v "grep" | grep -v "cheatsheet" # find grepped process(es)
 ps aux | grep -i "{1}" | grep -v "grep" | grep -v "cheatsheet" | tr -s " " | cut -d " " -f 2 | xargs kill -9 # kill grepped process(es)
-(sleep $(echo "{1} * 60" | bc) && terminal-notifier -title "TIMER" -message "You already finished {1} minutes") & # set timer on given minute and get a popup message
 tail -f /Library/Tomcat/logs/catalina.out # print tomcat console output
 uuidgen | tr '[:upper:]' '[:lower:]' # generate random uuid
 whoami # print out your logged in account name
