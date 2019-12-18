@@ -4,11 +4,11 @@
 #description            : This script provides a setup for the m1well-toolsuite.
 #author                 : Michael Wellner (@m1well) twitter.m1well.de
 #date of creation       : 20181210
-#date of last change    : 20190305
-#version                : 1.6.0
+#date of last change    : 20191218
+#version                : 1.7.0
 #usage                  : m1well-toolsuite.sh [-i|-u]
 #notes                  : prerequisits
-#                       : debian / ubuntu (e.g. a docker container) -- run this to get git: "apt-get update && apt-get -y install git"
+#                       : debian / ubuntu (e.g. a docker container) -- run this to get git: "apt-get update && apt-get -y install git vim"
 #                       : osx with homebrew -- run: "brew update && brew install git"
 #                       : for vim and zsh styling - you need vim and zsh installed
 #                       : to run this script you have to do following steps (wherever you want):
@@ -111,6 +111,19 @@ disableZsh() {
   commentOutLine cli/.cli_private "m1well.zsh-theme"
   RC_FILE=".bashrc" # if no zsh - then bashrc
 }
+createSshConfig() {
+  echo "hallo"
+  mkdir -p ${HOME}/.ssh
+  ssh-keygen -t rsa -f ${HOME}/.ssh/github-ssh.id_rsa -C "${GIT_USER_EMAIL}"
+  if (( $EUID != 0 )); then
+    sudo sh -c 'echo "\n# github ssh\nHost github.com\n  HostName github.com\n  User git\n  IdentityFile ${HOME}/.ssh/github-ssh.id_rsa"' >> ${HOME}/.ssh/config
+  else
+    sh -c 'echo "\n# github ssh\nHost github.com\n  HostName github.com\n  User git\n  IdentityFile ${HOME}/.ssh/github-ssh.id_rsa"' >> ${HOME}/.ssh/config
+  fi
+  printf "copy following public key to your github account and then change your remotes from https url to ssh url: ${BR}${BR}"
+  cat ${HOME}/.ssh/github-ssh.id_rsa.pub
+  printf "${BR}${BR}"
+}
 askQuestion() {
   read -n1 -p "${1} (y/n)? "
   echo ""
@@ -132,6 +145,8 @@ installation() {
   copyFontIfNeeded
   askQuestion "zsh already installed?"
   [[ ! $REPLY =~ ^[Yy]$ ]] && disableZsh
+  askQuestion "generate ssh config and ssh key for github?"
+  [[ $REPLY =~ ^[Yy]$ ]] && createSshConfig
   generateRcFile
   installTools
 }
