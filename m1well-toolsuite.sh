@@ -4,8 +4,8 @@
 #description            : This script provides a setup for the m1well-toolsuite.
 #author                 : Michael Wellner (@m1well) twitter.m1well.de
 #date of creation       : 20181210
-#date of last change    : 20191218
-#version                : 1.7.0
+#date of last change    : 20191221
+#version                : 1.8.0
 #usage                  : m1well-toolsuite.sh [-i|-u]
 #notes                  : prerequisits
 #                       : debian / ubuntu (e.g. a docker container) -- run this to get git: "apt-get update && apt-get -y install git vim"
@@ -97,6 +97,7 @@ generateRcFile() {
 }
 disableVim() {
   commentOutLine cli/.cli_private ".vimrc"
+  git config --global --unset core.editor
 }
 disableIterm2Profile() {
   USE_FONT=false
@@ -124,6 +125,13 @@ createSshConfig() {
   cat ${HOME}/.ssh/github-ssh.id_rsa.pub
   printf "${BR}${BR}"
 }
+createGlobalGitConfig() {
+  git config --global core.pager cat
+  git config --global color.ui auto
+  git config --global push.default simple
+  git config --global core.excludesfile ${HOME}/.gitignore_global
+  git config --global core.editor "vim"
+}
 askQuestion() {
   read -n1 -p "${1} (y/n)? "
   echo ""
@@ -138,6 +146,7 @@ installation() {
   copyIndividualCliFiles
   read -p "git user name: " GIT_USER_NAME
   read -p "git user email: " GIT_USER_EMAIL
+  createGlobalGitConfig
   askQuestion "vim already installed?"
   [[ ! $REPLY =~ ^[Yy]$ ]] && disableVim
   askQuestion "iterm2 installed and want to use m1well profile?"

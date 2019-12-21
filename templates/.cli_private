@@ -5,7 +5,8 @@
 # export the m1well's toolsuite home like
 # 'export M1WELL_TOOLSUITE_HOME="/Users/<your-user-home>/<path-to-toolsuite>"; '
 
-# export git config on each git call
+# export git config on each git call (especially the user name and email)
+# good for different usernames of different configs in various repos
 git() {
   command git config --global user.name "${GIT_STANDARD_USER_NAME}"
   command git config --global user.email "${GIT_STANDARD_USER_EMAIL}"

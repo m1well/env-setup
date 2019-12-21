@@ -52,7 +52,8 @@ git checkout . # checkout actual branch and reset all local changes
 git checkout {1} # checkout a given branch
 git commit --amend # change last commit (files and message)
 git commit -m "{1}" # commit with a given message
-git log -7 --pretty=format:"%C(161)%h%Creset -%C(auto)%d%Creset %s %C(82)(%cd) %C(27)<%an>%Creset" --date=local # show last 7 commits with time and author
+git log -1 --pretty=format:"%C(132)%h - %C(251)%s %C(45)(%ad) %C(33)<%cn>%Creset" --date=local # show last commit message with date and author
+git log -7 --pretty=format:"%C(132)%h - %C(251)%s %n   %C(45)(%ad) %C(33)<%cn>%Creset %n    %C(auto)%d%Creset" --date=local # show last 7 commits with date, author and refs
 git pull origin # pull branch from origin
 git push origin --delete {1} # delete a branch on origin remote
 git push origin --force-with-lease # push branch to origin with lease
