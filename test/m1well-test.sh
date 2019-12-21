@@ -4,8 +4,8 @@
 #description            : This script provides test for the m1well-toolsuite setup.
 #author                 : Michael Wellner (@m1well) twitter.m1well.de
 #date of creation       : 20181218
-#date of last change    : 20181222
-#version                : 0.2.1
+#date of last change    : 20191221
+#version                : 0.3.0
 #usage                  : m1well-test.sh
 #notes                  :
 ###
@@ -78,6 +78,24 @@ failATest() {
     printCommandNotAvailable "wxyz"
   fi
 }
+testGitConfig() {
+  echo ""
+  echo "_test git config_"
+  if isCommandAvailable "git"; then
+    if isStringNotEmpty "$(git config user.name)"; then
+      printTestSucceeded "git config (user.name not empty)"
+    else
+      printTestFailed "gitconf"
+    fi
+    if isStringNotEmpty "$(git config user.email)"; then
+      printTestSucceeded "git config (user.email not empty)"
+    else
+      printTestFailed "gitconf"
+    fi
+  else
+    printCommandNotAvailable "git"
+  fi
+}
 testUuid() {
   echo ""
   echo "_test uuid_"
@@ -137,31 +155,13 @@ testTimer() {
     printCommandNotAvailable "terminal-notifier"
   fi
 }
-testGitConf() {
-  echo ""
-  echo "_test gitconf_"
-  if isCommandAvailable "git"; then
-    if isCommandAvailable "gitconf"; then
-      printCommandAvailable "gitconf"
-      if isStringNotEmpty "$(gitconf)"; then
-        printTestSucceeded "gitconf (printed out the git config)"
-      else
-        printTestFailed "gitconf"
-      fi
-    else
-      printCommandNotAvailable "gitconf"
-    fi
-  else
-    printCommandNotAvailable "git"
-  fi
-}
 testCheatsheet() {
   echo ""
   echo "_test cheatsheet_"
   if isCommandAvailable "cheat" ; then
     printCommandAvailable "cheat"
     if echo "$(cheat -l all)" >/dev/null; then
-      printTestSucceeded "cheat (get some output from 'cheat -l all')"
+      printTestSucceeded "cheat (got some output from 'cheat -l all')"
     else
       printTestFailed "cheat"
     fi
@@ -192,6 +192,20 @@ testRandomizer() {
     printCommandNotAvailable "randomizer"
   fi
 }
+testFif() {
+  echo ""
+  echo "_test fif_"
+  if isCommandAvailable "fif" ; then
+    printCommandAvailable "fif"
+    if isStringNotEmpty "$(fif test)"; then
+      printTestSucceeded "fif test (found this test file)"
+    else
+      printTestFailed "gitconf"
+    fi
+  else
+    printCommandNotAvailable "fif"
+  fi
+}
 testList() {
   echo ""
   echo "_test list_"
@@ -210,14 +224,15 @@ printLines
 
 sourceCliMasterFile
 failATest
+testGitConfig
 testUuid
 testRand
 testWeek
 testTimer
-testGitConf
 testCheatsheet
 testVersions
 testRandomizer
+testFif
 testList
 echo ""
 
