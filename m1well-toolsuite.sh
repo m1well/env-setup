@@ -38,11 +38,16 @@ printEndLines() {
   printf "${FONT_NONE}"
 }
 printSuccess() {
+  if [ -f ${HOME}/.zshrc ]; then
+    local file=${HOME}/.zshrc
+  else
+    local file=${HOME}/.bashrc
+  fi
   printf "${FONT_GREEN}"
   printf "##### succeeded ${BR}"
   printf "##### if you added the iterm2 profile file you have to set it as default profile ${BR}"
   printf "##### now you have to source your rc file to finish: ${BR}"
-  printf "##### \"source ${HOME}/${RC_FILE}\" ${BR}"
+  printf "##### \"source ${file}\" ${BR}"
   printf "${FONT_NONE}"
 }
 printUsage() {
@@ -113,7 +118,6 @@ disableZsh() {
   RC_FILE=".bashrc" # if no zsh - then bashrc
 }
 createSshConfig() {
-  echo "hallo"
   mkdir -p ${HOME}/.ssh
   ssh-keygen -t rsa -f ${HOME}/.ssh/github-ssh.id_rsa -C "${GIT_USER_EMAIL}"
   if (( $EUID != 0 )); then
