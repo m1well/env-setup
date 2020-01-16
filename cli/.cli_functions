@@ -22,17 +22,6 @@ src() {
   fi
 }
 
-# tree
-## example ...
-#|__Cycles
-#| |__.DS_Store
-#| |__CyclesCards.json
-#| |__Carbon
-#| | |__Carbon.json
-tree() {
-  find ${1:-.} -print | sed -e 's;[^/]*/;|_;g;s;_|; |;g'
-}
-
 # print color codes
 colorcodes() {
   for code in {000..255}; do
