@@ -20,8 +20,8 @@ alias gitcom="git commit -m"
 alias gitconf="git config --list"
 alias gitpod="git checkout develop && git pull origin develop"
 alias gitpom="git checkout master && git pull origin master"
-alias gitrc="git rebase --continue"
-alias gitrd="git rebase develop"
+alias gitrb="git rebase"
+alias gitrbc="git rebase --continue"
 alias gitst="git status"
 
 # gradle
