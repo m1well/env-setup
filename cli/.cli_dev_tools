@@ -43,6 +43,7 @@ alias mvnwci="./mvnw clean install"
 
 # npm
 alias npmi="npm install"
+alias npmrm="rm -rf node_modules"
 
 # java
 alias jj="java -jar"
