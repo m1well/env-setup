@@ -4,7 +4,7 @@
 
 # check if a command is available
 isCommandAvailable() {
-  if command -v "${1}" >/dev/null; then return 0 ; fi
+  if command -v "${1}" >/dev/null ; then return 0 ; fi
   return 1
 }
 
@@ -57,6 +57,7 @@ uuid() {
     fi
   else
     echo "error: uuidgen has to be installed"
+    return
   fi
 }
 
@@ -66,6 +67,7 @@ rand() {
     echo $(cat /dev/urandom | env LC_CTYPE=C tr -cd '0-9' | head -c ${1})
   else
     echo "error: set number of digits - e.g. rand 5"
+    return
   fi
 }
 
@@ -82,9 +84,11 @@ timer() {
       echo "set timer to ${1} minutes"
     else
       echo "error: terminal-notifier has to be installed"
+      return
     fi
   else
     echo "error: timer needs an integer argument for the amount of minutes - e.g. timer 2"
+    return
   fi
 }
 
@@ -92,19 +96,27 @@ timer() {
 loremipsum() {
   local text="Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu f"
   if [ $# -ne 0 ] ; then
-    echo ${text} | cut -c 1-${1}
+    local result=$(echo "${text}" | cut -c 1-${1})
+    if [[ "${result}" =~ ' '$ ]] ; then
+      echo "${result%?}x"
+    else
+      echo ${result}
+    fi
   else
     echo "error: how many words do you want? - e.g. loremipsum 300"
+    return
   fi
 }
 
 # sync a file or folder into a backup folder
 backup_sync() {
-  if [ $# -ne 2 ]; then
+  if [ $# -ne 2 ] ; then
     echo "error: i need 2 parameters - one for file/folder and one for TARGET_FOLDER folder"
+    return
   else
     if [[ ! -d "${2}" ]] ; then
       echo "error: no TARGET_FOLDER given"
+      return
     else
       SOURCE="${1}"
       TARGET_FOLDER="${2}"
@@ -118,7 +130,7 @@ backup_sync() {
 
       # some dev folder excludes - a bit like .gitignore
       rsync -av --times --checksum --human-readable --itemize-changes --stats \
-        --exclude 'build' --exclude 'out' --exclude 'target' --exclude 'RemoteSystemsTempFiles' --exclude 'Servers' --exclude 'node_modules' --exclude '_site' \
+        --exclude 'build' --exclude 'out' --exclude 'target' --exclude 'dist' --exclude 'RemoteSystemsTempFiles' --exclude 'Servers' --exclude 'node_modules' --exclude '_site' \
         --exclude '.gradle' --exclude '.idea' --exclude '.metadata' --exclude '.recommenders'  --exclude '.settings' \
         --exclude '*.iml' --exclude '*.classpath' --exclude '*.project' --exclude '.DS_Store' \
         --out-format="[%t] %o %l Bytes - %f (last modified: %M)" "${SOURCE}" "${TARGET_FOLDER}" \
@@ -145,17 +157,18 @@ chucknorris() {
 fif() {
   if [ $# -ne 0 ] ; then
     local found=$(find . -maxdepth 1 -type f -name "*${1}*")
-    if (( ${#found[@]} )); then
+    if (( ${#found[@]} )) ; then
       echo ${found}
     else
       echo "Not found in this folder -> search recursively? (Y|n) [ENTER]"
       read REPLY
-      if [[ $REPLY =~ ^[Yy]$ ]]; then
+      if [[ ${REPLY} =~ ^[Yy]$ ]] ; then
         fifr ${1}
       fi
     fi
   else
     echo "error: search string missing!"
+    return
   fi
 }
 
@@ -165,6 +178,7 @@ fifr() {
     find . -type f -name "*${1}*"
   else
     echo "error: search string missing!"
+    return
   fi
 }
 
@@ -172,17 +186,18 @@ fifr() {
 fid() {
   if [ $# -ne 0 ] ; then
     local found=$(find . -maxdepth 1 -type d -name "*${1}*")
-    if (( ${#found[@]} )); then
+    if (( ${#found[@]} )) ; then
       echo ${found}
     else
       echo "Not found in this folder -> search recursively? (Y|n) [ENTER]"
       read REPLY
-      if [[ $REPLY =~ ^[Yy]$ ]]; then
+      if [[ ${REPLY} =~ ^[Yy]$ ]] ; then
         fidr ${1}
       fi
     fi
   else
     echo "error: search string missing!"
+    return
   fi
 }
 
@@ -192,6 +207,7 @@ fidr() {
     find . -type d -name "*${1}*"
   else
     echo "error: search string missing!"
+    return
   fi
 }
 
@@ -203,13 +219,14 @@ fsplit() {
     echo "Which file suffix? (standard .txt) [ENTER]"
     read SUFFIX
     local filename=$(echo "${1}" | cut -d'.' -f1)
-    if [[ -z "${SUFFIX}" ]]; then
+    if [[ -z "${SUFFIX}" ]] ; then
       split -n ${AMOUNT} -d ${1} "${filename}_" --additional-suffix=.txt
     else
       split -n ${AMOUNT} -d ${1} "${filename}_" --additional-suffix=${SUFFIX}
     fi
   else
     echo "error: source file missing!"
+    return
   fi
 }
 
@@ -220,4 +237,26 @@ dockercleanup() {
   docker volume prune -f
   docker image prune -f
   docker system df
+}
+
+# git push with options
+git_push() {
+  local toBranch=$(git rev-parse --abbrev-ref HEAD)
+  echo "You really wanna push? All things checked? (Y|n) [ENTER]"
+  read REPLY
+  if [[ ! ${REPLY} =~ ^[Yy]$ ]] ; then
+    return
+  fi
+  echo "To which remote? - leave empty for "origin" [ENTER]"
+  read REMOTE
+  echo "Force push? (Y|n) [ENTER]"
+  read FORCE
+  local toRemote=${REMOTE:-"origin"}
+  if [[ ${FORCE} =~ ^[Yy]$ ]] ; then
+    echo "doing a push force now..."
+    $(git push ${toRemote} ${toBranch} --force-with-lease)
+  else
+    echo "doing a push now..."
+    $(git push ${toRemote} ${toBranch})
+  fi
 }

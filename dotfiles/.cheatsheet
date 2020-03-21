@@ -20,9 +20,9 @@ docker images -a # show all images
 docker logs {1} # show the logs of a given container
 docker ps -a # show all container
 docker rm $(docker ps -a -q) # remove all not running container
-docker rmi $(docker images -a | grep "{1}" | tr -s " " "#" | cut -d "#" -f 3) # delete image by given grep string
-docker rmi $(docker images -q -f dangling=true) # remove unused images
-docker rmi $(docker images -q {1}) # delete image by exactly given name
+docker rmi $(docker images -a | grep "{1}" | tr -s " " "#" | cut -d "#" -f 3) -f # delete image by given grep string
+docker rmi $(docker images -q -f dangling=true) -f # remove unused images
+docker rmi $(docker images -q {1}) -f # delete image by exactly given name
 docker run -d --name mongodb -p 27017:27017 mongo:4.0 # run mongo db in a container
 docker run -d --name mysqldb -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE={1} mysql:5.6 # run mysql db in a container with given db name
 docker run -d --name postgresdb -p 5432:5432 -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB={1} postgres:11.0-alpine # run postgres db in a container with given db name
