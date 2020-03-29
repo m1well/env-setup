@@ -15,7 +15,7 @@ alias ........="cd .. && cd .. && cd .. && cd .."
 alias cc="clear"
 alias xx="exit"
 
-alias chrome="open -a \"Google Chrome\""
+alias chrome="open -a \"Google Chrome\" --new --args -incognito"
 
 # grep given string recursively (add search-string and path)
 alias greprec="grep -in --directories=recurse"
