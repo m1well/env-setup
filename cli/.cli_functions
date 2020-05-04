@@ -34,6 +34,14 @@ week() {
   echo "calendar week: $(date +"%V")"
 }
 
+# print actual datestring or add hours to go into the past
+datestring() {
+  echo "actual date: $(date +"%Y-%m-%d_%H-%M")"
+  if [ $# -ne 0 ] ; then
+    echo "  past date: $(date -v -${1}H +"%Y-%m-%d_%H-%M")"
+  fi
+}
+
 # print timestamp seconds and add number of seconds if you want
 seconds() {
   local now=$(date +%s)
