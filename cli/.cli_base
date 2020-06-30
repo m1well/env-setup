@@ -19,3 +19,5 @@ alias chrome="open -a \"Google Chrome\" --new --args -incognito"
 
 # grep given string recursively (add search-string and path)
 alias greprec="grep -in --directories=recurse"
+
+export TIMESTAMP=`date "+%Y-%m-%d %H:%M:%S"`
