@@ -52,6 +52,7 @@ git checkout . # checkout actual branch and reset all local changes
 git checkout {1} # checkout a given branch
 git commit --amend # change last commit (files and message)
 git commit -m "{1}" # commit with a given message
+git diff $(git branch --show-current) {1} --shortstat # compare diff of actual and given branch
 git diff --shortstat {1} # show diff summary from here to given commit
 git log -1 --pretty=format:"%C(132)%h - %C(251)%s %C(45)(%ad) %C(33)<%cn>%Creset" --date=local # show last commit message with date and author
 git log -7 --pretty=format:"%C(132)%h - %C(251)%s %n   %C(45)(%ad) %C(33)<%cn>%Creset %n    %C(auto)%d%Creset" --date=local # show last 7 commits with date, author and refs
@@ -85,6 +86,7 @@ npm ls --parseable | sort -u | wc -l # count distinct dev node modules in curren
 printenv {1} # print environment variable
 ps aux | grep -i "{1}" | grep -v "grep" | grep -v "cheatsheet" # find grepped process(es)
 ps aux | grep -i "{1}" | grep -v "grep" | grep -v "cheatsheet" | tr -s " " | cut -d " " -f 2 | xargs kill -9 # kill grepped process(es)
+python -m SimpleHTTPServer 2323 # simple http server on port 2323
 tail -f /Library/Tomcat/logs/catalina.out # print tomcat console output
 uuidgen | tr '[:upper:]' '[:lower:]' # generate random uuid
 whoami # print out your logged in account name

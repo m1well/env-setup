@@ -268,3 +268,11 @@ git_push() {
     $(git push ${toRemote} ${toBranch})
   fi
 }
+
+# angular update
+nggu() {
+# angular
+  npm uninstall -g @angular/cli
+  npm cache verify
+  npm install -g @angular/cli@${1}
+}
