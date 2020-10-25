@@ -270,9 +270,17 @@ git_push() {
 }
 
 # angular update
-nggu() {
-# angular
+ngcliupdate() {
   npm uninstall -g @angular/cli
   npm cache verify
   npm install -g @angular/cli@${1}
+}
+
+# remove some build and dev folders
+rmbuilds() {
+  find . -name node_modules -type d -exec rm -rf {} + # npm
+  find . -name dist -type d -exec rm -rf {} + # angular build
+  find . -name coverage -type d -exec rm -rf {} + # angular test
+  find . -name target -type d -exec rm -rf {} + # maven
+  find . -name build -type d -exec rm -rf {} + # gradle
 }
