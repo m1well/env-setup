@@ -24,7 +24,7 @@ docker rmi $(docker images -a | grep "{1}" | tr -s " " "#" | cut -d "#" -f 3) -f
 docker rmi $(docker images -q -f dangling=true) -f # remove unused images
 docker rmi $(docker images -q {1}) -f # delete image by exactly given name
 docker run -d --name mongodb -p 27017:27017 mongo:4.0 # run mongo db in a container
-docker run -d --name mysqldb -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE={1} mysql:5.6 # run mysql db in a container with given db name
+docker run -d --name mysqldb -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE={1} -e LANG=C.UTF-8 mysql:5.6 # run mysql db in a container with given db name
 docker run -d --name postgresdb -p 5432:5432 -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB={1} postgres:11.0-alpine # run postgres db in a container with given db name
 docker run -d --name rabbitmq -p 15672:15672 -p 5672:5672 rabbitmq:3.7.7-management-alpine # run a rabbitmq in a docker container
 docker run -d --name redis -p 6379:6379 redis:5.0.0-alpine # run redis in a container

@@ -222,16 +222,25 @@ fidr() {
 # split files in N files
 fsplit() {
   if [ $# -ne 0 ] ; then
-    echo "How much files do you want? [ENTER]"
-    read AMOUNT
+    local linesInFile=$(cat ${1} | wc -l | xargs)
+    echo "File has ${linesInFile} lines - how much lines per file do you want? [ENTER]"
+    read LINES_PER_FILE
     echo "Which file suffix? (standard .txt) [ENTER]"
     read SUFFIX
     local filename=$(echo "${1}" | cut -d'.' -f1)
     if [[ -z "${SUFFIX}" ]] ; then
-      split -n ${AMOUNT} -d ${1} "${filename}_" --additional-suffix=.txt
+      SFX=".txt"
     else
-      split -n ${AMOUNT} -d ${1} "${filename}_" --additional-suffix=${SUFFIX}
+      SFX=${SUFFIX}
     fi
+    split -l "${LINES_PER_FILE}" "${1}"
+    local i=1
+    local suffixlen=2
+    for x in `ls x* | sort`; do
+      local prefix=$(printf "%0${suffixlen}d" ${i})
+      mv $x ${filename}_${prefix}${SFX}
+      i=$(($i+1))
+    done
   else
     echo "error: source file missing!"
     return
