@@ -293,3 +293,25 @@ rmbuilds() {
   find . -name target -type d -exec rm -rf {} + # maven
   find . -name build -type d -exec rm -rf {} + # gradle
 }
+
+# show apps listening on ports - you can also specify a port
+listening() {
+    if [ $# -eq 0 ]; then
+        lsof -iTCP -sTCP:LISTEN -n -P
+    elif [ $# -eq 1 ]; then
+        lsof -iTCP -sTCP:LISTEN -n -P | grep -i --color $1
+    else
+        "Usage: listening [pattern]"
+    fi
+}
+
+# print some infos of my intellij scheme
+intellij_scheme() {
+  echo "General / Error - Stripemark + Effects: FF0000"
+  echo "General / Unknown Symbol - Foreground: FF0000"
+  echo "Default / Keyword - Foreground: A1441A"
+  echo "Default / Number - Foreground: 345EEE"
+  echo "Default / String - Foreground: 34D34D"
+  echo "Default / Static field - Foreground: B66DDD"
+  echo "Java / Annotation name - Foreground: CFCF33"
+}
