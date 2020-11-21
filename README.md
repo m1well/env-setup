@@ -46,7 +46,6 @@ This is my actual file for aliases regarding to my own written toolsuite.<br>
 source: [cheatsheet](https://github.com/m1well/cheatsheet)<br>
 source: [versions](https://github.com/m1well/versions)<br>
 source: [randomizer](https://github.com/m1well/ranzomizer)<br>
-source: [bashlist](https://github.com/m1well/bashlist)<br>
 
 #### .cli_private ([link](/templates/.cli_private)) and cli_projects ([link](/templates/.cli_projects))
 These files are e.g. for your private exports / aliases / symlinks / functions / etc.<br>
@@ -67,4 +66,4 @@ If you want the installation process copies it to the right folder and then you 
 The font file is also getting copied for special zsh characters.<br>
 
 ## Copyright
-Copyright :copyright: 2018 Michael Wellner ([@m1well](http://www.twitter.m1well.de))<br>
+Copyright :copyright: 2020 Michael Wellner ([@m1well](https://m1well.com))<br>

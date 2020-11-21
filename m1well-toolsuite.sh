@@ -62,7 +62,6 @@ installTools() {
   git clone https://github.com/m1well/cheatsheet.git
   git clone https://github.com/m1well/versions.git
   git clone https://github.com/m1well/randomizer.git
-  git clone https://github.com/m1well/bashlist.git
 }
 copyCliMaster() {
   cp dotfiles/.m1well_cli_master ${HOME}/.m1well_cli_master

@@ -206,15 +206,6 @@ testFif() {
     printCommandNotAvailable "fif"
   fi
 }
-testList() {
-  echo ""
-  echo "_test list_"
-  if isCommandAvailable "list" ; then
-    printCommandAvailable "list"
-  else
-    printCommandNotAvailable "list"
-  fi
-}
 
 ### start of script ###
 
@@ -233,7 +224,6 @@ testCheatsheet
 testVersions
 testRandomizer
 testFif
-testList
 echo ""
 
 printLines
