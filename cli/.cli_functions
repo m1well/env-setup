@@ -2,13 +2,45 @@
 # export the user's home like
 # 'export USER_HOME="/Users/<your-user-home>"; '
 
+# print aliases by name
+print_aliases() {
+  alias | grep "^${1}.*" --color=never
+}
+
+# print functions from here (alphabetically)
+print_functions() {
+  echo "backup_sync() # sync a file or folder into a backup folder without some dev build folders/files"
+  echo "chucknorris() # get a random chuck norris joke one of a given category"
+  echo "colorcodes() # print shell color codes"
+  echo "datestrings() # print actual datestrings"
+  echo "dockercleanup() # clean up docker system, volumes and images"
+  echo "fid() # find directories"
+  echo "fidr() # find directories recursively"
+  echo "fif() # find files"
+  echo "fifr() # find files recursively"
+  echo "fsplit() # split file in N files"
+  echo "git_push() # git push with some options"
+  echo "intellij_scheme() # print some infos of my intellij scheme"
+  echo "isCommandAvailable() # check if a command is available"
+  echo "listening() # show apps listening on ports - you can also specify a port"
+  echo "loremipsum() # small lorem ipsum generator (up to 2.000 characters)"
+  echo "ngcliupdate() # angular cli update"
+  echo "rand() # generate random number with given digits (up to 15)"
+  echo "rm_builds() # remove some build and dev folders"
+  echo "seconds() # print timestamp seconds and add number of seconds if you want"
+  echo "src() # source zshrc and/or bashrc if available"
+  echo "timer() # set a terminal timer (terminal-notifier has to be installed)"
+  echo "uuid() # generate one uuid (uuid-runtime has to be installed) ore more (if number is given)"
+  echo "week() # print calendarweek"
+}
+
 # check if a command is available
 isCommandAvailable() {
   if command -v "${1}" >/dev/null ; then return 0 ; fi
   return 1
 }
 
-# source zshrc or bashrc if available
+# source zshrc and/or bashrc if available
 src() {
   local z=$(find ${USER_HOME}/ -maxdepth 1 -type f -name ".zshrc")
   if [ "${z}" != "" ] ; then
@@ -22,7 +54,7 @@ src() {
   fi
 }
 
-# print color codes
+# print shell color codes
 colorcodes() {
   for code in {000..255}; do
     print -P -- "$code: %F{$code}Test%f";
@@ -34,12 +66,26 @@ week() {
   echo "calendar week: $(date +"%V")"
 }
 
-# print actual datestring or add hours to go into the past
-datestring() {
-  echo "actual date: $(date +"%Y-%m-%d_%H-%M")"
-  if [ $# -ne 0 ] ; then
-    echo "  past date: $(date -v -${1}H +"%Y-%m-%d_%H-%M")"
-  fi
+# print actual datestrings
+datestrings() {
+  echo "# up to second"
+  echo "-- $(date +"%Y%m%d%H%M%S")"
+  echo "-- $(date +"%Y%m%d-%H%M%S")"
+  echo "-- $(date +"%Y-%m-%d_%H-%M-%S")"
+  echo "# up to minute"
+  echo "-- $(date +"%Y%m%d%H%M")"
+  echo "-- $(date +"%Y%m%d-%H%M")"
+  echo "-- $(date +"%Y-%m-%d_%H-%M")"
+  echo "# up to hour"
+  echo "-- $(date +"%Y%m%d%H")"
+  echo "-- $(date +"%Y%m%d-%H")"
+  echo "-- $(date +"%Y-%m-%d_%H")"
+  echo "# up to day"
+  echo "-- $(date +"%Y%m%d")"
+  echo "-- $(date +"%Y-%m-%d")"
+  echo "-- $(date +"%Y/%m/%d")"
+  echo "-- $(date +"%d.%m.%Y")"
+  echo "-- $(date +"%d/%m/%Y")"
 }
 
 # print timestamp seconds and add number of seconds if you want
@@ -47,9 +93,9 @@ seconds() {
   local now=$(date +%s)
   if [ $# -ne 0 ] ; then
     local future=$((${now} + ${1}))
-    echo "${future}"
+    echo "$(date -r ${future}) -- ${future}"
   else
-    echo "${now}"
+    echo "$(date) -- ${now}"
   fi
 }
 
@@ -69,19 +115,19 @@ uuid() {
   fi
 }
 
-# generate random number with given digits
+# generate random number with given digits (up to 15)
 rand() {
   if [ $# -ne 0 ] ; then
-    echo $(cat /dev/urandom | env LC_CTYPE=C tr -cd '0-9' | head -c ${1})
+    if (( ${1} > 15 )); then
+      echo "error: only up to 15 digits"
+      return
+    fi
+    local random="${$(head -200 /dev/urandom | cksum)// /}"
+    echo "$(echo ${random} | head -c ${1})"
   else
     echo "error: set number of digits - e.g. rand 5"
     return
   fi
-}
-
-# get aliases by name
-get_aliases() {
-  alias | grep "^${1}.*" --color=never
 }
 
 # set a terminal timer (terminal-notifier has to be installed)
@@ -100,23 +146,7 @@ timer() {
   fi
 }
 
-# small lorem ipsum generator (up to 1.000 characters)
-loremipsum() {
-  local text="Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu f"
-  if [ $# -ne 0 ] ; then
-    local result=$(echo "${text}" | cut -c 1-${1})
-    if [[ "${result}" =~ ' '$ ]] ; then
-      echo "${result%?}x"
-    else
-      echo ${result}
-    fi
-  else
-    echo "error: how many words do you want? - e.g. loremipsum 300"
-    return
-  fi
-}
-
-# sync a file or folder into a backup folder
+# sync a file or folder into a backup folder without some dev build folders/files
 backup_sync() {
   if [ $# -ne 2 ] ; then
     echo "error: i need 2 parameters - one for file/folder and one for TARGET_FOLDER folder"
@@ -151,12 +181,12 @@ backup_sync() {
 # get a random chuck norris joke one of a given category
 chucknorris() {
   if [ $# -ne 0 ] ; then
-    echo "chuck norris:"
-    echo $(curl https://api.chucknorris.io/jokes/random\?categories\=${1} -s | jq -r '.value')
+    echo "chuck norris says:"
+    echo $(curl https://api.chucknorris.io/jokes/random\?category\=${1} -s | jq -r '.value')
   else
     echo "chuck norris categories:"
     echo $(curl https://api.chucknorris.io/jokes/categories -s)
-    echo "random chuck norris:"
+    echo "chuck norris says:"
     echo $(curl https://api.chucknorris.io/jokes/random -s | jq -r '.value')
   fi
 }
@@ -180,7 +210,7 @@ fif() {
   fi
 }
 
-# find files recoursively
+# find files recursively
 fifr() {
   if [ $# -ne 0 ] ; then
     find . -type f -name "*${1}*"
@@ -209,7 +239,7 @@ fid() {
   fi
 }
 
-# find directories recoursively
+# find directories recursively
 fidr() {
   if [ $# -ne 0 ] ; then
     find . -type d -name "*${1}*"
@@ -219,7 +249,7 @@ fidr() {
   fi
 }
 
-# split files in N files
+# split file in N files
 fsplit() {
   if [ $# -ne 0 ] ; then
     local linesInFile=$(cat ${1} | wc -l | xargs)
@@ -247,7 +277,7 @@ fsplit() {
   fi
 }
 
-# clean up docker images and volumes
+# clean up docker system, volumes and images
 dockercleanup() {
   docker system df
   docker system prune -f
@@ -256,7 +286,7 @@ dockercleanup() {
   docker system df
 }
 
-# git push with options
+# git push with some options
 git_push() {
   local toBranch=$(git rev-parse --abbrev-ref HEAD)
   echo "You really wanna push? All things checked? (Y|n) [ENTER]"
@@ -278,7 +308,7 @@ git_push() {
   fi
 }
 
-# angular update
+# angular cli update
 ngcliupdate() {
   npm uninstall -g @angular/cli
   npm cache verify
@@ -286,7 +316,7 @@ ngcliupdate() {
 }
 
 # remove some build and dev folders
-rmbuilds() {
+rm_builds() {
   find . -name node_modules -type d -exec rm -rf {} + # npm
   find . -name dist -type d -exec rm -rf {} + # angular build
   find . -name coverage -type d -exec rm -rf {} + # angular test
@@ -314,4 +344,24 @@ intellij_scheme() {
   echo "Default / String - Foreground: 34D34D"
   echo "Default / Static field - Foreground: B66DDD"
   echo "Java / Annotation name - Foreground: CFCF33"
+}
+
+# small lorem ipsum generator (up to 2.000 characters)
+loremipsum() {
+  local template1="Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. "
+  local template2="Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. "
+  local template3="Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. "
+  local template4="Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim v"
+  if [ $# -ne 0 ] ; then
+    local text="${template1}${template2}${template3}${template4}"
+    local result=$(echo "${text}" | cut -c 1-${1})
+    if [[ "${result}" =~ ' '$ ]] ; then
+      echo "${result%?}x"
+    else
+      echo ${result}
+    fi
+  else
+    echo "error: how many words do you want? - e.g. loremipsum 300"
+    return
+  fi
 }
