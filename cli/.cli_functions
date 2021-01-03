@@ -25,7 +25,8 @@ print_functions() {
   echo "listening() # show apps listening on ports - you can also specify a port"
   echo "loremipsum() # small lorem ipsum generator (up to 2.000 characters)"
   echo "ngcliupdate() # angular cli update"
-  echo "rand() # generate random number with given digits (up to 15)"
+  echo "rand_num() # generate random number with given length (up to 32)"
+  echo "rand_pass() # generate random password with given length (up to 32)"
   echo "rm_builds() # remove some build and dev folders"
   echo "seconds() # print timestamp seconds and add number of seconds if you want"
   echo "src() # source zshrc and/or bashrc if available"
@@ -115,17 +116,32 @@ uuid() {
   fi
 }
 
-# generate random number with given digits (up to 15)
-rand() {
+# generate random number with given length (up to 32)
+rand_num() {
   if [ $# -ne 0 ] ; then
-    if (( ${1} > 15 )); then
-      echo "error: only up to 15 digits"
+    if (( ${1} > 32 )); then
+      echo "error: only up to 32 digits"
       return
     fi
-    local random="${$(head -200 /dev/urandom | cksum)// /}"
+    local random="${$(head -c 400 < /dev/urandom | cksum)// /}"
     echo "$(echo ${random} | head -c ${1})"
   else
     echo "error: set number of digits - e.g. rand 5"
+    return
+  fi
+}
+
+# generate random password with given length (up to 32)
+rand_pass() {
+  if [ $# -ne 0 ] ; then
+    if (( ${1} > 32 )); then
+      echo "error: only up to 32 digits"
+      return
+    fi
+    local random="${$(head -c 400 < /dev/random | base64)}"
+    echo "$(echo ${random} | head -c ${1})"
+  else
+    echo "error: set number of digits - e.g. gen_password 5"
     return
   fi
 }
@@ -344,6 +360,7 @@ intellij_scheme() {
   echo "Default / String - Foreground: 34D34D"
   echo "Default / Static field - Foreground: B66DDD"
   echo "Java / Annotation name - Foreground: CFCF33"
+  echo "JavaScript / Decorator - Foreground: CFCF33"
 }
 
 # small lorem ipsum generator (up to 2.000 characters)

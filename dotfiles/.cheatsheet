@@ -29,7 +29,7 @@ docker run -d --name postgresdb -p 5432:5432 -e POSTGRES_PASSWORD=postgres -e PO
 docker run -d --name rabbitmq -p 15672:15672 -p 5672:5672 rabbitmq:3.7.7-management-alpine # run a rabbitmq in a docker container
 docker run -d --name redis -p 6379:6379 redis:5.0.0-alpine # run redis in a container
 docker run -d --name sonarqube -p 9000:9000 -p 9092:9092 sonarqube:7.1-alpine # run sonarqube in a container
-docker run -d --name ubuntu -it ubuntu:18.04 # run ubuntu os in a container
+docker run -d --name ubuntu -it ubuntu:20.04 # run ubuntu os in a container
 docker stop {1} && docker rm {1} && docker ps -a # stop and remove a container and show all running container
 docker system df # show docker disk usage (images, container, volumes)
 docker system info # display system-wide information
