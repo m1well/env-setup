@@ -120,9 +120,9 @@ createSshConfig() {
   mkdir -p ${HOME}/.ssh
   ssh-keygen -t rsa -f ${HOME}/.ssh/github-ssh.id_rsa -C "${GIT_USER_EMAIL}"
   if (( $EUID != 0 )); then
-    sudo sh -c 'echo "\n# github ssh\nHost github.com\n  HostName github.com\n  User git\n  IdentityFile ${HOME}/.ssh/github-ssh.id_rsa"' >> ${HOME}/.ssh/config
+    sudo sh -c 'echo "\n# defaults\nHost *\n  AddressFamily inet\n  Protocol 2\n  Compression yes\n  ServerAliveInterval 60\n\n# github ssh\nHost github.com\n  HostName github.com\n  User git\n  IdentityFile ${HOME}/.ssh/github-ssh.id_rsa"' >> ${HOME}/.ssh/config
   else
-    sh -c 'echo "\n# github ssh\nHost github.com\n  HostName github.com\n  User git\n  IdentityFile ${HOME}/.ssh/github-ssh.id_rsa"' >> ${HOME}/.ssh/config
+    sh -c 'echo "\n# defaults\nHost *\n  AddressFamily inet\n  Protocol 2\n  Compression yes\n  ServerAliveInterval 60\n\n# github ssh\nHost github.com\n  HostName github.com\n  User git\n  IdentityFile ${HOME}/.ssh/github-ssh.id_rsa"' >> ${HOME}/.ssh/config
   fi
   printf "copy following public key to your github account and then change your remotes from https url to ssh url: ${BR}${BR}"
   cat ${HOME}/.ssh/github-ssh.id_rsa.pub
