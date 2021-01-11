@@ -1,7 +1,6 @@
 ### cli dev tools ###
 
 # docker
-alias docker="nocorrect docker" # disable zsh correct at docker commands
 alias doccomd="docker-compose down"
 alias doccomu="docker-compose up"
 alias doccomud="docker-compose up -d"
