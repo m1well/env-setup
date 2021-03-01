@@ -4,8 +4,8 @@
 #description            : This script provides a setup for the m1well-toolsuite.
 #author                 : Michael Wellner (@m1well) twitter.m1well.de
 #date of creation       : 20181210
-#date of last change    : 20191221
-#version                : 1.8.0
+#date of last change    : 20210103
+#version                : 1.9.0
 #usage                  : m1well-toolsuite.sh [-i|-u]
 #notes                  : prerequisits
 #                       : debian / ubuntu (e.g. a docker container) -- run this to get git: "apt-get update && apt-get -y install git vim"
@@ -109,7 +109,7 @@ disableIterm2Profile() {
 }
 copyFontIfNeeded() {
   if [ "${USE_FONT}" = true ]; then
-    cp terminal/font/Inconsolata\ Nerd\ Font\ Complete\ Mono.otf ${USER_HOME}/Library/Fonts/Inconsolata\ Nerd\ Font\ Complete\ Mono.otf
+    cp terminal/font/Inconsolata\ Nerd\ Font\ Complete\ Mono.otf ${HOME}/Library/Fonts/Inconsolata\ Nerd\ Font\ Complete\ Mono.otf
   fi
 }
 disableZsh() {
@@ -118,7 +118,7 @@ disableZsh() {
 }
 createSshConfig() {
   mkdir -p ${HOME}/.ssh
-  ssh-keygen -t rsa -f ${HOME}/.ssh/github-ssh.id_rsa -C "${GIT_USER_EMAIL}"
+  ssh-keygen -t rsa -b 4096 -f ${HOME}/.ssh/github-ssh.id_rsa -C "${GIT_USER_EMAIL}"
   if (( $EUID != 0 )); then
     sudo sh -c 'echo "\n# defaults\nHost *\n  AddressFamily inet\n  Protocol 2\n  Compression yes\n  ServerAliveInterval 60\n\n# github ssh\nHost github.com\n  HostName github.com\n  User git\n  IdentityFile ${HOME}/.ssh/github-ssh.id_rsa"' >> ${HOME}/.ssh/config
   else
