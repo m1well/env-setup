@@ -23,6 +23,7 @@ docker rm $(docker ps -a -q) # remove all not running container
 docker rmi $(docker images -a | grep "{1}" | tr -s " " "#" | cut -d "#" -f 3) -f # delete image by given grep string
 docker rmi $(docker images -q -f dangling=true) -f # remove unused images
 docker rmi $(docker images -q {1}) -f # delete image by exactly given name
+docker run -d --name mariadb -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE={1} -e LANG=C.UTF-8 mariadb:10.5.8 # run mariadb db in a container with given db name
 docker run -d --name mongodb -p 27017:27017 mongo:4.0 # run mongo db in a container
 docker run -d --name mysqldb -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE={1} -e LANG=C.UTF-8 mysql:5.6 # run mysql db in a container with given db name
 docker run -d --name postgresdb -p 5432:5432 -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB={1} postgres:11.0-alpine # run postgres db in a container with given db name
@@ -38,6 +39,7 @@ docker-compose build && docker-compose up -d # build images if they have changed
 du -sh * | sort -h # human readable disk usage of content in actual directory - sorted
 du -sh {1} # human readable disk usage sum of a given directory
 echo $(cat /dev/urandom | env LC_CTYPE=C tr -cd '0-9' | head -c {1}) # generate random number with given digits
+find . -name ".git" -type d -exec bash -c "cd '{}/..' && pwd && git remote -v | grep 'fetch' && echo''" \; # find all git remotes (fetch) and print their folder
 find . -name "*.java" -exec grep -ins --color=always -H -A 1 -B 1 "{1}" {} \; # grep given string in java files recursively and print out one line before and after
 find . -type d -exec chmod 755 {} \; # change dir mod recursively
 find . -type f -exec chmod 644 {} \; # change file mod recursively
