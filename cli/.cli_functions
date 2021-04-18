@@ -355,12 +355,12 @@ listening() {
 intellij_scheme() {
   echo "General / Error - Stripemark + Effects: FF0000"
   echo "General / Unknown Symbol - Foreground: FF0000"
-  echo "Default / Keyword - Foreground: A1441A"
-  echo "Default / Number - Foreground: 345EEE"
+  echo "Default / Keyword - Foreground: CF5F2C"
+  echo "Default / Number - Foreground: 1E61E6"
   echo "Default / String - Foreground: 34D34D"
   echo "Default / Static field - Foreground: B66DDD"
-  echo "Java / Annotation name - Foreground: CFCF33"
-  echo "JavaScript / Decorator - Foreground: CFCF33"
+  echo "Default / Metadata - Foreground: CFCF33"
+  echo "Java / Annotation name - inherit from Metadata"
 }
 
 # small lorem ipsum generator (up to 2.000 characters)
