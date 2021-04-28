@@ -4,7 +4,7 @@
 alias doccomd="docker-compose down"
 alias doccomu="docker-compose up"
 alias doccomud="docker-compose up -d"
-alias doci="docker images"
+alias doci="docker images -a"
 alias docirm="docker image rm"
 alias docps="docker ps -a"
 
