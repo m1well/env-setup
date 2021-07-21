@@ -141,7 +141,7 @@ rand_pass() {
     local random="${$(head -c 400 < /dev/random | base64)}"
     echo "$(echo ${random} | head -c ${1})"
   else
-    echo "error: set number of digits - e.g. gen_password 5"
+    echo "error: set number of digits - e.g. rand_pass 12"
     return
   fi
 }
@@ -327,8 +327,7 @@ git_push() {
 # angular cli update
 ngcliupdate() {
   npm uninstall -g @angular/cli
-  npm cache verify
-  npm install -g @angular/cli@${1}
+  npm install -g @angular/cli@latest
 }
 
 # remove some build and dev folders
