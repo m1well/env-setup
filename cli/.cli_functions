@@ -10,6 +10,7 @@ print_aliases() {
 # print functions from here (alphabetically)
 print_functions() {
   echo "backup_sync() # sync a file or folder into a backup folder without some dev build folders/files"
+  echo "brew_list() # show installed via brew && brew cask"
   echo "chucknorris() # get a random chuck norris joke one of a given category"
   echo "colorcodes() # print shell color codes"
   echo "datestrings() # print actual datestrings"
@@ -21,10 +22,9 @@ print_functions() {
   echo "fsplit() # split file in N files"
   echo "git_push() # git push with some options"
   echo "intellij_scheme() # print some infos of my intellij scheme"
-  echo "isCommandAvailable() # check if a command is available"
   echo "listening() # show apps listening on ports - you can also specify a port"
   echo "loremipsum() # small lorem ipsum generator (up to 2.000 characters)"
-  echo "ngcliupdate() # angular cli update"
+  echo "ngcli_update() # angular cli update"
   echo "rand_num() # generate random number with given length (up to 32)"
   echo "rand_pass() # generate random password with given length (up to 32)"
   echo "rm_builds() # remove some build and dev folders"
@@ -239,7 +239,7 @@ fifr() {
 # find directories
 fid() {
   if [ $# -ne 0 ] ; then
-    local found=$(find . -maxdepth 1 -type d -name "*${1}*")
+    local found=$(sudo find . -maxdepth 1 -type d -name "*${1}*")
     if (( ${#found[@]} )) ; then
       echo ${found}
     else
@@ -258,7 +258,7 @@ fid() {
 # find directories recursively
 fidr() {
   if [ $# -ne 0 ] ; then
-    find . -type d -name "*${1}*"
+    sudo find . -type d -name "*${1}*"
   else
     echo "error: search string missing!"
     return
@@ -325,7 +325,7 @@ git_push() {
 }
 
 # angular cli update
-ngcliupdate() {
+ngcli_update() {
   npm uninstall -g @angular/cli
   npm install -g @angular/cli@latest
 }
@@ -380,4 +380,9 @@ loremipsum() {
     echo "error: how many words do you want? - e.g. loremipsum 300"
     return
   fi
+}
+
+# show installed via brew && brew cask
+brew_list() {
+  brew list && brew list --cask
 }
