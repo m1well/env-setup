@@ -21,7 +21,7 @@ print_functions() {
   echo "fifr() # find files recursively"
   echo "fsplit() # split file in N files"
   echo "git_push() # git push with some options"
-  echo "intellij_scheme() # print some infos of my intellij scheme"
+  echo "intellij_setup() # print infos of my intellij setup"
   echo "listening() # show apps listening on ports - you can also specify a port"
   echo "loremipsum() # small lorem ipsum generator (up to 2.000 characters)"
   echo "ngcli_update() # angular cli update"
@@ -350,18 +350,6 @@ listening() {
     fi
 }
 
-# print some infos of my intellij scheme
-intellij_scheme() {
-  echo "General / Error - Stripemark + Effects: FF0000"
-  echo "General / Unknown Symbol - Foreground: FF0000"
-  echo "Default / Keyword - Foreground: CF5F2C"
-  echo "Default / Number - Foreground: 1E61E6"
-  echo "Default / String - Foreground: 34D34D"
-  echo "Default / Static field - Foreground: B66DDD"
-  echo "Default / Metadata - Foreground: CFCF33"
-  echo "Java / Annotation name - inherit from Metadata"
-}
-
 # small lorem ipsum generator (up to 2.000 characters)
 loremipsum() {
   local template1="Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. "
@@ -385,4 +373,150 @@ loremipsum() {
 # show installed via brew && brew cask
 brew_list() {
   brew list && brew list --cask
+}
+
+# print infos of my intellij setup
+intellij_setup() {
+  echo "
+editor:
+  general:
+    autoImport:
+      java:
+        addUnambiguousImportsOnTheFly: true
+      tsAndJs:
+        addUnambiguousImportsOnTheFly: true
+    editorTabs:
+      placement: 'none'
+  colorScheme:
+    general:
+      errorsAndWarnings:
+        unknownSymbol:
+          foreground: FF0000
+        error:
+          stripemark: FF0000
+          effects: FF0000
+    defaults:
+      classes:
+        staticField:
+          foreground: B66DDD
+      keyword:
+        foreground: C25C25
+      metadata:
+        foreground: E8E811
+      number:
+        foreground: 1E61E6
+      string:
+        stringText:
+          foreground: 35F35F
+    java:
+      annotations:
+        annotationName: 'inheritFromMetadata'
+  codeStyle:
+    java:
+      spaces:
+        arrayInitializerBraces: true
+      wrappingBraces:
+        keepSimpleBlocksInOneLine: true
+        ifBracesForce: 'always'
+        forBracesForce: 'always'
+        whileBracesforce: 'always'
+        doWhileBracesForce: 'always'
+        ternaryOperationWrap: 'wrap if long'
+        signsOnNextLine: true
+        arraysWrap: 'wrap if long'
+      blankLines:
+        maximumInDeclaration: 1
+        maximumInCode: 1
+        beforeEndBrace: 1
+        betweenHeaderAndPackages: 1
+      imports:
+        classCountStartImports: 999
+        staticNamesCountStartImports: 999
+    styleSheets:
+      tabsIndents:
+        tabSize: 2
+        indent: 2
+        continuationIndent: 2
+      blankLines:
+        maximumInCode: 1
+    groovy:
+      tabsIndents:
+        tabSize: 2
+        indent: 2
+        continuationIndent: 2
+      blankLines:
+        maximumInDeclaration: 1
+        maximumInCode: 1
+        beforeEndBrace: 1
+      imports:
+        classCountStartImports: 999
+        staticNamesCountStartImports: 999
+    javascript:
+      tabsIndents:
+        indentSize: 2
+        continuationIndentSize: 2
+        tabSize: 2
+      spaces:
+        objectLiteralBraces: true
+        es6ImportExportBraces: true
+        arrayBrackets: true
+      wrappingBraces:
+        keepSimpleBlocksInOneLine: true
+        keepSimpleMethodsInOneLine: true
+        ifBracesForce: 'always'
+        forBracesForce: 'always'
+        whileBracesforce: 'always'
+        doWhileBracesForce: 'always'
+        ternaryOperationWrap: 'wrap if long'
+        signsOnNextLine: true
+        arraysWrap: 'wrap if long'
+      blankLines:
+        maximumInCode: 1
+      punctuation:
+        useSemicolonTermination: 'always'
+        useSingleQuotes: 'always'
+        trailingComma: 'keep'
+    json:
+      tabsIndents:
+        tabSize: 2
+        indent: 2
+        continuationIndent: 2
+    markdown:
+      tabsIndents:
+        tabSize: 2
+        indent: 2
+        continuationIndent: 2
+    typescript:
+      tabsIndents:
+        indentSize: 2
+        continuationIndentSize: 2
+        tabSize: 2
+      spaces:
+        objectLiteralBraces: true
+        es6ImportExportBraces: true
+        arrayBrackets: true
+      wrappingBraces:
+        keepSimpleBlocksInOneLine: true
+        keepSimpleMethodsInOneLine: true
+        ifBracesForce: 'always'
+        forBracesForce: 'always'
+        whileBracesforce: 'always'
+        doWhileBracesForce: 'always'
+        ternaryOperationWrap: 'wrap if long'
+        signsOnNextLine: true
+        arraysWrap: 'wrap if long'
+      blankLines:
+        maximumInCode: 1
+      punctuation:
+        useSemicolonTermination: 'always'
+        useSingleQuotes: 'always'
+        trailingComma: 'keep'
+  todo:
+    patterns:
+      pattern: 'MWE*'
+      icon: '!'
+versionControl:
+  commit:
+    useNonModalCommitInterface: false
+"
 }
