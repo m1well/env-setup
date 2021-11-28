@@ -387,14 +387,18 @@ editor:
         addUnambiguousImportsOnTheFly: true
     editorTabs:
       placement: 'none'
+  font:
+    font: Fira Code
+    size: 13
+    line height: 1.3
   colorScheme:
     general:
       errorsAndWarnings:
         unknownSymbol:
-          foreground: FF0000
+          foreground: E81057
         error:
-          stripemark: FF0000
-          effects: FF0000
+          stripemark: E81057
+          effects: E81057
     defaults:
       classes:
         staticField:
@@ -404,10 +408,10 @@ editor:
       metadata:
         foreground: E8E811
       number:
-        foreground: 1E61E6
+        foreground: 1057E8
       string:
         stringText:
-          foreground: 35F35F
+          foreground: 57E810
     java:
       annotations:
         annotationName: 'inheritFromMetadata'
