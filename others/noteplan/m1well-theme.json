@@ -226,12 +226,12 @@
       "regex": "(~~)([^~]{1,})(~~)"
     },
     "todo-flagged-1-sign": {
-      "backgroundColor": "#74082B",
+      "backgroundColor": "#5C0622",
       "matchPosition": 2,
       "regex": "(^|\\v)(\\h*(\\*)\\h*(\\[ \\]\\h+|\\h+)\\!{1}\\h+.*)($|\\v)"
     },
-    "todo-flagged-2-signs": {
-      "backgroundColor": "#B90C45",
+    "todo-flagged-2-sign": {
+      "backgroundColor": "#A20B3C",
       "matchPosition": 2,
       "regex": "(^|\\v)(\\h*(\\*)\\h*(\\[ \\]\\h+|\\h+)\\!{2}\\h+.*)($|\\v)"
     },
@@ -254,9 +254,9 @@
       "strikethroughStyle": 1
     },
     "todo-wife": {
-      "backgroundColor": "#745008",
+      "backgroundColor": "#453004",
       "matchPosition": 2,
-      "regex": "(^|\\v)(\\h*(\\*)\\h*(\\[ \\]\\h+|\\h+)\\Frau\\h+.*)($|\\v)"
+      "regex": "(^|\\v)(\\h*(\\*|-)\\h*(\\[ \\]\\h+|\\h+)\\Frau(:?)\\h+.*)($|\\v)"
     },
     "template-tags": {
       "color": "#8B6009",
@@ -265,6 +265,12 @@
       "isHiddenWithoutCursor": false,
       "isRevealOnCursorRange": true,
       "regex": "(?>\\{\\{)[^)]{1,}((?>\\(\\)\\}\\})|(?>\\)\\}\\}))"
+    },
+    "timeblocks": {
+      "color": "#F1C66F",
+      "matchPosition": 0,
+      "regex": "(?<!@done\\(\\d{4}-[01]\\d{1}-\\d{2})(^|\\s|T)((at|from)\\s*)?(([0-2]?\\d{1}|noon|midnight)(:[0-5]\\d)?|(?:[0-2]?\\d{1}|noon|midnight))(A\\.M\\.|P\\.M\\.|AM?|PM?|am?|pm?)?(\\s*(\\-|\\–|\\~|\\〜|to|\\?)\\s*([0-2]?\\d)(:[0-5]\\d)?(A\\.M\\.|P\\.M\\.|AM?|PM?|am?|pm?)?|$)",
+      "type": "italic"
     }
   }
 }
