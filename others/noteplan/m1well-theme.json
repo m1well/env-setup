@@ -7,7 +7,7 @@
   },
   "colors": {
     "colorPage": "color-hex.com",
-    "blue": "#1057E8 -> RGB(16,87,232)",
+    "blue": "1057E8 -> RGB(16,87,232)",
     "yellow": "E8A110",
     "green": "57E810",
     "red": "E81057",
@@ -154,7 +154,7 @@
       "size": 15
     },
     "special-char": {
-      "color": "#E8A110",
+      "color": "#E8E8E9",
       "font": "Menlo-Regular",
       "size": 15
     },
@@ -253,10 +253,25 @@
       "regex": "(^\\h*[\\*]{1} |^\\h*[0-9]+[\\.\\)] )(\\[-\\] )(.*)",
       "strikethroughStyle": 1
     },
+    "todo-udemy": {
+      "backgroundColor": "#041A45",
+      "matchPosition": 2,
+      "regex": "(^|\\v)(\\h*(\\*|-)\\h*(\\[ \\]\\h+|\\h+)Udemy(:?)\\h+.*)($|\\v)"
+    },
+    "todo-noteplan": {
+      "backgroundColor": "#041A45",
+      "matchPosition": 2,
+      "regex": "(^|\\v)(\\h*(\\*|-)\\h*(\\[ \\]\\h+|\\h+)NP(:?)\\h+.*)($|\\v)"
+    },
     "todo-wife": {
       "backgroundColor": "#453004",
       "matchPosition": 2,
-      "regex": "(^|\\v)(\\h*(\\*|-)\\h*(\\[ \\]\\h+|\\h+)\\Frau(:?)\\h+.*)($|\\v)"
+      "regex": "(^|\\v)(\\h*(\\*|-)\\h*(\\[ \\]\\h+|\\h+)Frau(:?)\\h+.*)($|\\v)"
+    },
+    "todo-goal": {
+      "backgroundColor": "#348B09",
+      "matchPosition": 2,
+      "regex": "(^|\\v)(\\h*(\\*|-)\\h*(\\[ \\]\\h+|\\h+)>>\\h+.*)($|\\v)"
     },
     "template-tags": {
       "color": "#8B6009",
@@ -268,8 +283,8 @@
     },
     "timeblocks": {
       "color": "#F1C66F",
-      "matchPosition": 0,
-      "regex": "(?<!@done\\(\\d{4}-[01]\\d{1}-\\d{2})(^|\\s|T)((at|from)\\s*)?(([0-2]?\\d{1}|noon|midnight)(:[0-5]\\d)?|(?:[0-2]?\\d{1}|noon|midnight))(A\\.M\\.|P\\.M\\.|AM?|PM?|am?|pm?)?(\\s*(\\-|\\–|\\~|\\〜|to|\\?)\\s*([0-2]?\\d)(:[0-5]\\d)?(A\\.M\\.|P\\.M\\.|AM?|PM?|am?|pm?)?|$)",
+      "matchPosition": 1,
+      "regex": "((?:\\d{4}-[01]\\d{1}-\\d{2})?(?:(at|from)\\s*([0-2]?\\d|noon|midnight)(:[0-5]\\d)?(\\s?(AM?|PM?|am?|pm?)?)|\\h+([0-2]?\\d)(:[0-5]\\d)?(\\s?(AM?|PM?|am?|pm?)|(?=\\s*(\\-|\\–|\\~|\\〜|to|\\?)))|\\h+([0-2]?\\d|noon|midnight)(:[0-5]\\d)\\s?(AM?|PM?|am?|pm?)?)(?:\\s*(\\-|\\–|\\~|\\〜|to|\\?)\\s*([0-2]?\\d|noon|midnight)(:[0-5]\\d)?(\\s?(AM?|PM?|am?|pm?)?))?(?=\\h|$))",
       "type": "italic"
     }
   }
