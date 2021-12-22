@@ -115,7 +115,7 @@
       "color": "#F1C66F"
     },
     "code": {
-      "color": "#EAAA27",
+      "color": "#EEBD57",
       "font": "Courier New",
       "size": 14
     },
@@ -182,25 +182,25 @@
       }
     },
     "highlighted": {
-      "backgroundColor": "#0B3CA2",
+      "backgroundColor": "#0C45B9",
       "color": "#D2D2D3",
       "isRevealOnCursorRange": true,
-      "matchPosition": 2,
-      "regex": "(::)([^:]{1,})(::)"
+      "matchPosition": 3,
+      "regex": "(\\h|^)(::)(.+)(::)(\\h|$)"
     },
     "highlighted-left-colon": {
       "isHiddenWithoutCursor": true,
       "isMarkdownCharacter": true,
       "isRevealOnCursorRange": true,
-      "matchPosition": 1,
-      "regex": "(::)([^:]{1,})(::)"
+      "matchPosition": 2,
+      "regex": "(\\h|^)(::)(.+)(::)(\\h|$)"
     },
     "highlighted-right-colon": {
       "isHiddenWithoutCursor": true,
       "isMarkdownCharacter": true,
       "isRevealOnCursorRange": true,
-      "matchPosition": 3,
-      "regex": "(::)([^:]{1,})(::)"
+      "matchPosition": 4,
+      "regex": "(\\h|^)(::)(.+)(::)(\\h|$)"
     },
     "strikethrough": {
       "color": "#78787B",
@@ -226,29 +226,29 @@
       "regex": "(~~)([^~]{1,})(~~)"
     },
     "todo-flagged-1-sign": {
-      "backgroundColor": "#5C0622",
+      "backgroundColor": "#45041A",
       "matchPosition": 2,
-      "regex": "(^|\\v)(\\h*(\\*)\\h*(\\[ \\]\\h+|\\h+)\\!{1}\\h+.*)($|\\v)"
+      "regex": "(^|\\v)(\\h*(\\*|-)\\h*(\\[ \\]\\h+|\\h+)\\!{1}\\h+.*)($|\\v)"
     },
     "todo-flagged-2-sign": {
-      "backgroundColor": "#A20B3C",
+      "backgroundColor": "#8B0934",
       "matchPosition": 2,
-      "regex": "(^|\\v)(\\h*(\\*)\\h*(\\[ \\]\\h+|\\h+)\\!{2}\\h+.*)($|\\v)"
+      "regex": "(^|\\v)(\\h*(\\*|-)\\h*(\\[ \\]\\h+|\\h+)\\!{2}\\h+.*)($|\\v)"
     },
     "todo-checked-override": {
-      "color": "#3CA20B",
+      "color": "#45B90C",
       "matchPosition": 0,
       "regex": "(^\\h*[\\*]{1} |^\\h*[0-9]+[\\.\\)] )(\\[x\\] )(.*)",
       "strikethroughStyle": 1
     },
     "todo-scheduled-override": {
-      "color": "#F8E2B7",
+      "color": "#F3D087",
       "matchPosition": 0,
       "regex": "(^\\h*[\\*]{1} |^\\h*[0-9]+[\\.\\)] )(\\[\\>\\] )(.*)",
       "strikethroughStyle": 1
     },
     "todo-canceled-override": {
-      "color": "#F8B7CC",
+      "color": "#D00E4E",
       "matchPosition": 0,
       "regex": "(^\\h*[\\*]{1} |^\\h*[0-9]+[\\.\\)] )(\\[-\\] )(.*)",
       "strikethroughStyle": 1
@@ -256,20 +256,25 @@
     "todo-udemy": {
       "backgroundColor": "#041A45",
       "matchPosition": 2,
-      "regex": "(^|\\v)(\\h*(\\*|-)\\h*(\\[ \\]\\h+|\\h+)Udemy(:?)\\h+.*)($|\\v)"
+      "regex": "(^|\\v)(\\h*(\\*|-)\\h*(\\[ \\]\\h+|\\h+)#udemy\\h+.*)($|\\v)"
     },
     "todo-noteplan": {
       "backgroundColor": "#041A45",
       "matchPosition": 2,
-      "regex": "(^|\\v)(\\h*(\\*|-)\\h*(\\[ \\]\\h+|\\h+)NP(:?)\\h+.*)($|\\v)"
+      "regex": "(^|\\v)(\\h*(\\*|-)\\h*(\\[ \\]\\h+|\\h+)#np\\h+.*)($|\\v)"
+    },
+    "todo-company": {
+      "backgroundColor": "#082B74",
+      "matchPosition": 2,
+      "regex": "(^|\\v)(\\h*(\\*|-)\\h*(\\[ \\]\\h+|\\h+)#comp\\h+.*)($|\\v)"
     },
     "todo-wife": {
       "backgroundColor": "#453004",
       "matchPosition": 2,
-      "regex": "(^|\\v)(\\h*(\\*|-)\\h*(\\[ \\]\\h+|\\h+)Frau(:?)\\h+.*)($|\\v)"
+      "regex": "(^|\\v)(\\h*(\\*|-)\\h*(\\[ \\]\\h+|\\h+)SW(:?)\\h+.*)($|\\v)"
     },
     "todo-goal": {
-      "backgroundColor": "#348B09",
+      "backgroundColor": "#2B7408",
       "matchPosition": 2,
       "regex": "(^|\\v)(\\h*(\\*|-)\\h*(\\[ \\]\\h+|\\h+)>>\\h+.*)($|\\v)"
     },
@@ -284,7 +289,7 @@
     "timeblocks": {
       "color": "#F1C66F",
       "matchPosition": 1,
-      "regex": "((?:\\d{4}-[01]\\d{1}-\\d{2})?(?:(at|from)\\s*([0-2]?\\d|noon|midnight)(:[0-5]\\d)?(\\s?(AM?|PM?|am?|pm?)?)|\\h+([0-2]?\\d)(:[0-5]\\d)?(\\s?(AM?|PM?|am?|pm?)|(?=\\s*(\\-|\\–|\\~|\\〜|to|\\?)))|\\h+([0-2]?\\d|noon|midnight)(:[0-5]\\d)\\s?(AM?|PM?|am?|pm?)?)(?:\\s*(\\-|\\–|\\~|\\〜|to|\\?)\\s*([0-2]?\\d|noon|midnight)(:[0-5]\\d)?(\\s?(AM?|PM?|am?|pm?)?))?(?=\\h|$))",
+      "regex": "((\\s)(?:[01]\\d:[0-5][0-9]|2[0-3]:[0-5][0-9])-(?:[01]\\d:[0-5][0-9]|2[0-3]:[0-5][0-9])(\\s|$))",
       "type": "italic"
     }
   }
