@@ -10,6 +10,8 @@ print_aliases() {
 # print functions from here (alphabetically)
 print_functions() {
   echo "backup_sync() # sync a file or folder into a backup folder without some dev build folders/files"
+  echo "base64dec() # base64-decode provided base64 string"
+  echo "base64enc() # base64-encode provided string"
   echo "brew_list() # show installed via brew && brew cask"
   echo "chucknorris() # get a random chuck norris joke one of a given category"
   echo "colorcodes() # print shell color codes"
@@ -87,6 +89,24 @@ datestrings() {
   echo "-- $(date +"%Y/%m/%d")"
   echo "-- $(date +"%d.%m.%Y")"
   echo "-- $(date +"%d/%m/%Y")"
+}
+
+# base64-encode provided string
+base64enc() {
+  if [ $# -ne 0 ] ; then
+    echo "$(echo -n ${1} | base64)"
+  else
+    echo "error: no string provided"
+  fi
+}
+
+# base64-decode provided base64 string
+base64dec() {
+  if [ $# -ne 0 ] ; then
+    echo "$(echo -n ${1} | base64 -d)"
+  else
+    echo "error: no base64 string provided"
+  fi
 }
 
 # print timestamp seconds and add number of seconds if you want
