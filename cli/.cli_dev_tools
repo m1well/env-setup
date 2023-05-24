@@ -24,6 +24,7 @@ alias gitpod="git checkout develop && git pull origin develop --rebase"
 alias gitpom="git checkout master && git pull origin master --rebase"
 alias gitpsh="git_push"
 alias gitrb="git rebase"
+alias gitrba="git rebase --abort"
 alias gitrbc="git rebase --continue"
 alias gitst="git status"
 
@@ -38,10 +39,14 @@ alias grawcbd="./gradlew clean buildDocker"
 # maven
 alias mvnc="mvn clean"
 alias mvncp="mvn clean package"
+alias mvncpst="mvn clean package -DskipTests"
 alias mvnci="mvn clean install"
+alias mvncv="mvn clean verify"
 alias mvnwc="./mvnw clean"
 alias mvnwcp="./mvnw clean package"
+alias mvnwcpst="./mvnw clean package -DskipTests"
 alias mvnwci="./mvnw clean install"
+alias mvnwcv="./mvnw clean verify"
 
 # npm
 alias npmi="npm install"

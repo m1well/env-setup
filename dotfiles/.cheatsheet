@@ -82,6 +82,7 @@ grep -ri {1} . | wc -l # grep given string recursively and count all occurrences
 grep -rin {1} . # grep given string recursively and show linenumbers
 jar tvf {1} # view contents of a jar file
 killall Docker && open /Applications/Docker.app # on macOS restart docker deamon
+lsof -i -n | grep LISTEN # show used ports
 mvn -N wrapper:wrapper -Dmaven={1} # add maven wrapper to project root with given version
 mvn dependency:list -Dsort=true | grep "^\[INFO\]   " | grep ":" | cut -d " " -f 5 | grep "{1}" | sort -u # get info of given maven dependency in current project
 mvn dependency:list -Dsort=true | grep "^\[INFO\]   " | grep ":" | cut -d " " -f 5 | wc -l # count distinct maven dependencies in current project
