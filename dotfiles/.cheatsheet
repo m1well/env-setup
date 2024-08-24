@@ -73,6 +73,7 @@ git remote add upstream {1} # add an upstream remote
 git remote set-url origin {1} # change the url of the origin remote
 git remote set-url upstream {1} # change the url of the upstream remote
 git reset HEAD~1 # reset last commit and put files to staging area
+git shortlog -s -n --all --no-merges # show commiter and commit amount
 git stash save {1} # stash the changes with a given message
 git status # show actual changes
 git update-index --chmod=+x {1} # after adding a fie to git you can mark it as a executable

@@ -21,7 +21,7 @@ alias gitconf="git config --list"
 alias gitfa="git fetch --all"
 alias gitll="git log -2 --graph --pretty=format:'%C(132)%h - %C(251)%s %C(45)(%ad) %C(33)<%cn>%Creset' --date=local"
 alias gitpod="git checkout develop && git pull origin develop --rebase"
-alias gitpom="git checkout master && git pull origin master --rebase"
+alias gitpom="git_current_master"
 alias gitpsh="git_push"
 alias gitrb="git rebase"
 alias gitrba="git rebase --abort"
@@ -50,7 +50,7 @@ alias mvnwcv="./mvnw clean verify"
 
 # npm
 alias npmi="npm install"
-alias npmrm="rm -rf node_modules"
+alias npmrm="rm -f package-lock.json && rm -rf node_modules"
 alias npms="npm start"
 alias npmt="npm test"
 alias npmgu="npm install -g npm" # npm global update

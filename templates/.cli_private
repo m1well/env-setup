@@ -15,5 +15,6 @@ git() {
 }
 
 ln -sf ${M1WELL_TOOLSUITE_HOME}/env-setup/dotfiles/.vimrc ${USER_HOME}/.vimrc
+ln -sf ${M1WELL_TOOLSUITE_HOME}/env-setup/nvim/init.lua ${USER_HOME}/.config/nvim/init.lua
 ln -sf ${M1WELL_TOOLSUITE_HOME}/env-setup/terminal/m1well.plist ${USER_HOME}/Library/Application\ Support/iTerm2/DynamicProfiles/m1well.plist
 ln -sf ${M1WELL_TOOLSUITE_HOME}/env-setup/terminal/m1well.zsh-theme ${USER_HOME}/.oh-my-zsh/themes/m1well.zsh-theme

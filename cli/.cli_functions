@@ -17,6 +17,7 @@ print_functions() {
   echo "colorcodes() # print shell color codes"
   echo "datestrings() # print actual datestrings"
   echo "dockercleanup() # clean up docker system, volumes and images"
+  echo "ev() # edit a file with nvim or vim"
   echo "fid() # find directories"
   echo "fidr() # find directories recursively"
   echo "fif() # find files"
@@ -54,6 +55,15 @@ src() {
   if [ "${b}" != "" ] ; then
     source ${USER_HOME}/.bashrc
     echo ">> sourced .bashrc <<"
+  fi
+}
+
+# edit a file with nvim or vim
+ev() {
+  if isCommandAvailable "nvim" ; then
+    nvim "$@"
+  else
+    vim "$@"
   fi
 }
 
@@ -320,6 +330,14 @@ dockercleanup() {
   docker volume prune -f
   docker image prune -f
   docker system df
+}
+
+git_current_master() {
+  if [[ -z $(git ls-remote origin master) ]]; then
+    git checkout main && git pull origin main --rebase
+  else
+    git checkout master && git pull origin master --rebase
+  fi
 }
 
 # git push with some options
