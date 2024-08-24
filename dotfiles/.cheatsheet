@@ -14,6 +14,7 @@ cf services # show all services in the space
 cf target -s {1} # target cf to a given space
 curl "https://devops.datenkollektiv.de/renderBannerTxt?font=ogre&text={1}" # create small banner for given text
 date +"%V" # show actual calendar week number
+df -h # check disk space usage
 docker exec -it {1} /bin/bash # enter running container
 docker image history {1} # displays all build steps for the given image
 docker images -a # show all images
@@ -46,10 +47,11 @@ find . -type f -exec chmod 644 {} \; # change file mod recursively
 find . -type f -exec wc -l {} + # print linenumbers of files recursively
 find . -type f -name "{1}" # find files recursively with given name/regex
 find . -type f -name "{1}" -exec rm -f {} \; # delete files recursively with given name/regex
+free -h -c 3 -s 3 # check memory usage (three times)
 git add . # add all untracked files
 git add . && git commit --amend # git add all and amend the last commit
-git branch -D {1} # delete given branch locally
 git branch -av # show local and remote branches with last commit message
+git branch -D {1} # delete given branch locally
 git checkout -b {1} # checkout actual branch with a new name
 git checkout . # checkout actual branch and reset all local changes
 git checkout {1} # checkout a given branch
