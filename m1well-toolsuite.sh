@@ -160,7 +160,7 @@ installation() {
   askQuestion "generate ssh config and ssh key for github?"
   [[ $REPLY =~ ^[Yy]$ ]] && createSshConfig
   generateRcFile
-  mkdir .config/nvim
+  mkdir -p ${HOME}/.config/nvim
   installTools
 }
 update() {

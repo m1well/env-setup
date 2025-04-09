@@ -28,6 +28,7 @@ print_functions() {
   echo "listening() # show apps listening on ports - you can also specify a port"
   echo "loremipsum() # small lorem ipsum generator (up to 2.000 characters)"
   echo "ngcli_update() # angular cli update"
+  echo "npm_update() # npm update"
   echo "rand_num() # generate random number with given length (up to 32)"
   echo "rand_pass() # generate random password with given length (up to 32)"
   echo "rm_builds() # remove some build and dev folders"
@@ -366,6 +367,15 @@ git_push() {
 ngcli_update() {
   npm uninstall -g @angular/cli
   npm install -g @angular/cli@latest
+  ng --version
+}
+
+# npm update
+npm_update() {
+  npm -v
+  npm cache clean -f
+  npm install -g n
+  npm -v
 }
 
 # remove some build and dev folders
