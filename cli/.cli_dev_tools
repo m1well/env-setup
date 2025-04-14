@@ -1,5 +1,8 @@
 ### cli dev tools ###
 
+# curl
+alias curl='curl -w "\n"'
+
 # docker
 alias doccomd="docker compose down"
 alias doccomu="docker compose up"
@@ -41,6 +44,10 @@ alias ksgetdeploy="kubectl get deployments"
 alias ksgetpod="kubectl get pods"
 alias ksgetserv="kubectl get services"
 alias ksgetingr="kubectl get ingress"
+alias kslog="kubectl logs"
+alias ksapply="kubectl apply -f"
+alias ksdescpod="kubectl describe pod"
+alias ksdeletpod="kubectl delete pod"
 alias kstop="kubectl top pods"
 
 # maven
