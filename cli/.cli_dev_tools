@@ -72,6 +72,9 @@ alias npmv="npm view ${1}" # overview of specific npm library
 # typescript
 alias tsgu="npm install -g typescript" # typescript global update
 
+# vs code
+alias vsc="code ." # open vs code with content of current folder
+
 # java
 alias jj="java -jar"
 

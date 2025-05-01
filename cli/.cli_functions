@@ -35,6 +35,7 @@ print_functions() {
   echo "seconds() # print timestamp seconds and add number of seconds if you want"
   echo "src() # source zshrc and/or bashrc if available"
   echo "timer() # set a terminal timer (terminal-notifier has to be installed)"
+  echo "url_from_string() # create hyphened url from string"
   echo "uuid() # generate one uuid (uuid-runtime has to be installed) ore more (if number is given)"
   echo "week() # print calendarweek"
 }
@@ -100,6 +101,11 @@ datestrings() {
   echo "-- $(date +"%Y/%m/%d")"
   echo "-- $(date +"%d.%m.%Y")"
   echo "-- $(date +"%d/%m/%Y")"
+}
+
+# create hyphened url from string
+url_from_string() {
+  echo "$(echo ${1} | tr '[:upper:]' '[:lower:]' | sed -e 's/[-,?]//g' | sed -e 's/  / /g' | sed -e 's/ /-/g')"
 }
 
 # base64-encode provided string
