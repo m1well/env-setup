@@ -4,8 +4,8 @@
 #description            : This script provides a setup for the m1well-toolsuite.
 #author                 : Michael Wellner (@m1well) twitter.m1well.de
 #date of creation       : 20181210
-#date of last change    : 20210103
-#version                : 1.9.0
+#date of last change    : 20250506
+#version                : 2.0.0
 #usage                  : m1well-toolsuite.sh [-i|-u]
 #notes                  : prerequisits
 #                       : debian / ubuntu (e.g. a docker container) -- run this to get git: "apt-get update && apt-get -y install git vim"
@@ -59,9 +59,21 @@ isStringEqual() {
 }
 installTools() {
   cd ..
-  git clone https://github.com/m1well/cheatsheet.git
-  git clone https://github.com/m1well/versions.git
-  git clone https://github.com/m1well/randomizer.git
+  if [ -d cheatsheet ]; then
+    printf "## cheatsheet project apparently already exists ${BR}"
+  else
+    git clone https://github.com/m1well/cheatsheet.git
+  fi
+  if [ -d versions ]; then
+    printf "## versions project apparently already exists ${BR}"
+  else
+    git clone https://github.com/m1well/versions.git
+  fi
+  if [ -d randomizer ]; then
+    printf "## randomizer project apparently already exists ${BR}"
+  else
+    git clone https://github.com/m1well/randomizer.git
+  fi  
 }
 copyCliMaster() {
   cp dotfiles/.m1well_cli_master ${HOME}/.m1well_cli_master
@@ -128,13 +140,6 @@ createSshConfig() {
   cat ${HOME}/.ssh/github-ssh.id_rsa.pub
   printf "${BR}${BR}"
 }
-createGlobalGitConfig() {
-  git config --global core.pager cat
-  git config --global color.ui auto
-  git config --global push.default simple
-  git config --global core.excludesfile ${HOME}/.gitignore_global
-  git config --global core.editor "vim"
-}
 askQuestion() {
   read -n1 -p "${1} (y/n)? "
   echo ""
@@ -143,13 +148,13 @@ installation() {
   TEMP_FILE=".temp"
   RC_FILE=".zshrc"
   RC_TEMPLATE_FILE="templates/.rc_template"
+  GITCONFIG_FILE="dotfiles/.gitconfig"
   TOOLSUITE_HOME=$(cd .. && pwd)
   USE_FONT=true
   copyCliMaster
   copyIndividualCliFiles
   read -p "git user name: " GIT_USER_NAME
   read -p "git user email: " GIT_USER_EMAIL
-  createGlobalGitConfig
   askQuestion "vim already installed?"
   [[ ! $REPLY =~ ^[Yy]$ ]] && disableVim
   askQuestion "iterm2 installed and want to use m1well profile?"

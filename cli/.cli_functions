@@ -23,6 +23,8 @@ print_functions() {
   echo "fif() # find files"
   echo "fifr() # find files recursively"
   echo "fsplit() # split file in N files"
+  echo "git_current_develop() # get and checkout develop or development branch"
+  echo "git_current_main() # get and checkout main or master branch"
   echo "git_push() # git push with some options"
   echo "intellij_setup() # print infos of my intellij setup"
   echo "listening() # show apps listening on ports - you can also specify a port"
@@ -339,8 +341,18 @@ dockercleanup() {
   docker system df
 }
 
-git_current_master() {
-  if [[ -z $(git ls-remote origin master) ]]; then
+# get and checkout develop or development branch
+git_current_develop() {
+  if [[ $(git ls-remote origin develop) ]]; then
+    git checkout develop && git pull origin develop --rebase
+  else
+    git checkout development && git pull origin development --rebase
+  fi
+}
+
+# get and checkout main or master branch
+git_current_main() {
+  if [[ $(git ls-remote origin main) ]]; then
     git checkout main && git pull origin main --rebase
   else
     git checkout master && git pull origin master --rebase

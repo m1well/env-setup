@@ -25,3 +25,4 @@ alias idea="/usr/local/bin/idea"
 alias greprec="grep -in --directories=recurse"
 
 export TIMESTAMP=`date "+%Y-%m-%d %H:%M:%S"`
+
