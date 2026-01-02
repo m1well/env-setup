@@ -447,7 +447,7 @@ intellij_setup() {
 editor:
   general:
     autoImport:
-      java:
+      java & kotlin:
         addUnambiguousImportsOnTheFly: true
       tsAndJs:
         addUnambiguousImportsOnTheFly: true
@@ -460,48 +460,66 @@ editor:
   colorScheme:
     general:
       errorsAndWarnings:
-        unknownSymbol:
-          foreground: E81057
         error:
           stripemark: E81057
           effects: E81057
+        unknownSymbol:
+          foreground: E81057
     defaults:
       classes:
         staticField:
           foreground: B66DDD
+      identifiers:
+        constant: B66DDD
       keyword:
-        foreground: C25C25
+        foreground: C26C26
       metadata:
         foreground: E8E811
       number:
-        foreground: 1057E8
+        foreground: 1D41D4
       string:
         stringText:
-          foreground: 57E810
-    java:
+          foreground: 44D44D
+    html:
+      tagName: 'inheritFromKeyword'
+    java & kotlin:
       annotations:
         annotationName: 'inheritFromMetadata'
   codeStyle:
     java:
       spaces:
         arrayInitializerBraces: true
-      wrappingBraces:
-        keepSimpleBlocksInOneLine: true
+      wrappingAndBraces:
+        simpleBlocksInOneLine: true
+        simpleLambdasInOneLine: true
+        simpleClassesInOneLine: true
         ifBracesForce: 'always'
         forBracesForce: 'always'
         whileBracesforce: 'always'
         doWhileBracesForce: 'always'
         ternaryOperationWrap: 'wrap if long'
-        signsOnNextLine: true
+        ternaryOperationSignsOnNextLine: true
         arraysWrap: 'wrap if long'
       blankLines:
         maximumInDeclaration: 1
         maximumInCode: 1
-        beforeEndBrace: 1
-        betweenHeaderAndPackages: 1
+        maximumBeforeEndBrace: 1
+        maximumBetweenHeaderAndPackages: 1
       imports:
         classCountStartImports: 999
         staticNamesCountStartImports: 999
+    kotlin:
+      spaces:
+        rangeOperators: true
+      blankLines:
+        maximumInDeclaration: 1
+        maximumInCode: 1
+        maximumBeforeEndBrace: 1
+      imports:
+        topLevelUseSingleImports: true
+        staticAndEnumSingleImprts: true
+      other:
+        useTrailingComma: true  
     styleSheets:
       tabsIndents:
         tabSize: 2
@@ -585,8 +603,5 @@ editor:
     patterns:
       pattern: 'MWE*'
       icon: '!'
-versionControl:
-  commit:
-    useNonModalCommitInterface: false
 "
 }
