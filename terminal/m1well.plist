@@ -1,54 +1,209 @@
 {
-  "Profiles":[
-    {
-      "Guid":"D5AA25D8-D42B-4164-93AD-D0AF8517FEBB",
-      "Name":"m1well",
-      "Blinking Cursor":false,
-      "Prompt Before Closing 2":false,
-      "Character Encoding":4,
-      "Rows":60,
-      "Columns":220,
-      "Normal Font":"InconsolataNerdFontCompleteM-Medium 15",
-      "Non Ascii Font":"Monaco 12",
-      "Terminal Type":"xterm-256color",
-      "Disable Window Resizing":true,
-      "Close Sessions On End":true,
-      "Description":"Default",
-      "Transparency":0.10,
-      "Use Bright Bold":true,
-      "Use Italic Font":true,
-      "Use Bold Font":true,
-      "Sync Title":false,
-      "Scrollback Lines":3000,
-      "Cursor Boost":0.1,
-      "Background Color":{
-        "Color Space":"sRGB",
-        "Alpha Component":1.00,
-        "Red Component":0.05,
-        "Green Component":0.05,
-        "Blue Component":0.10
-      },
-      "Foreground Color":{
-        "Red Component":0.85,
-        "Green Component":0.85,
-        "Blue Component":0.85
-      },
-      "Selected Text Color":{
-        "Red Component":0.10,
-        "Green Component":0.10,
-        "Blue Component":0.10
-      },
-      "Selection Color":{
-        "Red Component":0.75,
-        "Green Component":0.75,
-       "Blue Component":0.99
-      },
-      "Jobs to Ignore":[
-        "rlogin",
-        "ssh",
-        "slogin",
-        "telnet"
-      ]
-    }
-  ]
+   "Profiles":[
+      {
+         "Guid":"D5AA25D8-D42B-4164-93AD-D0AF8517FEBB",
+         "Name":"m1well",
+         "Blinking Cursor":false,
+         "Prompt Before Closing 2":false,
+         "Character Encoding":4,
+         "Rows":57,
+         "Columns":205,
+         "Normal Font":"InconsolataNerdFontCompleteM-Medium 15",
+         "Non Ascii Font":"Monaco 12",
+         "Terminal Type":"xterm-256color",
+         "Disable Window Resizing":true,
+         "Close Sessions On End":true,
+         "Description":"m1well Profile",
+         "Transparency":0.10,
+         "Use Bright Bold":true,
+         "Use Italic Font":true,
+         "Use Bold Font":true,
+         "Sync Title":false,
+         "Scrollback Lines":3000,
+         "Cursor Boost":0.1,
+         "Working Directory":"\/Users\/m1well",
+         "BM Growl":true,
+         "Command":"",
+         "Rewritable":true,
+         "Dynamic Profile Filename":"\/Users\/m1well\/Library\/Application Support\/iTerm2\/DynamicProfiles\/m1well.plist",
+         "Screen":-1,
+         "Custom Directory":"No",
+         "Default Bookmark":"No",
+         "Ambiguous Double Width":false,
+         "Non-ASCII Anti Aliased":true,
+         "Custom Command":"No",
+         "ASCII Anti Aliased":true,
+         "Vertical Spacing":1,
+         "Option Key Sends":0,
+         "Mouse Reporting":true,
+         "Idle Code":0,
+         "Send Code When Idle":false,
+         "Visual Bell":true,
+         "Flashing Bell":false,
+         "Silence Bell":false,
+         "Horizontal Spacing":1,
+         "Right Option Key Sends":0,
+         "Use Non-ASCII Font":false,
+         "Window Type":0,
+         "Background Image Location":"",
+         "Blur":false,
+         "Shortcut":"",
+         "Unlimited Scrollback":false,
+         "Jobs to Ignore":[
+            "rlogin",
+            "ssh",
+            "slogin",
+            "telnet"
+         ],
+         "Ansi 6 Color":{
+            "Green Component":0.50448882579803467,
+            "Red Component":0.061654355376958847,
+            "Blue Component":0.838664710521698
+         },
+         "Tags":[
+            "Dynamic"
+         ],
+         "Ansi 12 Color":{
+            "Green Component":0.50448882579803467,
+            "Red Component":0.061654355376958847,
+            "Blue Component":0.838664710521698
+         },
+         "Ansi 1 Color":{
+            "Green Component":0.067135065793991089,
+            "Red Component":0.97170770168304443,
+            "Blue Component":0.095619738101959229
+         },
+         "Bold Color":{
+            "Green Component":0.8579363226890564,
+            "Red Component":0.84028750658035278,
+            "Blue Component":0.89713811874389648
+         },
+         "Ansi 2 Color":{
+            "Green Component":0.77383565902709961,
+            "Red Component":0.17600196599960327,
+            "Blue Component":0.36823004484176636
+         },
+         "Ansi 4 Color":{
+            "Green Component":0.51804500818252563,
+            "Red Component":0.16567224264144897,
+            "Blue Component":0.82454067468643188
+         },
+         "Cursor Guide Color":{
+            "Red Component":0.74862593412399292,
+            "Color Space":"P3",
+            "Blue Component":0.99125725030899048,
+            "Alpha Component":0.25,
+            "Green Component":0.92047786712646484
+         },
+         "Ansi 10 Color":{
+            "Green Component":0.82695949077606201,
+            "Red Component":0.11459558457136154,
+            "Blue Component":0.379891037940979
+         },
+         "Ansi 15 Color":{
+            "Green Component":1,
+            "Red Component":1,
+            "Blue Component":1
+         },
+         "Foreground Color":{
+            "Green Component":0.8579363226890564,
+            "Red Component":0.84028750658035278,
+            "Blue Component":0.89713811874389648
+         },
+         "Selection Color":{
+            "Green Component":0.12343578040599823,
+            "Red Component":0.1234394758939743,
+            "Blue Component":0.379891037940979
+         },
+         "Ansi 13 Color":{
+            "Green Component":0.3135044276714325,
+            "Red Component":0.32478702068328857,
+            "Blue Component":0.72698760032653809
+         },
+         "Selected Text Color":{
+            "Green Component":0.8579363226890564,
+            "Red Component":0.84028750658035278,
+            "Blue Component":0.89713811874389648
+         },
+         "Background Color":{
+            "Green Component":0.076217696070671082,
+            "Red Component":0.07621997594833374,
+            "Blue Component":0.1118375289440155
+         },
+         "Ansi 11 Color":{
+            "Green Component":0.74144089221954346,
+            "Red Component":0.95126962661743164,
+            "Blue Component":0.035377603024244308
+         },
+         "Badge Color":{
+            "Red Component":0.92929404973983765,
+            "Color Space":"P3",
+            "Blue Component":0.13960540294647217,
+            "Alpha Component":0.5,
+            "Green Component":0.25479039549827576
+         },
+         "Ansi 14 Color":{
+            "Green Component":0.4900696873664856,
+            "Red Component":0.059441849589347839,
+            "Blue Component":0.85764402151107788
+         },
+         "Cursor Text Color":{
+            "Green Component":0.062745101749897003,
+            "Red Component":0.062745101749897003,
+            "Blue Component":0.062745101749897003
+         },
+         "Match Background Color":{
+            "Red Component":0.99697142839431763,
+            "Color Space":"P3",
+            "Blue Component":0.32116127014160156,
+            "Alpha Component":1,
+            "Green Component":0.98600882291793823
+         },
+         "Cursor Color":{
+            "Green Component":0.72549021244049072,
+            "Red Component":0.72549021244049072,
+            "Blue Component":0.72549021244049072
+         },
+         "Link Color":{
+            "Red Component":0.14513972401618958,
+            "Color Space":"P3",
+            "Blue Component":0.7093239426612854,
+            "Alpha Component":1,
+            "Green Component":0.35333043336868286
+         },
+         "Ansi 3 Color":{
+            "Green Component":0.72761225700378418,
+            "Red Component":0.92706489562988281,
+            "Blue Component":0.060177117586135864
+         },
+         "Ansi 7 Color":{
+            "Green Component":0.8579363226890564,
+            "Red Component":0.84028750658035278,
+            "Blue Component":0.89713811874389648
+         },
+         "Ansi 8 Color":{
+            "Green Component":0.8579363226890564,
+            "Red Component":0.84028750658035278,
+            "Blue Component":0.89713811874389648
+         },
+         "Ansi 9 Color":{
+            "Green Component":0.20686990022659302,
+            "Red Component":0.87161564826965332,
+            "Blue Component":0.1818375289440155
+         },
+         "Ansi 0 Color":{
+            "Green Component":0.12343578040599823,
+            "Red Component":0.1234394758939743,
+            "Blue Component":0.12343787401914597
+         },
+         "Ansi 5 Color":{
+            "Green Component":0.35215187072753906,
+            "Red Component":0.30770933628082275,
+            "Blue Component":0.71787959337234497
+         },
+         "Keyboard Map":{
+            
+         },
+      }
+   ]
 }
