@@ -157,32 +157,32 @@ uuid() {
 
 # generate random number with given length (up to 32)
 rand_num() {
-  if [ $# -ne 0 ] ; then
-    if (( ${1} > 32 )); then
-      echo "error: only up to 32 digits"
-      return
-    fi
-    local random="${$(head -c 400 < /dev/urandom | cksum)// /}"
-    echo "$(echo ${random} | head -c ${1})"
-  else
-    echo "error: set number of digits - e.g. rand 5"
-    return
+  if [ -z "${1}" ]; then
+    echo "error: set number of digits - e.g. rand_num 12"
+    return 1
   fi
+  if (( ${1} > 32 )); then
+    echo "error: only up to 32 digits"
+    return 1
+  fi
+
+  head -c 500 /dev/urandom | LC_ALL=C tr -dc '0-9' | head -c "${1}"
+  echo ""
 }
 
 # generate random password with given length (up to 32)
 rand_pass() {
-  if [ $# -ne 0 ] ; then
-    if (( ${1} > 32 )); then
-      echo "error: only up to 32 digits"
-      return
-    fi
-    local random="${$(head -c 400 < /dev/random | base64)}"
-    echo "$(echo ${random} | head -c ${1})"
-  else
+  if [ -z "${1}" ]; then
     echo "error: set number of digits - e.g. rand_pass 12"
-    return
+    return 1
   fi
+  if (( ${1} > 32 )); then
+    echo "error: only up to 32 digits"
+    return 1
+  fi
+
+  head -c 500 /dev/urandom | LC_ALL=C tr -dc 'a-zA-Z0-9' | tr -d 'oOiI0' | head -c "${1}"
+  echo ""
 }
 
 # set a terminal timer (terminal-notifier has to be installed)
