@@ -341,43 +341,47 @@ dockercleanup() {
   docker system df
 }
 
-# get and checkout develop or development branch
+# get and checkout dev or develop or development branch
 git_current_develop() {
-  if [[ $(git ls-remote origin develop) ]]; then
-    git checkout develop && git pull origin develop --rebase
-  else
-    git checkout development && git pull origin development --rebase
-  fi
+  local branches=(dev develop development)
+
+  for branch in "${branches[@]}"; do
+    if git ls-remote --exit-code --heads origin "$branch" &>/dev/null; then
+      git checkout "$branch" && git pull --rebase origin "$branch"
+      return 0
+    fi
+  done
+  
+  echo "no develop branch found"
+  return 1
 }
 
 # get and checkout main or master branch
 git_current_main() {
-  if [[ $(git ls-remote origin main) ]]; then
-    git checkout main && git pull origin main --rebase
-  else
-    git checkout master && git pull origin master --rebase
-  fi
+  local branches=(main master)
+
+  for branch in "${branches[@]}"; do
+    if git ls-remote --exit-code --heads origin "$branch" &>/dev/null; then
+      git checkout "$branch" && git pull --rebase origin "$branch"
+      return 0
+    fi
+  done
+
+  echo "no main branch found"
+  return 1
 }
 
 # git push with some options
 git_push() {
   local toBranch=$(git rev-parse --abbrev-ref HEAD)
-  echo "You really wanna push? All things checked? (Y|n) [ENTER]"
-  read REPLY
-  if [[ ! ${REPLY} =~ ^[Yy]$ ]] ; then
-    return
-  fi
-  echo "To which remote? - leave empty for "origin" [ENTER]"
-  read REMOTE
-  echo "Force push? (Y|n) [ENTER]"
+  echo "Force push? (press ff to force or just ENTER to normal)"
   read FORCE
-  local toRemote=${REMOTE:-"origin"}
-  if [[ ${FORCE} =~ ^[Yy]$ ]] ; then
-    echo "doing a push force now..."
-    $(git push ${toRemote} ${toBranch} --force-with-lease)
+  if [[ ${FORCE} =~ [ff]$ ]] ; then
+    echo "Performing force push now..."
+    $(git push origin ${toBranch} --force-with-lease)
   else
-    echo "doing a push now..."
-    $(git push ${toRemote} ${toBranch})
+    echo "Performing normal push now..."
+    $(git push origin ${toBranch})
   fi
 }
 

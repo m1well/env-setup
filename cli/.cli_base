@@ -4,14 +4,13 @@
 
 alias helloworld="echo \"Hello World!\""
 alias home="cd ${USER_HOME}";
-alias ..,,="cd .. && ls -alp"
-alias ,,="ls -alp"
-alias ,,,="ls -alprt"
-alias .-="cd - >/dev/null"
-alias ..="cd .."
-alias ....="cd .. && cd .."
-alias ......="cd .. && cd .. && cd .."
-alias ........="cd .. && cd .. && cd .. && cd .."
+alias kkll="cd .. && ls -alp"
+alias ll="ls -alp"
+alias lll="ls -alprt"
+alias k-="cd - >/dev/null"
+alias kk="cd .."
+alias kkk="cd .. && cd .."
+alias kkkk="cd .. && cd .. && cd .."
 alias cc="clear"
 alias xx="exit"
 

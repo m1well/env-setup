@@ -7,7 +7,7 @@ alias curl='curl -w "\n"'
 alias doccomd="docker compose down"
 alias doccomu="docker compose up"
 alias doccomud="docker compose up -d"
-alias doci="docker images -a"
+alias doci="docker images ls"
 alias docirm="docker image rm"
 alias docps="docker ps -a"
 
@@ -29,6 +29,7 @@ alias gitpsh="git_push"
 alias gitrb="git rebase"
 alias gitrba="git rebase --abort"
 alias gitrbc="git rebase --continue"
+alias gitrevert="git reset HEAD~1"
 alias gitst="git status"
 
 # gradle
@@ -38,6 +39,8 @@ alias grawrapper="gradle wrapper --gradle-version "
 alias grawc="./gradlew clean"
 alias grawcb="./gradlew clean build"
 alias grawcbd="./gradlew clean buildDocker"
+alias grawcbx="./gradlew clean build -x test"
+alias grawspot="./gradlew spotlessApply"
 
 # kubernetes
 alias ksgetdeploy="kubectl get deployments"
@@ -63,6 +66,7 @@ alias mvnwci="./mvnw clean install"
 alias mvnwcv="./mvnw clean verify"
 
 # npm
+alias npmci="npm ci"
 alias npmi="npm install"
 alias npmrm="rm -f package-lock.json && rm -rf node_modules"
 alias npms="npm start"
