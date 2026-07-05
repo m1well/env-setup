@@ -4,9 +4,9 @@
 
 alias helloworld="echo \"Hello World!\""
 alias home="cd ${USER_HOME}";
-alias kkll="cd .. && ls -alp"
-alias ll="ls -alp"
-alias lll="ls -alprt"
+alias kkmm="cd .. && ls -alp"
+alias mm="ls -alp"
+alias mmm="ls -alprt"
 alias k-="cd - >/dev/null"
 alias kk="cd .."
 alias kkk="cd .. && cd .."

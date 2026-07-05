@@ -3,34 +3,39 @@
 # curl
 alias curl='curl -w "\n"'
 
+
 # docker
 alias doccomd="docker compose down"
 alias doccomu="docker compose up"
 alias doccomud="docker compose up -d"
-alias doci="docker images ls"
+alias doci="docker image ls"
 alias docirm="docker image rm"
 alias docps="docker ps -a"
+
 
 # git
 alias gitaa="git add ."
 alias gitaacoa="git add . && git commit --amend"
 alias gitbra="git rev-parse --abbrev-ref HEAD"
 alias gitch="git checkout"
-alias gitchb="git checkout -b"
+alias gitchbr="git_checkout_new_branch"
 alias gitcoa="git commit --amend"
 alias gitcoaner="git commit --amend --no-edit --reset-author"
 alias gitcom="git commit"
 alias gitconf="git config --list"
+alias gitdelbr="git branch -D ${1}"
 alias gitfa="git fetch --all"
 alias gitll="git log -2 --graph --pretty=format:'%C(132)%h - %C(251)%s %C(45)(%ad) %C(33)<%cn>%Creset' --date=local"
 alias gitpod="git_current_develop"
 alias gitpom="git_current_main"
+alias gitpot="git_current_test"
 alias gitpsh="git_push"
 alias gitrb="git rebase"
 alias gitrba="git rebase --abort"
 alias gitrbc="git rebase --continue"
 alias gitrevert="git reset HEAD~1"
 alias gitst="git status"
+
 
 # gradle
 alias grac="gradle clean"
@@ -40,7 +45,10 @@ alias grawc="./gradlew clean"
 alias grawcb="./gradlew clean build"
 alias grawcbd="./gradlew clean buildDocker"
 alias grawcbx="./gradlew clean build -x test"
+alias grawkill="./gradlew --stop"
+alias grawrun="./gradlew bootRun --args='--spring.profiles.active=local'"
 alias grawspot="./gradlew spotlessApply"
+
 
 # kubernetes
 alias ksgetdeploy="kubectl get deployments"
@@ -52,6 +60,7 @@ alias ksapply="kubectl apply -f"
 alias ksdescpod="kubectl describe pod"
 alias ksdeletpod="kubectl delete pod"
 alias kstop="kubectl top pods"
+
 
 # maven
 alias mvnc="mvn clean"
@@ -65,20 +74,25 @@ alias mvnwcpst="./mvnw clean package -DskipTests"
 alias mvnwci="./mvnw clean install"
 alias mvnwcv="./mvnw clean verify"
 
+
 # npm
 alias npmci="npm ci"
 alias npmi="npm install"
-alias npmrm="rm -f package-lock.json && rm -rf node_modules"
+alias npmrm="rm -rf node_modules"
 alias npms="npm start"
 alias npmt="npm test"
 alias npmv="npm view ${1}" # overview of specific npm library
 
+
 # typescript
 alias tsgu="npm install -g typescript" # typescript global update
+
 
 # vs code
 alias vsc="code ." # open vs code with content of current folder
 
+
 # java
 alias jj="java -jar"
+
 

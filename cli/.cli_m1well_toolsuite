@@ -6,7 +6,7 @@
 
 alias m1well-update="bash ${M1WELL_TOOLSUITE_HOME}/env-setup/m1well-toolsuite.sh -u"
 alias cheat="bash ${M1WELL_TOOLSUITE_HOME}/cheatsheet/cheatsheet.sh"
-alias versions="bash ${M1WELL_TOOLSUITE_HOME}/versions/versions.sh"
+alias versions="source ${M1WELL_TOOLSUITE_HOME}/versions/versions.sh"
 alias randomizer="bash ${M1WELL_TOOLSUITE_HOME}/randomizer/randomizer.sh"
 
 alias ts-h="cd ${M1WELL_TOOLSUITE_HOME} && ls -al";

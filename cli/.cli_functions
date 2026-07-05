@@ -14,6 +14,7 @@ print_functions() {
   echo "base64enc() # base64-encode provided string"
   echo "brew_list() # show installed via brew && brew cask"
   echo "chucknorris() # get a random chuck norris joke one of a given category"
+  echo "colima_restart() # stopp and start colima"
   echo "colorcodes() # print shell color codes"
   echo "datestrings() # print actual datestrings"
   echo "dockercleanup() # clean up docker system, volumes and images"
@@ -23,8 +24,10 @@ print_functions() {
   echo "fif() # find files"
   echo "fifr() # find files recursively"
   echo "fsplit() # split file in N files"
-  echo "git_current_develop() # get and checkout develop or development branch"
-  echo "git_current_main() # get and checkout main or master branch"
+  echo "git_checkout_new_branch() # checkout new branch or show message if exists"
+  echo "git_current_develop() # get, checkout and pull dev or develop or development branch"
+  echo "git_current_main() # get, checkout and pull main or master branch"
+  echo "git_current_test() get, checkout and pull test or testing branch"
   echo "git_push() # git push with some options"
   echo "intellij_setup() # print infos of my intellij setup"
   echo "listening() # show apps listening on ports - you can also specify a port"
@@ -233,6 +236,11 @@ backup_sync() {
   fi
 }
 
+# stopp and start colima
+colima_restart() {
+  colima stop --force && colima start --cpu 4 --memory 4 --disk 50 --vm-type vz
+}
+
 # get a random chuck norris joke one of a given category
 chucknorris() {
   if [ $# -ne 0 ] ; then
@@ -341,7 +349,17 @@ dockercleanup() {
   docker system df
 }
 
-# get and checkout dev or develop or development branch
+# checkout new branch or show message if exists
+git_checkout_new_branch() {
+  local branch="${1}"
+  if git ls-remote --exit-code --heads origin "${branch}" >/dev/null 2>&1; then
+    echo "Remote branch exists. Use: git checkout ${branch}" >&2
+    return 1
+  fi
+  git checkout -b "${branch}"
+}
+
+# get, checkout and pull dev or develop or development branch
 git_current_develop() {
   local branches=(dev develop development)
 
@@ -356,7 +374,7 @@ git_current_develop() {
   return 1
 }
 
-# get and checkout main or master branch
+# get, checkout and pull main or master branch
 git_current_main() {
   local branches=(main master)
 
@@ -368,6 +386,21 @@ git_current_main() {
   done
 
   echo "no main branch found"
+  return 1
+}
+
+# get, checkout and pull test or testing branch
+git_current_test() {
+  local branches=(test testing)
+
+  for branch in "${branches[@]}"; do
+    if git ls-remote --exit-code --heads origin "$branch" &>/dev/null; then
+      git checkout "$branch" && git pull --rebase origin "$branch"
+      return 0
+    fi
+  done
+
+  echo "no test branch found"
   return 1
 }
 
@@ -492,18 +525,18 @@ editor:
   codeStyle:
     java:
       spaces:
-        arrayInitializerBraces: true
+        within:
+          arrayInitializerBraces: true
       wrappingAndBraces:
-        simpleBlocksInOneLine: true
         simpleLambdasInOneLine: true
         simpleClassesInOneLine: true
-        ifBracesForce: 'always'
-        forBracesForce: 'always'
-        whileBracesforce: 'always'
-        doWhileBracesForce: 'always'
+        ifForceBraces: 'always'
+        forForceBraces: 'always'
+        whileForceBraces: 'always'
+        doWhileForceBraces: 'always'
         ternaryOperationWrap: 'wrap if long'
         ternaryOperationSignsOnNextLine: true
-        arraysWrap: 'wrap if long'
+        arrayInitializerWrap: 'wrap if long'
       blankLines:
         maximumInDeclaration: 1
         maximumInCode: 1
@@ -513,8 +546,6 @@ editor:
         classCountStartImports: 999
         staticNamesCountStartImports: 999
     kotlin:
-      spaces:
-        rangeOperators: true
       blankLines:
         maximumInDeclaration: 1
         maximumInCode: 1
@@ -531,18 +562,6 @@ editor:
         continuationIndent: 2
       blankLines:
         maximumInCode: 1
-    groovy:
-      tabsIndents:
-        tabSize: 2
-        indent: 2
-        continuationIndent: 2
-      blankLines:
-        maximumInDeclaration: 1
-        maximumInCode: 1
-        beforeEndBrace: 1
-      imports:
-        classCountStartImports: 999
-        staticNamesCountStartImports: 999
     javascript:
       tabsIndents:
         indentSize: 2
@@ -560,7 +579,7 @@ editor:
         whileBracesforce: 'always'
         doWhileBracesForce: 'always'
         ternaryOperationWrap: 'wrap if long'
-        signsOnNextLine: true
+        ternaryOperationSignsOnNextLine: true
         arraysWrap: 'wrap if long'
       blankLines:
         maximumInCode: 1
@@ -590,12 +609,12 @@ editor:
       wrappingBraces:
         keepSimpleBlocksInOneLine: true
         keepSimpleMethodsInOneLine: true
-        ifBracesForce: 'always'
-        forBracesForce: 'always'
-        whileBracesforce: 'always'
-        doWhileBracesForce: 'always'
+        ifForceBraces: 'always'
+        forForceBraces: 'always'
+        whileForceBraces: 'always'
+        doBracesForceBraces: 'always'
         ternaryOperationWrap: 'wrap if long'
-        signsOnNextLine: true
+        ternaryOperaiontSignsOnNextLine: true
         arraysWrap: 'wrap if long'
       blankLines:
         maximumInCode: 1

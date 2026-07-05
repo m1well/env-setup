@@ -18,6 +18,10 @@ in the m1well-toolsuite: `bash m1well-toolsuite.sh -u` <br>
 (All apps/repos have to stay in the master branch!) <br>
 
 #### test m1well-toolsuite
+Just build the Dockerfile and run the container. <br>
+In the container then execute `bash m1well-toolsuite.sh -i`
+
+#### test m1well-toolsuite (legacy)
 To run some test just execute following statement in the rootfolder: <br>
 `bash test/m1well-test.sh` <br>
 
@@ -66,4 +70,4 @@ If you want the installation process copies it to the right folder and then you 
 The font file is also getting copied for special zsh characters.<br>
 
 ## Copyright
-Copyright :copyright: 2020 Michael Wellner ([@m1well](https://m1well.com))<br>
+Copyright :copyright: 2026 Michael Wellner ([@m1well](https://m1well.com))<br>
