@@ -24,7 +24,7 @@
          "Working Directory":"\/Users\/m1well",
          "BM Growl":true,
          "Command":"",
-         "Rewritable":true,
+         "Rewritable":false,
          "Dynamic Profile Filename":"\/Users\/m1well\/Library\/Application Support\/iTerm2\/DynamicProfiles\/m1well.plist",
          "Screen":-1,
          "Custom Directory":"No",

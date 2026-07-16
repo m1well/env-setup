@@ -2,10 +2,10 @@
 ###
 #title                  : m1well-toolsuite.sh
 #description            : This script provides a setup for the m1well-toolsuite.
-#author                 : Michael Wellner (@m1well) twitter.m1well.de
+#author                 : Michael Wellner (@m1well)
 #date of creation       : 20181210
-#date of last change    : 20260704
-#version                : 2.1.0
+#date of last change    : 20260716
+#version                : 2.2.0
 #usage                  : m1well-toolsuite.sh [-i|-u]
 #notes                  : prerequisits
 #                       : debian / ubuntu (e.g. a docker container) -- run this to get git: "apt-get update && apt-get -y install git vim"
@@ -38,11 +38,13 @@ printStartLines() {
   printf "${HASHLINE}${BR}"
   printf "${FONT_NONE}"
 }
+
 printEndLines() {
   printf "${FONT_CYAN}"
   printf "${HASHLINE}${BR}"
   printf "${FONT_NONE}"
 }
+
 printSuccess() {
   if [ -f "${HOME}/.zshrc" ]; then
     local file="${HOME}/.zshrc"
@@ -56,9 +58,11 @@ printSuccess() {
   printf "##### \"source ${file}\" ${BR}"
   printf "${FONT_NONE}"
 }
+
 printUsage() {
   echo "Invalid option - you can only use -i for installation or -u for update" >&2
 }
+
 installTools() {
   cd "${TOOLSUITE_HOME}"
   if [ -d cheatsheet ]; then
@@ -77,13 +81,16 @@ installTools() {
     git clone https://github.com/m1well/randomizer.git
   fi
 }
+
 copyCliMaster() {
   cp "${SCRIPT_DIR}/dotfiles/.m1well_cli_master" "${HOME}/.m1well_cli_master"
 }
+
 copyIndividualCliFiles() {
   cp "${SCRIPT_DIR}/templates/.cli_private" "${SCRIPT_DIR}/cli/.cli_private"
   cp "${SCRIPT_DIR}/templates/.cli_projects" "${SCRIPT_DIR}/cli/.cli_projects"
 }
+
 commentOutLine() {
   if [[ "${OSTYPE}" == darwin* ]]; then
     sed -i -temp -e "/${2}/s/^/# /g" "${1}"
@@ -93,6 +100,7 @@ commentOutLine() {
     mv "${1}-temp" "${1}"
   fi
 }
+
 replaceString() {
   if [[ "${OSTYPE}" == darwin* ]]; then
     sed -i -temp -e "s|${2}|${3}|g" "${1}"
@@ -102,6 +110,7 @@ replaceString() {
     mv "${1}-temp" "${1}"
   fi
 }
+
 generateRcFile() {
   cp "${RC_TEMPLATE_FILE}" "${RC_TEMPLATE_FILE}.copy"
   replaceString "${RC_TEMPLATE_FILE}.copy" "&&userhome&&" "${HOME}"
@@ -113,14 +122,17 @@ generateRcFile() {
   fi
   mv "${RC_TEMPLATE_FILE}.copy" "${HOME}/${RC_FILE}"
 }
+
 disableVim() {
   commentOutLine "${SCRIPT_DIR}/cli/.cli_private" ".vimrc"
   git config --global --unset core.editor || true
 }
+
 disableIterm2Profile() {
   USE_FONT=false
   commentOutLine "${SCRIPT_DIR}/cli/.cli_private" "m1well.plist"
 }
+
 copyFontIfNeeded() {
   if [ "${USE_FONT}" = true ]; then
     if [[ "${OSTYPE}" == darwin* ]]; then
@@ -131,10 +143,12 @@ copyFontIfNeeded() {
     fi
   fi
 }
+
 disableZsh() {
   commentOutLine "${SCRIPT_DIR}/cli/.cli_private" "m1well.zsh-theme"
   RC_FILE=".bashrc" # if no zsh - then bashrc
 }
+
 createSshConfig() {
   mkdir -p "${HOME}/.ssh"
   if [ -f "${HOME}/.ssh/github-ssh.id_rsa" ]; then
@@ -150,10 +164,12 @@ createSshConfig() {
   cat "${HOME}/.ssh/github-ssh.id_rsa.pub"
   printf "${BR}${BR}"
 }
+
 askQuestion() {
   read -rn1 -p "${1} (y/n)? "
   echo ""
 }
+
 installation() {
   RC_FILE=".zshrc"
   RC_TEMPLATE_FILE="${SCRIPT_DIR}/templates/.rc_template"
@@ -175,6 +191,7 @@ installation() {
   mkdir -p "${HOME}/.config/nvim"
   installTools
 }
+
 update() {
   cd "${TOOLSUITE_HOME}"
   for dir in "${TOOLSUITE_HOME}"/*; do

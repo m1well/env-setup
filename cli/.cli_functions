@@ -1,6 +1,4 @@
 ### cli functions ###
-# export the user's home like
-# 'export USER_HOME="/Users/<your-user-home>"; '
 
 # print aliases by name
 print_aliases() {
@@ -27,7 +25,8 @@ print_functions() {
   echo "git_checkout_new_branch() # checkout new branch or show message if exists"
   echo "git_current_develop() # get, checkout and pull dev or develop or development branch"
   echo "git_current_main() # get, checkout and pull main or master branch"
-  echo "git_current_test() get, checkout and pull test or testing branch"
+  echo "git_current_test() # get, checkout and pull test or testing branch"
+  echo "git_local_user() # set local git user to m1well"
   echo "git_push() # git push with some options"
   echo "intellij_setup() # print infos of my intellij setup"
   echo "listening() # show apps listening on ports - you can also specify a port"
@@ -53,14 +52,14 @@ isCommandAvailable() {
 
 # source zshrc and/or bashrc if available
 src() {
-  local z=$(find ${USER_HOME}/ -maxdepth 1 -type f -name ".zshrc")
+  local z=$(find ${HOME}/ -maxdepth 1 -type f -name ".zshrc")
   if [ "${z}" != "" ] ; then
-    source ${USER_HOME}/.zshrc
+    source ${HOME}/.zshrc
     echo ">> sourced .zshrc <<"
   fi
-  local b=$(find ${USER_HOME}/ -maxdepth 1 -type f -name ".bashrc")
+  local b=$(find ${HOME}/ -maxdepth 1 -type f -name ".bashrc")
   if [ "${b}" != "" ] ; then
-    source ${USER_HOME}/.bashrc
+    source ${HOME}/.bashrc
     echo ">> sourced .bashrc <<"
   fi
 }
@@ -216,13 +215,13 @@ backup_sync() {
     else
       SOURCE="${1}"
       TARGET_FOLDER="${2}"
-      LOG_FILE="${USER_HOME}/backuplogs/$(date +%Y%m%d%H%M%S)_backup_sync.log"
-      ERROR_FILE="${USER_HOME}/backuplogs/$(date +%Y%m%d%H%M%S)_backup_sync_error.log"
+      LOG_FILE="${HOME}/backuplogs/$(date +%Y%m%d%H%M%S)_backup_sync.log"
+      ERROR_FILE="${HOME}/backuplogs/$(date +%Y%m%d%H%M%S)_backup_sync_error.log"
 
       echo "start backup sync from ${1} to ${2}"
 
       # create backuplogs folder if not exists
-      mkdir -p "${USER_HOME}/backuplogs"
+      mkdir -p "${HOME}/backuplogs"
 
       # some dev folder excludes - a bit like .gitignore
       rsync -av --times --checksum --human-readable --itemize-changes --stats \
@@ -347,6 +346,12 @@ dockercleanup() {
   docker volume prune -f
   docker image prune -f
   docker system df
+}
+
+# set local git user to m1well
+git_local_user() {
+  git config user.name "m1well"
+  git config user.email "michaelwellner@gmx.de"
 }
 
 # checkout new branch or show message if exists

@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(rg:*)",
+      "Bash(fd:*)",
+      "Bash(jq:*)",
+      "Bash(time:*)",
+      "Bash(xargs -I{} echo {})",
+      "Bash(xargs -I{} basename {})",
+      "Bash(awk '$1>1')",
+      "Bash(sort -t: -k2 -rn)",
+      "Bash(awk -F: '{s+=$2} END {print s\" total\"}')",
+      "Bash(awk '{s+=$1} END {print s}')"
+    ],
+    "deny": [
+      "Bash(rm -rf:*)",
+      "Bash(sudo:*)",
+      "Bash(curl:*)",
+      "Bash(wget:*)",
+      "Bash(git push:*)",
+      "Bash(git push --force:*)",
+      "Bash(npm publish:*)",
+      "Bash(gh pr merge:*)",
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./**/*.pem)",
+      "Read(./**/*credentials*)",
+      "Edit(./.env)",
+      "Edit(./.env.*)",
+      "Bash(git clean:*)",
+      "Bash(git reset --hard:*)",
+      "Bash(git rebase:*)",
+      "Bash(git commit)",
+      "Bash(git commit *)",
+      "Bash(git push)",
+      "Bash(git push *)"
+    ],
+    "defaultMode": "acceptEdits"
+  },
+  "model": "opus[1m]",
+  "statusLine": {
+    "type": "command",
+    "command": "${HOME}/.claude/statusline.sh",
+    "padding": 1
+  },
+  "effortLevel": "xhigh",
+  "theme": "dark"
+}

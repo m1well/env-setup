@@ -1,9 +1,7 @@
 ### cli base ###
-# export the user's home like
-# 'export USER_HOME="/Users/<your-user-home>"; '
 
 alias helloworld="echo \"Hello World!\""
-alias home="cd ${USER_HOME}";
+alias home="cd ${HOME}";
 alias kkmm="cd .. && ls -alp"
 alias mm="ls -alp"
 alias mmm="ls -alprt"
@@ -24,4 +22,3 @@ alias idea="/usr/local/bin/idea"
 alias greprec="grep -in --directories=recurse"
 
 export TIMESTAMP=`date "+%Y-%m-%d %H:%M:%S"`
-
