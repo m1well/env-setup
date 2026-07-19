@@ -2,6 +2,10 @@
 
 CURRENT_BG='NONE'
 
+# gives us $jobstates, so prompt_status can check for background
+# jobs without forking a subshell on every single prompt render
+zmodload -F zsh/parameter +p:jobstates 2>/dev/null
+
 # colors
 COLOR_BLUE=27
 COLOR_GREEN=76
@@ -110,64 +114,6 @@ prompt_git() {
   fi
 }
 
-prompt_bzr() {
-    (( $+commands[bzr] )) || return
-    if (bzr status >/dev/null 2>&1); then
-        status_mod=`bzr status | head -n1 | grep "modified" | wc -m`
-        status_all=`bzr status | head -n1 | wc -m`
-        revision=`bzr log | head -n2 | tail -n1 | sed 's/^revno: //'`
-        if [[ $status_mod -gt 0 ]] ; then
-            prompt_segment $COLOR_YELLOW $COLOR_BLACK
-            echo -n "bzr@"$revision "✚ "
-        else
-            if [[ $status_all -gt 0 ]] ; then
-                prompt_segment $COLOR_YELLOW $COLOR_BLACK
-                echo -n "bzr@"$revision
-
-            else
-                prompt_segment $COLOR_GREEN $COLOR_BLACK
-                echo -n "bzr@"$revision
-            fi
-        fi
-    fi
-}
-
-prompt_hg() {
-  (( $+commands[hg] )) || return
-  local rev status
-  if $(hg id >/dev/null 2>&1); then
-    if $(hg prompt >/dev/null 2>&1); then
-      if [[ $(hg prompt "{status|unknown}") = "?" ]]; then
-        # if files are not added
-        prompt_segment $COLOR_RED $COLOR_WHITE
-        st='±'
-      elif [[ -n $(hg prompt "{status|modified}") ]]; then
-        # if any modification
-        prompt_segment $COLOR_YELLOW $COLOR_BLACK
-        st='±'
-      else
-        # if working copy is clean
-        prompt_segment $COLOR_GREEN $COLOR_BLACK
-      fi
-      echo -n $(hg prompt "☿ {rev}@{branch}") $st
-    else
-      st=""
-      rev=$(hg id -n 2>/dev/null | sed 's/[^-0-9]//g')
-      branch=$(hg id -b 2>/dev/null)
-      if `hg st | grep -q "^\?"`; then
-        prompt_segment $COLOR_RED $COLOR_WHITE
-        st='±'
-      elif `hg st | grep -q "^[MA]"`; then
-        prompt_segment $COLOR_YELLOW $COLOR_BLACK
-        st='±'
-      else
-        prompt_segment $COLOR_GREEN $COLOR_BLACK
-      fi
-      echo -n "☿ $rev@$branch" $st
-    fi
-  fi
-}
-
 # Dir: current working directory
 prompt_dir() {
   prompt_segment $COLOR_BLUE $COLOR_WHITE '%~'
@@ -190,7 +136,7 @@ prompt_status() {
   symbols=()
   [[ $RETVAL -ne 0 ]] && symbols+="%{%F{$COLOR_RED}%}✘"
   [[ $UID -eq 0 ]] && symbols+="%{%F{$COLOR_YELLOW}%}⚡"
-  [[ $(jobs -l | wc -l) -gt 0 ]] && symbols+="%{%F{$COLOR_BLUE}%}⚙"
+  (( ${#jobstates} )) && symbols+="%{%F{$COLOR_BLUE}%}⚙"
 
   [[ -n "$symbols" ]] && prompt_segment $COLOR_BLACK $COLOR_WHITE "$symbols"
 }
@@ -203,8 +149,6 @@ build_prompt() {
   prompt_context
   prompt_dir
   prompt_git
-  prompt_bzr
-  prompt_hg
   prompt_end
 }
 

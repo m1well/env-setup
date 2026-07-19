@@ -5,12 +5,19 @@
     autocrlf = input  # keep newlines as in input
     compression = 9  # trade cpu for network
     fsync = none
-    whitespace = error  # threat incorrect whitespace as errors
-    pager = "if [ ! -z \"$(which diff-so-fancy)\" ]; then diff-so-fancy | less --tabs=4 -RFX; else cat; fi"
+    whitespace = error  # treat incorrect whitespace as errors
+    pager = "if command -v delta >/dev/null 2>&1; then delta; else cat; fi"
     editor = "vim"
     longpaths = true
 
-[advice]  # disable advices
+[interactive]
+    diffFilter = "if command -v delta >/dev/null 2>&1; then delta --color-only; else cat; fi"
+
+[delta]
+    navigate = true
+    line-numbers = true
+
+[advice]
     addEmptyPathspec = false
     pushNonFastForward = false
     statusHints = false
@@ -23,6 +30,7 @@
     context = 3  # less context in diffs
     renames = copies  # detect copies as renames in diffs
     interHunkContext = 10  # merge near hunks in diffs
+    algorithm = histogram
 
 [log]
     abbrevCommit = true  # short commits
@@ -34,16 +42,27 @@
 [pager]
     branch = false  # no need to use pager for git branch
 
+[branch]
+    sort = -committerdate
+
+[fetch]
+    prune = true
+
 [push]
     autoSetupRemote = true
     default = current
 
 [pull]
-    default = current
     rebase = true
+
+[merge]
+    conflictStyle = zdiff3
 
 [rebase]
     autoStash = true
+
+[column]
+    ui = auto
 
 [status]
     branch = true
@@ -51,6 +70,15 @@
     showStash = true
     showUntrackedFiles = all  # show individual untracked files
 
+[rerere]
+    enabled = true
+
 [user]
 	name = m1well
 	email = michaelwellner@gmx.de
+
+# machine-local, untracked overrides - e.g. work identities via includeIf.
+# must stay last so its values win over the [user] block above.
+# git silently ignores this include if the file does not exist.
+[include]
+    path = ~/.gitconfig.local

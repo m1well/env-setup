@@ -7,6 +7,8 @@ vim.cmd("set shiftwidth=2")
 vim.cmd("set number")
 vim.cmd("set numberwidth=4")
 
+vim.cmd("set clipboard=unnamed")
+
 vim.g.mapleader = " "
 
 -- load lazy.nvim

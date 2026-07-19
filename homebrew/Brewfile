@@ -1,0 +1,56 @@
+# ============================================================
+#  m1well-toolsuite - Brewfile
+# ============================================================
+#  Install everything:   brew bundle   --file=<path>/Brewfile
+#  Check what's missing:  brew bundle check --file=<path>/Brewfile
+#  Show what's NOT listed: brew bundle cleanup --file=<path>/Brewfile
+# ============================================================
+
+
+# --- shell & prompt ---
+brew "zsh"
+brew "fzf"                       # Ctrl-R history search + file picker
+# zsh-autosuggestions & zsh-syntax-highlighting run as oh-my-zsh
+# custom plugins (git clone into ~/.oh-my-zsh/custom), not via brew
+
+
+# --- modern CLI replacements ---
+brew "bat"                       # cat with syntax highlighting
+brew "eza"                       # ls with git status / --tree
+brew "fd"                        # find replacement
+brew "ripgrep"                   # rg - fast recursive grep
+brew "jq"                        # JSON processor (newer than the /usr/bin/jq that ships with macOS)
+
+
+# --- git ---
+brew "git"                       # newer than Apple Git - takes precedence in PATH
+brew "git-delta"                 # pager for git diff/log (see .gitconfig)
+
+
+# --- editors ---
+brew "neovim"
+
+
+# --- jvm / build ---
+brew "jenv"                      # java version manager
+brew "openjdk@21"                # a JDK for jenv to manage
+
+
+# --- web / static sites ---
+brew "http-server"
+
+
+# --- notifications ---
+brew "terminal-notifier"         # NEW - needed by the timer() function
+
+
+# ============================================================
+#  casks - GUI apps & fonts
+# ============================================================
+
+cask "iterm2"
+cask "font-inconsolata-nerd-font"  # NEW - powerline/nerd glyphs for the zsh theme
+
+# container / db / api tooling
+cask "dbeaver-community"
+cask "postman"

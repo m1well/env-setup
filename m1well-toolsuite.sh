@@ -7,7 +7,7 @@
 #date of last change    : 20260716
 #version                : 2.2.0
 #usage                  : m1well-toolsuite.sh [-i|-u]
-#notes                  : prerequisits
+#notes                  : prerequisites
 #                       : debian / ubuntu (e.g. a docker container) -- run this to get git: "apt-get update && apt-get -y install git vim"
 #                       : osx with homebrew -- run: "brew update && brew install git"
 #                       : for vim and zsh styling - you need vim and zsh installed
@@ -25,6 +25,7 @@ FONT_GREEN="\033[0;92m"
 FONT_NONE="\033[0m"
 HASHLINE="######################################################"
 HEADER="################## m1well toolsuite ##################"
+FONT_CASK="font-inconsolata-nerd-font"
 
 # resolve the script's real location, independent of the caller's cwd
 # (works whether invoked via relative path, absolute path, or PATH lookup)
@@ -123,6 +124,11 @@ generateRcFile() {
   mv "${RC_TEMPLATE_FILE}.copy" "${HOME}/${RC_FILE}"
 }
 
+generateGitTemplate() {
+  rm -f "${HOME}/.gittemplate"
+  cat "${SCRIPT_DIR}/dotfiles/.gittemplate" > "${HOME}/.gittemplate"
+}
+
 disableVim() {
   commentOutLine "${SCRIPT_DIR}/cli/.cli_private" ".vimrc"
   git config --global --unset core.editor || true
@@ -133,15 +139,21 @@ disableIterm2Profile() {
   commentOutLine "${SCRIPT_DIR}/cli/.cli_private" "m1well.plist"
 }
 
-copyFontIfNeeded() {
-  if [ "${USE_FONT}" = true ]; then
-    if [[ "${OSTYPE}" == darwin* ]]; then
-      mkdir -p "${HOME}/Library/Fonts"
-      cp "${SCRIPT_DIR}/terminal/font/Inconsolata Nerd Font Complete Mono.otf" "${HOME}/Library/Fonts/Inconsolata Nerd Font Complete Mono.otf"
-    else
-      printf "## font install skipped - ~/Library/Fonts only exists on macOS (looks like linux/docker here) ${BR}"
-    fi
+installFontIfNeeded() {
+  if [ "${USE_FONT}" != true ]; then
+    return
   fi
+  if [[ "${OSTYPE}" != darwin* ]]; then
+    printf "## font install skipped - homebrew cask fonts are macOS only (looks like linux/docker here) ${BR}"
+    return
+  fi
+  if ! command -v brew >/dev/null; then
+    printf "## font install skipped - homebrew not found ${BR}"
+    printf "## install the font manually with: brew install --cask ${FONT_CASK} ${BR}"
+    return
+  fi
+  printf "## installing font via homebrew: ${FONT_CASK} ${BR}"
+  brew install --cask "${FONT_CASK}" || printf "## font install failed - continuing anyway ${BR}"
 }
 
 disableZsh() {
@@ -182,12 +194,13 @@ installation() {
   [[ ! $REPLY =~ ^[Yy]$ ]] && disableVim
   askQuestion "iterm2 installed and want to use m1well profile?"
   [[ ! $REPLY =~ ^[Yy]$ ]] && disableIterm2Profile
-  copyFontIfNeeded
+  installFontIfNeeded
   askQuestion "zsh already installed?"
   [[ ! $REPLY =~ ^[Yy]$ ]] && disableZsh
   askQuestion "generate ssh config and ssh key for github?"
   [[ $REPLY =~ ^[Yy]$ ]] && createSshConfig
   generateRcFile
+  generateGitTemplate
   mkdir -p "${HOME}/.config/nvim"
   installTools
 }

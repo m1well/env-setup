@@ -26,7 +26,6 @@ print_functions() {
   echo "git_current_develop() # get, checkout and pull dev or develop or development branch"
   echo "git_current_main() # get, checkout and pull main or master branch"
   echo "git_current_test() # get, checkout and pull test or testing branch"
-  echo "git_local_user() # set local git user to m1well"
   echo "git_push() # git push with some options"
   echo "intellij_setup() # print infos of my intellij setup"
   echo "listening() # show apps listening on ports - you can also specify a port"
@@ -145,7 +144,7 @@ seconds() {
 uuid() {
   if isCommandAvailable "uuidgen" ; then
     if [ $# -ne 0 ] ; then
-      for i in in {1..$((${1}-1))}; do
+      for _ in {1..${1}}; do
         uuidgen | tr '[:upper:]' '[:lower:]'
       done
     else
@@ -168,7 +167,7 @@ rand_num() {
     return 1
   fi
 
-  head -c 500 /dev/urandom | LC_ALL=C tr -dc '0-9' | head -c "${1}"
+  LC_ALL=C tr -dc '0-9' < /dev/urandom | head -c "${1}"
   echo ""
 }
 
@@ -285,7 +284,7 @@ fifr() {
 # find directories
 fid() {
   if [ $# -ne 0 ] ; then
-    local found=$(sudo find . -maxdepth 1 -type d -name "*${1}*")
+    local found=$(find . -maxdepth 1 -type d -name "*${1}*")
     if (( ${#found[@]} )) ; then
       echo ${found}
     else
@@ -304,7 +303,7 @@ fid() {
 # find directories recursively
 fidr() {
   if [ $# -ne 0 ] ; then
-    sudo find . -type d -name "*${1}*"
+    find . -type d -name "*${1}*"
   else
     echo "error: search string missing!"
     return
@@ -346,12 +345,6 @@ dockercleanup() {
   docker volume prune -f
   docker image prune -f
   docker system df
-}
-
-# set local git user to m1well
-git_local_user() {
-  git config user.name "m1well"
-  git config user.email "michaelwellner@gmx.de"
 }
 
 # checkout new branch or show message if exists

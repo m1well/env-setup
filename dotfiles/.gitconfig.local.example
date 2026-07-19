@@ -1,0 +1,26 @@
+# ~/.gitconfig.local  --  copy this file to your $HOME WITHOUT the .example suffix
+#
+# it is pulled in by the [include] at the bottom of the tracked .gitconfig.
+#
+# setup:
+#   1. cp dotfiles/.gitconfig.local.example ~/.gitconfig.local
+#      and set the real path to your work repos below
+#   2. create ~/.gitconfig-work with your work identity, e.g.:
+#          [user]
+#              name = Your Name
+#              email = you@your-company.example
+#   3. every repo under that path now uses the work identity automatically,
+#      everything else keeps the default identity from dotfiles/.gitconfig
+#
+# the trailing slash matters - it matches that directory and everything under it.
+
+[includeIf "gitdir:~/path/to/work/repos/"]
+    path = ~/.gitconfig-work
+
+# --- alternative: match by remote URL instead of local path (git >= 2.36) ---
+# use this if you don't want to keep all work repos under one fixed directory.
+# the identity then follows the repo's remote (e.g. your company's github org),
+# no matter where you clone it. pick ONE of the two blocks, not both.
+#
+# [includeIf "hasconfig:remote.*.url:git@github.com:company-org/**"]
+#     path = ~/.gitconfig-work
