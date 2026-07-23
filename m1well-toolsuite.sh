@@ -4,13 +4,13 @@
 #description            : This script provides a setup for the m1well-toolsuite.
 #author                 : Michael Wellner (@m1well)
 #date of creation       : 20181210
-#date of last change    : 20260716
-#version                : 2.2.0
+#date of last change    : 20260724
+#version                : 3.0.0
 #usage                  : m1well-toolsuite.sh [-i|-u]
 #notes                  : prerequisites
 #                       : debian / ubuntu (e.g. a docker container) -- run this to get git: "apt-get update && apt-get -y install git vim"
 #                       : osx with homebrew -- run: "brew update && brew install git"
-#                       : for vim and zsh styling - you need vim and zsh installed
+#                       : for vim and zsh styling - you need vim, zsh and oh-my-zsh installed
 #                       : to run this script you have to do following steps (wherever you want):
 #                       : execute "mkdir m1well-toolsuite && cd m1well-toolsuite && git clone https://github.com/m1well/env-setup.git && cd env-setup"
 #                       : ---
@@ -19,7 +19,6 @@
 set -eu
 
 ### constants ###
-BR="\n"
 FONT_CYAN="\033[0;96m"
 FONT_GREEN="\033[0;92m"
 FONT_NONE="\033[0m"
@@ -27,23 +26,21 @@ HASHLINE="######################################################"
 HEADER="################## m1well toolsuite ##################"
 FONT_CASK="font-inconsolata-nerd-font"
 
-# resolve the script's real location, independent of the caller's cwd
-# (works whether invoked via relative path, absolute path, or PATH lookup)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TOOLSUITE_HOME="$(dirname "${SCRIPT_DIR}")"
 
 printStartLines() {
-  printf "${FONT_CYAN}"
-  printf "${HASHLINE}${BR}"
-  printf "${HEADER}${BR}"
-  printf "${HASHLINE}${BR}"
-  printf "${FONT_NONE}"
+  printf '%b' "${FONT_CYAN}"
+  printf '%s\n' "${HASHLINE}"
+  printf '%s\n' "${HEADER}"
+  printf '%s\n' "${HASHLINE}"
+  printf '%b' "${FONT_NONE}"
 }
 
 printEndLines() {
-  printf "${FONT_CYAN}"
-  printf "${HASHLINE}${BR}"
-  printf "${FONT_NONE}"
+  printf '%b' "${FONT_CYAN}"
+  printf '%s\n' "${HASHLINE}"
+  printf '%b' "${FONT_NONE}"
 }
 
 printSuccess() {
@@ -52,12 +49,12 @@ printSuccess() {
   else
     local file="${HOME}/.bashrc"
   fi
-  printf "${FONT_GREEN}"
-  printf "##### succeeded ${BR}"
-  printf "##### if you added the iterm2 profile file you have to set it as default profile ${BR}"
-  printf "##### now you have to source your rc file to finish: ${BR}"
-  printf "##### \"source ${file}\" ${BR}"
-  printf "${FONT_NONE}"
+  printf '%b' "${FONT_GREEN}"
+  printf '##### succeeded\n'
+  printf '##### if you added the iterm2 profile file you have to set it as default profile\n'
+  printf '##### now you have to source your rc file to finish:\n'
+  printf '##### "source %s"\n' "${file}"
+  printf '%b' "${FONT_NONE}"
 }
 
 printUsage() {
@@ -67,17 +64,17 @@ printUsage() {
 installTools() {
   cd "${TOOLSUITE_HOME}"
   if [ -d cheatsheet ]; then
-    printf "## cheatsheet project apparently already exists ${BR}"
+    printf '## cheatsheet project apparently already exists\n'
   else
     git clone https://github.com/m1well/cheatsheet.git
   fi
   if [ -d versions ]; then
-    printf "## versions project apparently already exists ${BR}"
+    printf '## versions project apparently already exists\n'
   else
     git clone https://github.com/m1well/versions.git
   fi
   if [ -d randomizer ]; then
-    printf "## randomizer project apparently already exists ${BR}"
+    printf '## randomizer project apparently already exists\n'
   else
     git clone https://github.com/m1well/randomizer.git
   fi
@@ -144,16 +141,16 @@ installFontIfNeeded() {
     return
   fi
   if [[ "${OSTYPE}" != darwin* ]]; then
-    printf "## font install skipped - homebrew cask fonts are macOS only (looks like linux/docker here) ${BR}"
+    printf '## font install skipped - homebrew cask fonts are macOS only (looks like linux/docker here)\n'
     return
   fi
   if ! command -v brew >/dev/null; then
-    printf "## font install skipped - homebrew not found ${BR}"
-    printf "## install the font manually with: brew install --cask ${FONT_CASK} ${BR}"
+    printf '## font install skipped - homebrew not found\n'
+    printf '## install the font manually with: brew install --cask %s\n' "${FONT_CASK}"
     return
   fi
-  printf "## installing font via homebrew: ${FONT_CASK} ${BR}"
-  brew install --cask "${FONT_CASK}" || printf "## font install failed - continuing anyway ${BR}"
+  printf '## installing font via homebrew: %s\n' "${FONT_CASK}"
+  brew install --cask "${FONT_CASK}" || printf '## font install failed - continuing anyway\n'
 }
 
 disableZsh() {
@@ -164,7 +161,7 @@ disableZsh() {
 createSshConfig() {
   mkdir -p "${HOME}/.ssh"
   if [ -f "${HOME}/.ssh/github-ssh.id_rsa" ]; then
-    printf "## ssh key already exists, skipping keygen ${BR}"
+    printf '## ssh key already exists, skipping keygen\n'
   else
     ssh-keygen -t ed25519 -f "${HOME}/.ssh/github-ssh.id_rsa" -C "${GIT_USER_EMAIL}"
   fi
@@ -172,9 +169,9 @@ createSshConfig() {
     printf "\n# defaults\nHost *\n  AddressFamily inet\n  Protocol 2\n  Compression yes\n  ServerAliveInterval 60\n"
     printf "\n# github ssh\nHost github.com\n  HostName github.com\n  User git\n  IdentityFile %s/.ssh/github-ssh.id_rsa\n" "${HOME}"
   } >> "${HOME}/.ssh/config"
-  printf "copy following public key to your github account and then change your remotes from https url to ssh url: ${BR}${BR}"
+  printf 'copy following public key to your github account and then change your remotes from https url to ssh url:\n\n'
   cat "${HOME}/.ssh/github-ssh.id_rsa.pub"
-  printf "${BR}${BR}"
+  printf '\n\n'
 }
 
 askQuestion() {
@@ -202,6 +199,7 @@ installation() {
   generateRcFile
   generateGitTemplate
   mkdir -p "${HOME}/.config/nvim"
+  mkdir "${HOME}/.claude"
   installTools
 }
 

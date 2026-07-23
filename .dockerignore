@@ -1,0 +1,7 @@
+# build context hygiene for the dry-run image (COPY . .)
+.idea
+.DS_Store
+
+# personal live files - gitignored, and regenerated from templates/ during -i
+cli/.cli_private
+cli/.cli_projects

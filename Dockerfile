@@ -1,4 +1,4 @@
-# Dockerfile.dry-run
+# Dockerfile
 #
 # Builds an isolated test environment for m1well-toolsuite.sh - ephemeral,
 # disposable, zero risk to the real machine.
@@ -7,13 +7,14 @@
 # still lurking anywhere in the old or new script, it crashes immediately
 # with "sudo: command not found" - that's the actual test.
 #
-# Build:  docker build -t toolsuite-dryrun -f Dockerfile.dry-run .
+# Build:  docker build -t toolsuite-dryrun .
 # Run:    docker run --rm -it toolsuite-dryrun
 FROM ubuntu:24.04
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
       git \
       vim \
+      curl \
       zsh \
       openssh-client \
       ca-certificates \
@@ -25,16 +26,12 @@ RUN useradd -m -s /bin/bash devuser
 USER devuser
 WORKDIR /home/devuser
 
-# replicates exactly the setup step from your script header:
-# mkdir m1well-toolsuite && cd m1well-toolsuite && git clone ... && cd env-setup
-RUN mkdir -p m1well-toolsuite \
-    && cd m1well-toolsuite \
-    && git clone https://github.com/m1well/env-setup.git
-
-# copy updated toolsuite script to test it
-COPY --chown=devuser:devuser m1well-toolsuite.sh /home/devuser/m1well-toolsuite/env-setup/m1well-toolsuite.sh
+# copy the LOCAL working tree into place - this tests exactly what is on disk
+# (including local cli/* changes), not the pushed GitHub version. TOOLSUITE_HOME
+# resolves to /home/devuser/m1well-toolsuite (parent of the script dir).
+RUN mkdir -p /home/devuser/m1well-toolsuite/env-setup
+COPY --chown=devuser:devuser . /home/devuser/m1well-toolsuite/env-setup
 RUN chmod +x /home/devuser/m1well-toolsuite/env-setup/m1well-toolsuite.sh
 
 WORKDIR /home/devuser/m1well-toolsuite/env-setup
 CMD ["/bin/bash"]
-

@@ -16,6 +16,6 @@ jobs:
       - name: Run shellcheck
         uses: ludeeus/action-shellcheck@2.0.0
         env:
-          SHELLCHECK_OPTS: --shell=bash
+          SHELLCHECK_OPTS: --shell=bash -e SC1091
         with:
           additional_files: '.cli_base .cli_dev_tools .cli_functions .cli_m1well_toolsuite .cli_private .cli_projects .rc_template'

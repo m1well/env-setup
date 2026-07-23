@@ -2,13 +2,12 @@
 # export the m1well's toolsuite home like
 # 'export M1WELL_TOOLSUITE_HOME="/Users/<your-user-home>/<path-to-toolsuite>"; '
 
-alias m1well-update="bash ${M1WELL_TOOLSUITE_HOME}/env-setup/m1well-toolsuite.sh -u"
-alias cheat="bash ${M1WELL_TOOLSUITE_HOME}/cheatsheet/cheatsheet.sh"
-alias versions="source ${M1WELL_TOOLSUITE_HOME}/versions/versions.sh"
-alias randomizer="bash ${M1WELL_TOOLSUITE_HOME}/randomizer/randomizer.sh"
+alias m1well-update='bash "${M1WELL_TOOLSUITE_HOME}/env-setup/m1well-toolsuite.sh" -u'
+alias cheat='bash "${M1WELL_TOOLSUITE_HOME}/cheatsheet/cheatsheet.sh"'
+alias versions='source "${M1WELL_TOOLSUITE_HOME}/versions/versions.sh"'
+alias randomizer='bash "${M1WELL_TOOLSUITE_HOME}/randomizer/randomizer.sh"'
 
-alias ts-h="cd ${M1WELL_TOOLSUITE_HOME} && ls -al";
+alias ts-h='cd "${M1WELL_TOOLSUITE_HOME}" && ls -al';
 
-ln -sf ${M1WELL_TOOLSUITE_HOME}/env-setup/dotfiles/.cheatsheet ${HOME}/
-ln -sf ${M1WELL_TOOLSUITE_HOME}/env-setup/dotfiles/.gitconfig ${HOME}/
-
+ln -sf "${M1WELL_TOOLSUITE_HOME}/env-setup/dotfiles/.cheatsheet" "${HOME}/"
+ln -sf "${M1WELL_TOOLSUITE_HOME}/env-setup/dotfiles/.gitconfig" "${HOME}/"

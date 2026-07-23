@@ -80,7 +80,6 @@ alias npmi="npm install"
 alias npmrm="rm -rf node_modules"
 alias npms="npm start"
 alias npmt="npm test"
-alias npmv="npm view ${1}" # overview of specific npm library
 
 
 # typescript

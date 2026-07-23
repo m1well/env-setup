@@ -1,7 +1,7 @@
 ### cli base ###
 
 alias helloworld="echo \"Hello World!\""
-alias home="cd ${HOME}";
+alias home='cd "${HOME}"';
 alias kkmm="cd .. && ls -alp"
 alias mm="ls -alp"
 alias mmm="ls -alprt"
@@ -19,4 +19,5 @@ alias chrome="open -a \"Google Chrome\" --new --args -incognito"
 # grep given string recursively (add search-string and path)
 alias greprec="grep -in --directories=recurse"
 
-export TIMESTAMP=`date "+%Y-%m-%d %H:%M:%S"`
+TIMESTAMP=$(date "+%Y-%m-%d %H:%M:%S")
+export TIMESTAMP

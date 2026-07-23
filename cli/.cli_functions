@@ -51,14 +51,14 @@ isCommandAvailable() {
 
 # source zshrc and/or bashrc if available
 src() {
-  local z=$(find ${HOME}/ -maxdepth 1 -type f -name ".zshrc")
+  local z; z=$(find "${HOME}/" -maxdepth 1 -type f -name ".zshrc")
   if [ "${z}" != "" ] ; then
-    source ${HOME}/.zshrc
+    source "${HOME}/.zshrc"
     echo ">> sourced .zshrc <<"
   fi
-  local b=$(find ${HOME}/ -maxdepth 1 -type f -name ".bashrc")
+  local b; b=$(find "${HOME}/" -maxdepth 1 -type f -name ".bashrc")
   if [ "${b}" != "" ] ; then
-    source ${HOME}/.bashrc
+    source "${HOME}/.bashrc"
     echo ">> sourced .bashrc <<"
   fi
 }
@@ -108,13 +108,13 @@ datestrings() {
 
 # create hyphened url from string
 url_from_string() {
-  echo "$(echo ${1} | tr '[:upper:]' '[:lower:]' | sed -e 's/[-,?]//g' | sed -e 's/  / /g' | sed -e 's/ /-/g')"
+  echo "${1}" | tr '[:upper:]' '[:lower:]' | sed -e 's/[-,?]//g' | sed -e 's/  / /g' | sed -e 's/ /-/g'
 }
 
 # base64-encode provided string
 base64enc() {
   if [ $# -ne 0 ] ; then
-    echo "$(echo -n ${1} | base64)"
+    echo -n "${1}" | base64
   else
     echo "error: no string provided"
   fi
@@ -123,7 +123,7 @@ base64enc() {
 # base64-decode provided base64 string
 base64dec() {
   if [ $# -ne 0 ] ; then
-    echo "$(echo -n ${1} | base64 -d)"
+    echo -n "${1}" | base64 -d
   else
     echo "error: no base64 string provided"
   fi
@@ -131,9 +131,9 @@ base64dec() {
 
 # print timestamp seconds and add number of seconds if you want
 seconds() {
-  local now=$(date +%s)
+  local now; now=$(date +%s)
   if [ $# -ne 0 ] ; then
-    local future=$((${now} + ${1}))
+    local future=$((now + ${1}))
     echo "$(date -r ${future}) -- ${future}"
   else
     echo "$(date) -- ${now}"
@@ -144,7 +144,7 @@ seconds() {
 uuid() {
   if isCommandAvailable "uuidgen" ; then
     if [ $# -ne 0 ] ; then
-      for _ in {1..${1}}; do
+      for _ in $(seq 1 "${1}"); do
         uuidgen | tr '[:upper:]' '[:lower:]'
       done
     else
@@ -190,7 +190,7 @@ rand_pass() {
 timer() {
   if [ $# -ne 0 ] ; then
     if isCommandAvailable "terminal-notifier" ; then
-      (sleep $(echo "${1} * 60" | bc) && terminal-notifier -title "TIMER" -message "You already finished ${1} minutes") &
+      (sleep "$(echo "${1} * 60" | bc)" && terminal-notifier -title "TIMER" -message "You already finished ${1} minutes") &
       echo "set timer to ${1} minutes"
     else
       echo "error: terminal-notifier has to be installed"
@@ -228,7 +228,7 @@ backup_sync() {
         --exclude '.gradle' --exclude '.idea' --exclude '.metadata' --exclude '.recommenders'  --exclude '.settings' \
         --exclude '*.iml' --exclude '*.classpath' --exclude '*.project' --exclude '.DS_Store' \
         --out-format="[%t] %o %l Bytes - %f (last modified: %M)" "${SOURCE}" "${TARGET_FOLDER}" \
-          > ${LOG_FILE} 2> ${ERROR_FILE}; [ -s ${ERROR_FILE} ] || rm -f ${ERROR_FILE}
+          > "${LOG_FILE}" 2> "${ERROR_FILE}"; [ -s "${ERROR_FILE}" ] || rm -f "${ERROR_FILE}"
       echo "backup sync done"
     fi
   fi
@@ -243,26 +243,26 @@ colima_restart() {
 chucknorris() {
   if [ $# -ne 0 ] ; then
     echo "chuck norris says:"
-    echo $(curl https://api.chucknorris.io/jokes/random\?category\=${1} -s | jq -r '.value')
+    curl -s "https://api.chucknorris.io/jokes/random?category=${1}" | jq -r '.value'
   else
     echo "chuck norris categories:"
-    echo $(curl https://api.chucknorris.io/jokes/categories -s)
+    curl -s https://api.chucknorris.io/jokes/categories
     echo "chuck norris says:"
-    echo $(curl https://api.chucknorris.io/jokes/random -s | jq -r '.value')
+    curl -s https://api.chucknorris.io/jokes/random | jq -r '.value'
   fi
 }
 
 # find files
 fif() {
   if [ $# -ne 0 ] ; then
-    local found=$(find . -maxdepth 1 -type f -name "*${1}*")
-    if (( ${#found[@]} )) ; then
-      echo ${found}
+    local found; found=$(find . -maxdepth 1 -type f -name "*${1}*")
+    if [[ -n "${found}" ]] ; then
+      echo "${found}"
     else
       echo "Not found in this folder -> search recursively? (Y|n) [ENTER]"
-      read REPLY
+      read -r REPLY
       if [[ ${REPLY} =~ ^[Yy]$ ]] ; then
-        fifr ${1}
+        fifr "${1}"
       fi
     fi
   else
@@ -284,14 +284,14 @@ fifr() {
 # find directories
 fid() {
   if [ $# -ne 0 ] ; then
-    local found=$(find . -maxdepth 1 -type d -name "*${1}*")
-    if (( ${#found[@]} )) ; then
-      echo ${found}
+    local found; found=$(find . -maxdepth 1 -type d -name "*${1}*")
+    if [[ -n "${found}" ]] ; then
+      echo "${found}"
     else
       echo "Not found in this folder -> search recursively? (Y|n) [ENTER]"
-      read REPLY
+      read -r REPLY
       if [[ ${REPLY} =~ ^[Yy]$ ]] ; then
-        fidr ${1}
+        fidr "${1}"
       fi
     fi
   else
@@ -313,12 +313,12 @@ fidr() {
 # split file in N files
 fsplit() {
   if [ $# -ne 0 ] ; then
-    local linesInFile=$(cat ${1} | wc -l | xargs)
+    local linesInFile; linesInFile=$(cat "${1}" | wc -l | xargs)
     echo "File has ${linesInFile} lines - how much lines per file do you want? [ENTER]"
-    read LINES_PER_FILE
+    read -r LINES_PER_FILE
     echo "Which file suffix? (standard .txt) [ENTER]"
-    read SUFFIX
-    local filename=$(echo "${1}" | cut -d'.' -f1)
+    read -r SUFFIX
+    local filename; filename=$(echo "${1}" | cut -d'.' -f1)
     if [[ -z "${SUFFIX}" ]] ; then
       SFX=".txt"
     else
@@ -327,10 +327,10 @@ fsplit() {
     split -l "${LINES_PER_FILE}" "${1}"
     local i=1
     local suffixlen=2
-    for x in `ls x* | sort`; do
-      local prefix=$(printf "%0${suffixlen}d" ${i})
-      mv $x ${filename}_${prefix}${SFX}
-      i=$(($i+1))
+    for x in x*; do
+      local prefix; prefix=$(printf "%0${suffixlen}d" "${i}")
+      mv "$x" "${filename}_${prefix}${SFX}"
+      i=$((i+1))
     done
   else
     echo "error: source file missing!"
@@ -404,15 +404,15 @@ git_current_test() {
 
 # git push with some options
 git_push() {
-  local toBranch=$(git rev-parse --abbrev-ref HEAD)
+  local toBranch; toBranch=$(git rev-parse --abbrev-ref HEAD)
   echo "Force push? (press ff to force or just ENTER to normal)"
-  read FORCE
-  if [[ ${FORCE} =~ [ff]$ ]] ; then
+  read -r FORCE
+  if [[ ${FORCE} == "ff" ]] ; then
     echo "Performing force push now..."
-    $(git push origin ${toBranch} --force-with-lease)
+    git push origin "${toBranch}" --force-with-lease
   else
     echo "Performing normal push now..."
-    $(git push origin ${toBranch})
+    git push origin "${toBranch}"
   fi
 }
 
@@ -445,9 +445,9 @@ listening() {
     if [ $# -eq 0 ]; then
         lsof -iTCP -sTCP:LISTEN -n -P
     elif [ $# -eq 1 ]; then
-        lsof -iTCP -sTCP:LISTEN -n -P | grep -i --color $1
+        lsof -iTCP -sTCP:LISTEN -n -P | grep -i --color "${1}"
     else
-        "Usage: listening [pattern]"
+        echo "Usage: listening [pattern]"
     fi
 }
 
@@ -459,11 +459,11 @@ loremipsum() {
   local template4="Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim v"
   if [ $# -ne 0 ] ; then
     local text="${template1}${template2}${template3}${template4}"
-    local result=$(echo "${text}" | cut -c 1-${1})
+    local result; result=$(echo "${text}" | cut -c "1-${1}")
     if [[ "${result}" =~ ' '$ ]] ; then
       echo "${result%?}x"
     else
-      echo ${result}
+      echo "${result}"
     fi
   else
     echo "error: how many words do you want? - e.g. loremipsum 300"
