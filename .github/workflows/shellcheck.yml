@@ -1,0 +1,21 @@
+name: check shell files
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  shellcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Run shellcheck
+        uses: ludeeus/action-shellcheck@2.0.0
+        env:
+          SHELLCHECK_OPTS: --shell=bash
+        with:
+          additional_files: '.cli_base .cli_dev_tools .cli_functions .cli_m1well_toolsuite .cli_private .cli_projects .rc_template'

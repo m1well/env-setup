@@ -46,6 +46,28 @@
     "command": "${HOME}/.claude/statusline.sh",
     "padding": 1
   },
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${HOME}/.claude/hooks/claude-sound.sh stop"
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${HOME}/.claude/hooks/claude-sound.sh notification"
+          }
+        ]
+      }
+    ]
+  },
   "effortLevel": "xhigh",
   "theme": "dark"
 }

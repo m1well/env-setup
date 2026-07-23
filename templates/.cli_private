@@ -12,4 +12,5 @@ ln -sf ${M1WELL_TOOLSUITE_HOME}/env-setup/claude-code/settings.json ${HOME}/.cla
 ln -sf ${M1WELL_TOOLSUITE_HOME}/env-setup/claude-code/statusline.sh ${HOME}/.claude/statusline.sh
 ln -sf ${M1WELL_TOOLSUITE_HOME}/env-setup/claude-code/CLAUDE.md ${HOME}/.claude/CLAUDE.md
 rm -rf "${HOME}/.claude/skills" && ln -s ${M1WELL_TOOLSUITE_HOME}/env-setup/claude-code/skills ${HOME}/.claude/skills
+rm -rf "${HOME}/.claude/hooks" && ln -s ${M1WELL_TOOLSUITE_HOME}/env-setup/claude-code/hooks ${HOME}/.claude/hooks
 
