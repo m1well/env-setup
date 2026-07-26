@@ -4,13 +4,29 @@
 
 input=$(cat)
 
-DIR=$(echo "$input" | jq -r '.workspace.current_dir')
-MODEL=$(echo "$input" | jq -r '.model.display_name')
-EFFORT=$(echo "$input" | jq -r '.effort.level // empty')
-PCT=$(echo "$input" | jq -r '.context_window.used_percentage // 0' | cut -d. -f1)
-FIVE_H=$(echo "$input" | jq -r '.rate_limits.five_hour.used_percentage // empty')
-FIVE_H_RESETS_AT=$(echo "$input" | jq -r '.rate_limits.five_hour.resets_at // empty')
-WEEK=$(echo "$input" | jq -r '.rate_limits.seven_day.used_percentage // empty')
+{
+    read -r DIR
+    read -r MODEL
+    read -r EFFORT
+    read -r PCT
+    read -r FIVE_H
+    read -r FIVE_H_RESETS_AT
+    read -r WEEK
+} <<< "$(
+    jq -r '[
+        .workspace.current_dir // "",
+        .model.display_name    // "",
+        .effort.level          // "",
+        ((.context_window.used_percentage // 0) | floor),
+        .rate_limits.five_hour.used_percentage // "",
+        .rate_limits.five_hour.resets_at       // "",
+        .rate_limits.seven_day.used_percentage // ""
+    ] | .[]' <<< "$input" 2>/dev/null
+)"
+
+# jq failing or returning nothing must not turn the numeric tests below into
+# "integer expression expected" noise on the status line
+PCT=${PCT:-0}
 
 # Light/muted colors - a bit brighter than pure dim, still not flashy
 GREEN='\033[32m'
@@ -95,4 +111,3 @@ OUT="${LIGHT}${DIR_NAME}  |  [$MODEL_PART]  ${BAR_COLOR}${BAR}${LIGHT} ${PCT}%"
 OUT="${OUT}${RESET}"
 
 echo -e "$OUT"
-

@@ -31,11 +31,6 @@ brew "git-delta"                 # pager for git diff/log (see .gitconfig)
 brew "neovim"
 
 
-# --- jvm / build ---
-brew "jenv"                      # java version manager
-brew "openjdk@21"                # a JDK for jenv to manage
-
-
 # --- web / static sites ---
 brew "http-server"
 

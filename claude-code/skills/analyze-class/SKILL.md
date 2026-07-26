@@ -1,5 +1,7 @@
 ---
-description: Analyzes a class and summarizes it, adapting the format to whether it's a Kotlin/Java class, an Angular component, or an Angular service
+name: analyze-class
+description: Analyzes a class and summarizes it, adapting the format to whether it's a Kotlin/Java class, an Angular component, or an Angular service. Invoked via /analyze-class.
+disable-model-invocation: true
 argument-hint: <class-name-or-path>
 ---
 

@@ -21,14 +21,11 @@
          "Sync Title":false,
          "Scrollback Lines":3000,
          "Cursor Boost":0.1,
-         "Working Directory":"\/Users\/m1well",
          "BM Growl":true,
          "Command":"",
          "Rewritable":false,
-         "Dynamic Profile Filename":"\/Users\/m1well\/Library\/Application Support\/iTerm2\/DynamicProfiles\/m1well.plist",
          "Screen":-1,
          "Custom Directory":"No",
-         "Default Bookmark":"No",
          "Ambiguous Double Width":false,
          "Non-ASCII Anti Aliased":true,
          "Custom Command":"No",
@@ -202,8 +199,7 @@
             "Blue Component":0.71787959337234497
          },
          "Keyboard Map":{
-            
-         },
+         }
       }
    ]
 }

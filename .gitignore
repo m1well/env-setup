@@ -6,7 +6,6 @@
 
 ### individual cli files
 cli/.cli_private
-cli/.cli_projects
 
 ### dev files
 .dev

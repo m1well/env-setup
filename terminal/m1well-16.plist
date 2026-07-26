@@ -2,7 +2,7 @@
    "Profiles":[
       {
          "Guid":"7F3C1A92-6B8D-4E11-9A4F-2C5D8E9B0A17",
-         "Name":"m1well",
+         "Name":"m1well 16",
          "Blinking Cursor":false,
          "Prompt Before Closing 2":false,
          "Character Encoding":4,
@@ -21,14 +21,11 @@
          "Sync Title":false,
          "Scrollback Lines":3000,
          "Cursor Boost":0.1,
-         "Working Directory":"\/Users\/m1well",
          "BM Growl":true,
          "Command":"",
          "Rewritable":false,
-         "Dynamic Profile Filename":"\/Users\/m1well\/Library\/Application Support\/iTerm2\/DynamicProfiles\/m1well-16zoll.plist",
          "Screen":-1,
          "Custom Directory":"No",
-         "Default Bookmark":"No",
          "Ambiguous Double Width":false,
          "Non-ASCII Anti Aliased":true,
          "Custom Command":"No",
@@ -49,7 +46,6 @@
          "Blur":false,
          "Shortcut":"",
          "Unlimited Scrollback":false,
-         "Smart Cursor Color":true,
          "Jobs to Ignore":[
             "rlogin",
             "ssh",
@@ -107,15 +103,14 @@
             "Blue Component":1
          },
          "Foreground Color":{
-            "Color Space":"sRGB",
-            "Red Component":0.85,
-            "Green Component":0.85,
-            "Blue Component":0.85
+            "Green Component":0.8579363226890564,
+            "Red Component":0.84028750658035278,
+            "Blue Component":0.89713811874389648
          },
          "Selection Color":{
-            "Red Component":0.75,
-            "Green Component":0.75,
-            "Blue Component":0.99
+            "Green Component":0.12343578040599823,
+            "Red Component":0.1234394758939743,
+            "Blue Component":0.379891037940979
          },
          "Ansi 13 Color":{
             "Green Component":0.3135044276714325,
@@ -123,16 +118,14 @@
             "Blue Component":0.72698760032653809
          },
          "Selected Text Color":{
-            "Red Component":0.10,
-            "Green Component":0.10,
-            "Blue Component":0.10
+            "Green Component":0.8579363226890564,
+            "Red Component":0.84028750658035278,
+            "Blue Component":0.89713811874389648
          },
          "Background Color":{
-            "Color Space":"sRGB",
-            "Alpha Component":1.00,
-            "Red Component":0.05,
-            "Green Component":0.05,
-            "Blue Component":0.10
+            "Green Component":0.076217696070671082,
+            "Red Component":0.07621997594833374,
+            "Blue Component":0.1118375289440155
          },
          "Ansi 11 Color":{
             "Green Component":0.74144089221954346,
@@ -206,8 +199,8 @@
             "Blue Component":0.71787959337234497
          },
          "Keyboard Map":{
-
          }
       }
    ]
 }
+

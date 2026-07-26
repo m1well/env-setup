@@ -2,10 +2,9 @@
 
 export M1WELL_TOOLSUITE_HOME="&&toolsuitehome&&";
 
-export GIT_STANDARD_USER_NAME="&&gitname&&"
-export GIT_STANDARD_USER_EMAIL="&&gitemail&&"
+export M1WELL_USE_ITERM2="&&useiterm2&&";
 
-. ${HOME}/.m1well_cli_master
+. "${HOME}/.m1well_cli_master"
 
 ######################################################
 

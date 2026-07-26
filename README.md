@@ -69,6 +69,9 @@ This is my actual file for aliases regarding my own written toolsuite. Sources:
 - [versions](https://github.com/m1well/versions)
 - [randomizer](https://github.com/m1well/randomizer)
 
+It also (re)creates all the dotfile symlinks on every shell start, so they always point to the
+current toolsuite files.
+
 #### .cli_private ([link](/templates/.cli_private)) and .cli_projects ([link](/templates/.cli_projects))
 
 These files are e.g. for your private exports / aliases / symlinks / functions / etc.
@@ -81,7 +84,7 @@ so they stay forever because they aren't affected by a toolsuite update.
 #### .rc_template ([link](/templates/.rc_template))
 
 This is the skeleton for the generated `.zshrc` / `.bashrc`.
-During installation the placeholders (toolsuite home, git user/email) get replaced
+During installation the placeholders (toolsuite home, iterm2 usage) get replaced
 and the existing rc file is appended below it.
 
 #### m1well.zsh-theme ([link](/terminal/m1well.zsh-theme))
@@ -91,10 +94,14 @@ If you want another username or hostname, just add the following statement to yo
 (just change the names) and source your rc file again:
 `export ZSH_USER_PROMPT="my-name@my-hostname";`
 
-#### m1well.plist ([link](/terminal/m1well.plist))
+#### m1well.plist ([link](/terminal/m1well.plist)) / m1well-16.plist ([link](/terminal/m1well-16.plist))
 
-This is my actual iterm2 profile.
-If you want, the installation process copies it to the right folder and then you can set it as default profile.
+These are my actual iterm2 profiles - identical except for the window size:
+`m1well` (57x205) and `m1well 16` (70x225) for the 16 inch machine.
+Both get symlinked into the iterm2 `DynamicProfiles` folder, so both show up in the profile list
+and you pick the one you want per machine via `Profiles > Other Actions > Set as Default`.
+iterm2 stores that choice by guid in its app prefs, so it survives a reinstall of the symlinks -
+but it also means the guids in these files must stay stable.
 The matching nerd font (needed for the special zsh characters) is installed via homebrew:
 `brew install --cask font-inconsolata-nerd-font`
 

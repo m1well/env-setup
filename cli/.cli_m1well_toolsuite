@@ -2,13 +2,37 @@
 # export the m1well's toolsuite home like
 # 'export M1WELL_TOOLSUITE_HOME="/Users/<your-user-home>/<path-to-toolsuite>"; '
 
-alias m1well-update="bash ${M1WELL_TOOLSUITE_HOME}/env-setup/m1well-toolsuite.sh -u"
-alias cheat="bash ${M1WELL_TOOLSUITE_HOME}/cheatsheet/cheatsheet.sh"
-alias versions="source ${M1WELL_TOOLSUITE_HOME}/versions/versions.sh"
-alias randomizer="bash ${M1WELL_TOOLSUITE_HOME}/randomizer/randomizer.sh"
+alias m1well-update='bash "${M1WELL_TOOLSUITE_HOME}/env-setup/m1well-toolsuite.sh" -u'
+alias cheat='bash "${M1WELL_TOOLSUITE_HOME}/cheatsheet/cheatsheet.sh"'
+alias versions='source "${M1WELL_TOOLSUITE_HOME}/versions/versions.sh"'
+alias randomizer='bash "${M1WELL_TOOLSUITE_HOME}/randomizer/randomizer.sh"'
 
-alias ts-h="cd ${M1WELL_TOOLSUITE_HOME} && ls -al";
+alias ts-h='cd "${M1WELL_TOOLSUITE_HOME}" && ls -al';
 
-ln -sf ${M1WELL_TOOLSUITE_HOME}/env-setup/dotfiles/.cheatsheet ${HOME}/
-ln -sf ${M1WELL_TOOLSUITE_HOME}/env-setup/dotfiles/.gitconfig ${HOME}/
+ln -sfn "${M1WELL_TOOLSUITE_HOME}/env-setup/dotfiles/.cheatsheet" "${HOME}/"
+ln -sfn "${M1WELL_TOOLSUITE_HOME}/env-setup/dotfiles/.gitconfig" "${HOME}/"
 
+ln -sfn "${M1WELL_TOOLSUITE_HOME}/env-setup/dotfiles/.vimrc" "${HOME}/.vimrc"
+ln -sfn "${M1WELL_TOOLSUITE_HOME}/env-setup/nvim/init.lua" "${HOME}/.config/nvim/init.lua"
+
+# both profiles are linked - pick the default per machine in iterm2 (Profiles > Other Actions > Set as Default),
+# it is stored by guid in the app prefs and therefore survives a reinstall of these symlinks
+if [ "${M1WELL_USE_ITERM2}" = true ] && [[ "${OSTYPE}" == darwin* ]]; then
+  ITERM2_DYNAMIC_PROFILES="${HOME}/Library/Application Support/iTerm2/DynamicProfiles"
+  mkdir -p "${ITERM2_DYNAMIC_PROFILES}"
+  ln -sfn "${M1WELL_TOOLSUITE_HOME}/env-setup/terminal/m1well.plist" "${ITERM2_DYNAMIC_PROFILES}/m1well.plist"
+  ln -sfn "${M1WELL_TOOLSUITE_HOME}/env-setup/terminal/m1well-16.plist" "${ITERM2_DYNAMIC_PROFILES}/m1well-16.plist"
+fi
+
+# only link the theme if oh-my-zsh is actually installed
+OH_MY_ZSH_THEMES="${ZSH:-${HOME}/.oh-my-zsh}/themes"
+if [ -d "${OH_MY_ZSH_THEMES}" ]; then
+  ln -sfn "${M1WELL_TOOLSUITE_HOME}/env-setup/terminal/m1well.zsh-theme" "${OH_MY_ZSH_THEMES}/m1well.zsh-theme"
+fi
+unset OH_MY_ZSH_THEMES
+
+ln -sfn "${M1WELL_TOOLSUITE_HOME}/env-setup/claude-code/settings.json" "${HOME}/.claude/settings.json"
+ln -sfn "${M1WELL_TOOLSUITE_HOME}/env-setup/claude-code/statusline.sh" "${HOME}/.claude/statusline.sh"
+ln -sfn "${M1WELL_TOOLSUITE_HOME}/env-setup/claude-code/CLAUDE.md" "${HOME}/.claude/CLAUDE.md"
+ln -sfn "${M1WELL_TOOLSUITE_HOME}/env-setup/claude-code/skills" "${HOME}/.claude/skills"
+ln -sfn "${M1WELL_TOOLSUITE_HOME}/env-setup/claude-code/hooks" "${HOME}/.claude/hooks"
