@@ -1,0 +1,16 @@
+:host {
+  display: block;
+}
+
+.ui-list-layout__header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.ui-list-layout__actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-inline-start: auto;
+}

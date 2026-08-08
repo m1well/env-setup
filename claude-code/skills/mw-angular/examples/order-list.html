@@ -1,0 +1,57 @@
+<app-ui-list-layout>
+  <h2 slot="title">Orders <small>({{ state.openCount() }} open)</small></h2>
+
+  <div slot="actions" class="order-list__filters" role="group" aria-label="Filter orders by status">
+    @for (status of statuses; track status) {
+      <button
+        type="button"
+        [class.order-list__filter--active]="state.activeFilter() === status"
+        [attr.aria-pressed]="state.activeFilter() === status"
+        (click)="state.applyFilter(status)">
+        {{ status }}
+      </button>
+    }
+  </div>
+
+  <button slot="actions" type="button" [disabled]="state.isLoading()" (click)="state.refresh()">
+    Refresh
+  </button>
+
+  @if (state.isLoading()) {
+    <p role="status">Loading orders…</p>
+  } @else if (state.error()) {
+    <p role="alert">
+      Orders could not be loaded.
+      <button type="button" (click)="state.refresh()">Try again</button>
+    </p>
+  } @else {
+    <ul class="order-list__items">
+      @for (order of state.orders(); track order.id) {
+        <li>
+          <app-order-card
+            [order]="order"
+            [expanded]="isExpanded(order.id)"
+            (expandedChange)="setExpanded(order.id, $event)"
+            (selected)="showDetail($event)"
+            (shipped)="state.markAsShipped($event)" />
+        </li>
+      } @empty {
+        <li class="order-list__empty">No orders with status {{ state.activeFilter() }}.</li>
+      }
+    </ul>
+  }
+
+  <dialog slot="overlay" #detailDialog class="order-list__detail" (close)="state.clearSelection()">
+    @if (state.isDetailLoading()) {
+      <p role="status">Loading details…</p>
+    } @else if (state.selectedOrder(); as detail) {
+      <h3>{{ detail.reference }}</h3>
+      <p>{{ detail.customerName }}</p>
+      <address>{{ detail.shippingAddress }}</address>
+      @if (detail.notes) {
+        <p class="order-list__notes">{{ detail.notes }}</p>
+      }
+    }
+    <button type="button" (click)="closeDetail()">Close</button>
+  </dialog>
+</app-ui-list-layout>

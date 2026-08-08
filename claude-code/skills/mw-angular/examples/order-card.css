@@ -1,0 +1,33 @@
+:host {
+  display: block;
+  border: 1px solid var(--border-color, #d0d0d0);
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+}
+
+:host(.order-card--expanded) {
+  border-color: var(--border-color-strong, #9ca3af);
+}
+
+.order-card__toggle {
+  display: flex;
+  width: 100%;
+  text-align: start;
+}
+
+.order-card__items {
+  margin: 0.5rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.order-card__items li {
+  display: flex;
+  justify-content: space-between;
+}
+
+.order-card__actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}

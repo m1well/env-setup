@@ -1,6 +1,6 @@
 ---
-name: next-tidy
-description: Stages all changes (git add -A) — or falls back to the last commit when the working tree is clean — then reads the diff and suggests the single smallest next tidy toward cleaner code — one safe, behavior-preserving step, no rewrites, no new abstractions. Invoked via /next-tidy.
+name: mw-next-tidy
+description: Stages all changes (git add -A) — or falls back to the last commit when the working tree is clean — then reads the diff and suggests the single smallest next tidy toward cleaner code — one safe, behavior-preserving step, no rewrites, no new abstractions. Invoked via /mw-next-tidy.
 disable-model-invocation: true
 argument-hint: [file or path — optional, to narrow the suggestion]
 ---

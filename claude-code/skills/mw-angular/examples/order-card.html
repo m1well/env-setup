@@ -1,0 +1,27 @@
+<button
+  type="button"
+  class="order-card__toggle"
+  [attr.aria-expanded]="expanded()"
+  [attr.aria-controls]="itemsId()"
+  (click)="toggle()">
+  <app-order-summary [order]="order()" [currency]="currency()" />
+</button>
+
+@if (expanded()) {
+  <ul class="order-card__items" [id]="itemsId()">
+    @for (item of order().items; track item.sku) {
+      <li>
+        <span class="order-card__sku">{{ item.sku }}</span>
+        <span>{{ item.quantity }} × {{ item.unitPrice | currency: currency() }}</span>
+      </li>
+    }
+  </ul>
+}
+
+<footer class="order-card__actions">
+  <button type="button" (click)="selected.emit(order().id)">Details</button>
+
+  @if (canShip()) {
+    <button type="button" (click)="shipped.emit(order().id)">Mark as shipped</button>
+  }
+</footer>

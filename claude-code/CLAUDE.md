@@ -12,6 +12,13 @@
 * For complex or tricky topics, feel free to use an analogy to make the concept click
 * Prefer communication in German, but use English for code and comments, except for technical terms
 
+# Writing style
+* Never use em dashes or en dashes (the long ones) - always a plain hyphen "-" surrounded by spaces
+* This applies everywhere: chat replies, markdown docs, commit messages, code comments and string literals in code
+* Do not sound like an AI: no "it's important to note", no "let's dive in", no enthusiastic openers, no closing paragraph that just summarizes what was said
+* Avoid the typical LLM cadence: no three-part parallel phrases ("not only X, but Y"), no filler adjectives, no bullet list where two sentences do the job
+* Write plain and direct, like a colleague in a code review - short sentences beat polished prose
+
 # Code comments
 * Keep comments short and rare - code should carry the meaning, comments only cover the non-obvious "why"
 * Test classes need almost no comments - a precise test method name beats a comment block

@@ -1,0 +1,7 @@
+<span class="order-summary__reference">{{ order().reference }}</span>
+
+@if (isUrgent()) {
+  <app-ui-badge [label]="dueLabel()" tone="warning" />
+}
+
+<span class="order-summary__total">{{ total() | currency: currency() }}</span>

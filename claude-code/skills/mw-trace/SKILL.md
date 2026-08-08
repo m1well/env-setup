@@ -1,6 +1,6 @@
 ---
-name: trace
-description: Follows one thing through the system — a request, a value, an event, a prop — station by station, naming the mechanism behind every hop and flagging where the thread breaks. Invoked via /trace.
+name: mw-trace
+description: Follows one thing through the system — a request, a value, an event, a prop — station by station, naming the mechanism behind every hop and flagging where the thread breaks. Invoked via /mw-trace.
 disable-model-invocation: true
 argument-hint: <what to follow — endpoint, value, event, function> [· "back" to follow it upstream]
 ---

@@ -1,0 +1,15 @@
+:host {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.order-summary__reference {
+  font-weight: 600;
+}
+
+.order-summary__total {
+  margin-inline-start: auto;
+  font-variant-numeric: tabular-nums;
+}

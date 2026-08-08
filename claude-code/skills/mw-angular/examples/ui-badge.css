@@ -1,0 +1,13 @@
+:host {
+  display: inline-block;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  background: var(--color-muted-bg, #e5e7eb);
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+:host(.ui-badge--warning) {
+  background: var(--color-warning-bg, #fed7aa);
+  color: var(--color-warning, #9a3412);
+}

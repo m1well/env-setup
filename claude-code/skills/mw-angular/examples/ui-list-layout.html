@@ -1,0 +1,14 @@
+<section class="ui-list-layout">
+  <header class="ui-list-layout__header">
+    <ng-content select="[slot=title]" />
+    <div class="ui-list-layout__actions">
+      <ng-content select="[slot=actions]" />
+    </div>
+  </header>
+
+  <div class="ui-list-layout__body">
+    <ng-content />
+  </div>
+
+  <ng-content select="[slot=overlay]" />
+</section>

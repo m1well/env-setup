@@ -1,0 +1,29 @@
+:host {
+  display: block;
+}
+
+.order-list__filters {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.order-list__filter--active {
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.order-list__items {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.order-list__empty {
+  color: var(--color-muted, #6b7280);
+}
+
+.order-list__detail::backdrop {
+  background: rgb(0 0 0 / 40%);
+}
