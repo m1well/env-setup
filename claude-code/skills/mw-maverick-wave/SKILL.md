@@ -30,12 +30,12 @@ Load the one you need - do not read them all up front.
 
 ## Examples
 
-| File                              | Content                                                                                                                |
-| --------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `examples/angular-list-page.md`   | Full list/CRUD page: page header, meta counters, filter bar, table with status tags, empty state, delete modal, toasts |
-| `examples/angular-form.md`        | Reactive form: `mw-field`, validation states, input groups, numeric input, toggles, form actions                       |
-| `examples/angular-services.md`    | Theme service, toast service, modal/scroll-lock, tabs and accordion without `main.js`                                  |
-| `examples/static-landing-page.md` | Plain HTML page: header, hero, sections, cards, tiles, accordion, footer, theme toggle                                 |
+| File                              | Content                                                                                                                                           |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `examples/angular-list-page.md`   | Full list/CRUD page: page header, meta counters, filter bar, table with status tags, empty state, delete modal, toasts                            |
+| `examples/angular-form.md`        | Reactive form: `mw-field`, validation states, input groups, numeric input, toggles, form actions                                                  |
+| `examples/angular-services.md`    | Theme service, toast service, modal/scroll-lock, tabs and accordion without `main.js`                                                             |
+| `examples/static-landing-page.md` | Plain HTML page: announcement ribbon, hero with scroll cue, feature and offer cards, testimonials, scroll reveal, accordion, footer, theme toggle |
 
 ## Setup
 
@@ -43,15 +43,15 @@ Load the one you need - do not read them all up front.
 
 ```html
 <link
-        rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/maverick-wave@3.10.0/maverick-wave.min.css"
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/maverick-wave@4.25.0/maverick-wave.min.css"
 />
 <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
 />
 ...
-<script src="https://cdn.jsdelivr.net/npm/maverick-wave@3.10.0/maverick-wave.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/maverick-wave@4.25.0/maverick-wave.min.js"></script>
 ```
 
 Pin the version. The JS file is optional and only for server-rendered/static pages -
@@ -84,8 +84,10 @@ The framework styles icon slots but ships no icons. Examples use FontAwesome
 
 ### Fonts
 
-`--mw-font-family-base` defaults to `'Poppins', sans-serif`, but no font is
-bundled. Load it yourself or override the token.
+No font is bundled. The defaults are system stacks - `--mw-font-family-base`
+and `-heading` resolve to the platform UI font, `-mono` to Fira Code with the
+system monospace stack behind it. Load a font yourself and either set the three
+`$font-family-*` variables in SCSS or override the tokens in CSS.
 
 ## Naming rules
 
@@ -99,30 +101,39 @@ bundled. Load it yourself or override the token.
 - Size variants: `-sm`, `-lg`, sometimes `-xs` / `-xl`. The unsuffixed class is
   the medium size.
 
-### State classes are not uniform - this is the single most common source of bugs
+### State classes
 
-| Component                                                         | State class                         |
-| ----------------------------------------------------------------- | ----------------------------------- |
-| Accordion header + content                                        | `active` (no prefix)                |
-| Tabs nav item + panel                                             | `active` (no prefix)                |
-| Navbar link                                                       | `active` (no prefix)                |
-| Timeline step (`mw-timeline-big-step`, `mw-timeline-simple-step`) | `active` (no prefix)                |
-| Image slider overlay image + control button                       | `active` (no prefix)                |
-| Button, pressed/selected look                                     | `active` (no prefix)                |
-| Theme toggle                                                      | `active` (no prefix)                |
-| Burger button + navbar drawer                                     | `open` (no prefix)                  |
-| Gallery dot                                                       | `mw-active`                         |
-| Stepper indicator / label / connector / step                      | `mw-active`, `mw-done`              |
-| Checkbox list item (`li`)                                         | `mw-selected`                       |
-| Kanban composer (open)                                            | `mw-active`                         |
-| Kanban ticket being edited                                        | `mw-kanban-editing`                 |
-| Modal overlay                                                     | `mw-modal-open`                     |
-| Alert, after dismissal                                            | `mw-alert-closed` (`display: none`) |
-| Field wrapper in error                                            | `mw-field-has-error`                |
-| Single form control in error                                      | `mw-form-element-error`             |
+Since 4.0.0 there is one spelling for "this one is on": **`mw-active`**. It
+works on every component that previously wanted a bare `active` - accordion,
+tabs, navbar link, timeline step, image slider, button, theme toggle, segmented
+control - alongside gallery dot, stepper and kanban composer, which used it all
+along. Write `mw-active` and stop looking things up.
 
-Angular: `[class.active]="isOpen"` and `[class.mw-active]="i === current"` - the
-binding target must match the table exactly.
+The unprefixed `active` is still styled everywhere it used to be, so existing
+markup keeps working, but it is deprecated. The shipped `main.js` clears both
+when it switches a state off, precisely so a stale `active` in the HTML cannot
+leave a second tab lit.
+
+The classes that mean something _other_ than "on" keep their own names:
+
+| Component                                    | State class                         |
+| -------------------------------------------- | ----------------------------------- |
+| Anything switchable, "on"                    | `mw-active` (`active` deprecated)   |
+| Burger button + navbar drawer                | `open` (no prefix)                  |
+| Stepper indicator / label / connector / step | `mw-active`, `mw-done`              |
+| Checkbox list item (`li`)                    | `mw-selected`                       |
+| Calendar day, picked                         | `mw-selected`                       |
+| Kanban ticket being edited                   | `mw-kanban-editing`                 |
+| Modal overlay                                | `mw-modal-open`                     |
+| Alert, after dismissal                       | `mw-alert-closed` (`display: none`) |
+| Field wrapper in error                       | `mw-field-has-error`                |
+| Single form control in error                 | `mw-form-element-error`             |
+
+`mw-active` and `mw-selected` are not the same thing and not interchangeable:
+active is the one of several that is currently showing, selected is a choice the
+user made and can undo.
+
+Angular: `[class.mw-active]="i === current"`.
 
 ## Scales
 
@@ -144,39 +155,98 @@ keys at all (negative gap is invalid CSS and is not generated).
 
 **Radius** (`mw-radius-none|xs|sm|md|lg|xl|2xl|full`): 0, 2, 5, 10, 15, 20, 30 px, 50%.
 
+**The surface signature.** Every panel-like component - card, panel, modal,
+accordion, tile, calendar, pagination, login box - shares one silhouette: sharp
+5px corners on the top-left/bottom-right diagonal, round 20px ones on the other,
+plus a 2px **corner accent** in the primary tone (`--mw-corner-accent`) sitting
+on the two round corners. It is not a class and not opt-in; the components carry
+it. `mw-corner-plain` drops the accent on a box too small to hold it - see
+`references/layout.md`.
+
+**Elevation** (`mw-elevation-0` … `-5`, and `var(--mw-elevation-N)` inside SCSS).
+Two shadows per level - a tight contact layer plus a wide ambient one:
+`1` resting (inputs, tags), `2` raised (cards, panels at rest), `3` floating
+(a card under the pointer), `4` overlay (dropdown, popover, drawer), `5` modal.
+`0` is explicitly flat. Never write a `box-shadow` by hand - the twelve one-off
+values that used to exist are exactly what this replaced.
+
+**Motion** `--mw-duration-instant|fast|base|slow|slower` = 110/180/300/520/900ms
+plus `--mw-duration-zoom` (650ms, for a large surface actually travelling),
+`--mw-ease-out` (things arriving - the default), `--mw-ease-in-out` (A to B and
+back), `--mw-ease-spring` (a pop). Two ready-made transitions:
+`var(--mw-transition)` for hover and focus states, `var(--mw-transition-fast)`
+for anything that should feel instant under the pointer. Both list their
+properties explicitly rather than saying `all`.
+
+**Control sizes** `--mw-control-height-sm|base|lg` = 2 / 2.25 / 2.5rem (an even
+32 / 36 / 40px step) and
+`--mw-control-font-sm|base|lg` = 0.8 / 0.9 / 1rem, shared by `mw-input`,
+`mw-select`, `mw-textarea` and `mw-btn`. A field and the button beside it are
+the same height by construction. Buttons run one font step above the fields.
+
+**Focus** `--mw-focus-ring-width` 2px, `--mw-focus-ring-offset` 2px,
+`--mw-focus-ring-color`, plus `--mw-focus-halo-size` 3px /
+`--mw-focus-halo-opacity` 28% for the soft ring a form field gets instead of a
+hard outline. SCSS: `@include focus-ring`, `focus-ring-inset`, `field-focus`.
+
 ## Component index
 
 Everything below is documented in `references/components.md` unless marked otherwise.
 
 **Actions** `mw-btn` (+ `primary`, `secondary`, `danger`, `success`, `outline`,
-`link`, `link-muted`, `sm`, `lg`) · `mw-btn-mini` · `mw-button-bar`
+`ghost`, `ghost-danger`, `link`, `link-muted`, `plain`, `icon`, `block`, `sm`,
+`lg`) · `mw-btn-mini` · `mw-link` / `mw-link-muted` (the link in running text) ·
+`mw-button-bar`
+(+ `left`, `right`, `center`, `between`) · `mw-segmented` · `mw-actions-note`
 
-**Containers** `mw-card` (+ `simple`, `lg`, `xl`, `stack`, badge, ribbon) ·
+**Containers** `mw-card` (+ `simple`, `lg`, `xl`, `stack`, badge, ribbon,
+feature frame) ·
 `mw-panel` · `mw-tile` · `mw-accordion` · `mw-tabs` · `mw-modal` ·
-`mw-item-list` family
+`mw-item-list` family · `mw-offer` (+ `-head`, `-name`)
+
+**Pricing** `mw-price` (+ `-amount`, `-fraction`, `-currency`, `-original`,
+`-period`, `-word`, `-note`, `sm`/`lg`, `inline`, `center`, `plain`)
 
 **Data & status** `mw-table` (+ `subtle`, `sticky-head`, `cards`, `compact`,
-`hover`, responsive wrappers) · `mw-kanban` (+ `plain`, `compact`) · `mw-tag` /
-`mw-tags` · `mw-info` / `mw-info-mini` / `mw-info-counter` · `mw-progress-bar` ·
+`hover`, responsive wrappers) · `mw-kanban` (+ `plain`, `compact`) ·
+`mw-calendar` (+ `compact`, `plain`) · `mw-tag` /
+`mw-tags` · `mw-badge` (+ `-dot`, `-status`, `-anchor`, `-float`, `-pulse`) ·
+`mw-info` / `mw-info-mini` / `mw-info-counter` · `mw-progress-bar` ·
 `mw-rating` · `mw-meta-header` · `mw-stepper` · `mw-timeline-big` /
 `mw-timeline-simple`
 
-**Feedback** `mw-alert` · `mw-toast-stack` · `mw-empty-state` ·
+**Feedback** `mw-alert` · `mw-toast-stack` · `mw-announcement` (+ `-content`,
+`-highlight`, `-static`, color variants) · `mw-empty-state` ·
 `mw-spinner-border` / `mw-spinner-dots` / `mw-spinner-dual-ring` · `mw-skeleton`
 
 **Navigation** `mw-header` + `mw-navbar` · `mw-breadcrumbs` · `mw-pagination` ·
-`mw-section-nav` (`references/layout.md`)
+`mw-dropdown` (+ `-menu`, `-item`, `-item-danger`, `-divider`, `-label`,
+`-caret`, `-end`, `-up`) · `mw-section-nav` (`references/layout.md`)
 
 **Media & content** `mw-avatar` (+ `initials`, `group`) · `mw-gallery` ·
-`mw-image-slider` · `mw-blog-post` · `mw-code-block` / `mw-terminal` ·
-`mw-techstack-bucket` · `mw-coming-soon` · `mw-divider` · `mw-list` family
+`mw-image-slider` · `mw-blog-post` · `mw-testimonial` (+ `-source`, `-detail`,
+`-date`, `-featured`) · `mw-prose` · `mw-media` (+ `-caption`) · `mw-code-block` /
+`mw-terminal` · `mw-techstack-bucket` · `mw-coming-soon` · `mw-divider` ·
+`mw-kbd` · `mw-list` family
 
 **Forms** (`references/forms.md`) `mw-field` · `mw-input` · `mw-select` ·
 `mw-textarea` · `mw-checkbox` · `mw-radio` · `mw-toggle` · `mw-slider` ·
-`mw-input-group` · `mw-form` / `mw-form-group` / `mw-form-actions` · `mw-login`
+`mw-input-group` · `mw-prefilled` · `mw-form` / `mw-form-group` /
+`mw-form-actions` · `mw-login`
 
 **Layout** (`references/layout.md`) `mw-main` · `mw-container` · `mw-content` ·
-`mw-section` · `mw-page-header` · `mw-grid-*` · `mw-hero` · `mw-footer`
+`mw-section` (+ `mw-section-intro`) · `mw-page-header` · `mw-grid-*` ·
+`mw-columns-2/3` · `mw-row-split` · `mw-hero` (+ `mw-scroll-hint`, `-end`) · `mw-footer`
+
+**Utilities** (`references/layout.md`) `mw-sr-only` / `mw-sr-only-focusable` /
+`mw-skip-link` · `mw-row-split` (+ `center`) · `mw-text-numeric` /
+`mw-text-currency` · `mw-text-truncate` / `mw-text-clamp-2..5` /
+`mw-text-break` / `mw-text-nowrap` · `mw-text-balance` / `mw-text-pretty` /
+`mw-text-eyebrow` / `mw-text-measure` · `mw-elevation-0..5` ·
+`mw-corner-plain` ·
+`mw-aspect-square|video|wide|portrait|photo` · `mw-d-{sm,md,lg,xl}-*` /
+`mw-hide-mobile` / `mw-hide-desktop` · `mw-overflow-*` / `mw-snap-x` ·
+`mw-reveal` / `mw-reveal-stagger` · spacing, flex, display, text
 
 ## Pitfalls
 
@@ -199,11 +269,14 @@ Everything below is documented in `references/components.md` unless marked other
    `mw-table-responsive-scroll` (height via `--mw-table-scroll-height`).
 7. **`--mw-text-muted-color` on a coloured surface is always wrong.** It follows
    the theme; buttons, table headers and badges do not. Use
-   `--mw-accent-text-color` there, and `opacity` for disabled states.
-   `--mw-accent-text-color` is the text on a **brand** surface, so overriding it
-   for a light primary makes it dark everywhere it is used. The fixed grey
-   surfaces - tooltip, `mw-btn-mini`, `mw-info-mini`, gallery arrows - therefore
-   hardcode white and ignore the token.
+   `--mw-*-accent-text-color` there, and `opacity` for disabled states.
+   `--mw-accent-text-color` is the shared label for all six colours; each one
+   also has its own `--mw-primary-accent-text-color`,
+   `--mw-secondary-accent-text-color`, `--mw-success/warning/danger/info-accent-text-color`,
+   defaulting to the shared token. Override a single one when that colour needs
+   the opposite label - a neon primary on an otherwise dark palette. The fixed
+   grey surfaces - tooltip, `mw-btn-mini`, `mw-info-mini`, gallery arrows -
+   hardcode white and ignore all of them.
 8. **`mw-card` already lifts on hover** and `mw-btn` already has `inline-flex`
    plus a gap for icons. Neither has a modifier class for it - adding one from
    memory produces markup that does nothing.
@@ -211,9 +284,25 @@ Everything below is documented in `references/components.md` unless marked other
    backgrounds and borders are derived with `color-mix()` at runtime. Setting
    `--mw-primary-color-hover` by hand is usually a sign the base token was not
    set.
-10. **Browser floor: `color-mix()`** - Chrome 111+, Safari 16.2+, Firefox 113+.
-    Older browsers get no colours at all, not merely worse ones.
-11. **A component host between a container and its children breaks the layout,
+10. **Browser floor: `color-mix()` and `oklch(from ...)`** - Chrome 119+,
+    Safari 16.4+, Firefox 128+. Both carry the derived tones, so older browsers
+    get no colours at all, not merely worse ones.
+11. **Touch targets grow on their own.** On `pointer: coarse` or below 768px,
+    `mw-btn` gets a 2.75rem minimum height, `mw-btn-sm`, `mw-input-sm`,
+    `mw-select-sm` and `mw-textarea-sm` 2.5rem, a tab 2.75rem, a calendar day
+    44px, and list rows / menu items / pager pages / accordion headers 2.75rem.
+    `mw-btn-mini` keeps its 18px circle - it sits in tag rows and table cells
+    where a bigger one would shift the layout - and grows its _hit area_ to 28px
+    via a pseudo-element. Nothing to switch on, and no reason to write the media
+    query again in an app.
+12. **`mw-empty-state` has a `-desc`, not a `-text`.** The parts are
+    `mw-empty-state-icon`, `-title`, `-desc`, plus the size variant
+    `mw-empty-state-sm`. Invented names fail silently, as always.
+13. **`mw-text-numeric` gives digits, `mw-text-currency` gives a money column.**
+    The first is only `tabular-nums` - for a clock, a counter, an ID. The second
+    adds right alignment and `nowrap`. Before 4.0.0 the first did both, which
+    is why people wrote the declaration out by hand.
+14. **A component host between a container and its children breaks the layout,
     silently.** Every `mw-*` flex or grid container styles its _children_ -
     `mw-grid-*`, `mw-tags`, `mw-button-bar`, `mw-form-actions`, `mw-modal-footer`,
     `mw-toast-stack`. In plain HTML the children are right there; in a SPA a
@@ -222,3 +311,78 @@ Everything below is documented in `references/components.md` unless marked other
     that host - it then generates no box and the children take the item role
     back. Angular: `host: { class: 'mw-d-contents' }`. `mw-header` handles this
     case on its own, the others do not.
+15. **A badge is not a tag.** `mw-tag` names something - a topic, a state - and
+    sits in a row of its own kind, with a tinted surface. `mw-badge` carries a
+    _count_ or a _status_ and usually sits **on** something, filled rather than
+    tinted. Number on a bell: badge. "Draft" next to a title: tag.
+16. **A dropdown is a `<details>`, not a div.** `<details class="mw-dropdown">`
+    with a `<summary>` trigger - that is where the keyboard handling, the focus
+    and the open state come from, and it works without script. The framework JS
+    only adds Escape and click-outside. Writing your own div-plus-click loses all
+    of it.
+17. **An open dropdown is clipped by anything that hides its overflow.** The menu
+    is absolutely positioned. The framework's own containers - panel, card, tile,
+    modal body, responsive table - lift the clip while a menu is open. On your
+    own container it is one line:
+    `:has(.mw-dropdown[open]) { overflow: visible }`.
+18. **Never write `box-shadow` by hand.** Use `var(--mw-elevation-1..5)` or the
+    `mw-elevation-*` class. A hand-rolled shadow is the wrong colour in one of
+    the two themes - the dark theme's shadow is a light rim over a dark contact
+    layer, not a black blur.
+19. **Never write a duration or an easing curve by hand** either. Use
+    `var(--mw-transition)` for a hover or focus state,
+    `var(--mw-transition-fast)` for something that should feel instant, and
+    `var(--mw-duration-*)` with `var(--mw-ease-*)` for anything else. That is
+    also what makes `prefers-reduced-motion` work - it turns the duration tokens
+    down, so anything built on them is covered for free.
+20. **A hover effect that _moves_ something needs the `hover` mixin.** On touch
+    `:hover` latches after a tap and stays on, so a lifted card stays lifted,
+    visibly out of line with its row. `@include hover { transform: ... }` -
+    colour changes are fine unguarded, movement is not. The framework's own
+    components already do this.
+21. **Below 576px a modal is a bottom sheet.** Full width, anchored to the bottom
+    edge, rounded on the top two corners, with a grab handle and full-width
+    actions in the footer. Nothing to switch on - do not fight it with your own
+    media query, and do not put a fixed height on `mw-modal`.
+22. **Press states exist on every control**, because a finger never hovers.
+    `mw-btn` and friends dip 1px and invert their highlight, `mw-btn-mini` and
+    `mw-modal-close` scale down. If you build your own control, give it an
+    `:active` - on touch it is the only feedback there is.
+23. **Never set a height on a form control.** `mw-input`, `mw-select`,
+    `mw-textarea` and `mw-btn` all take their minimum height from the control
+    scale, so a field and the button next to it line up on their own. Pick the
+    size step (`-sm` / nothing / `-lg`) and leave the height alone - a hand-set
+    one puts that control back out of line with everything around it.
+24. **Put the size modifier on the input group, not inside it.**
+    `mw-input-group-sm` and `-lg` size the prefix, the suffix _and_ the field.
+    Adding `mw-input-sm` inside as well is redundant, and mixing the two steps
+    is what makes a group look broken.
+25. **Loops keep their own timing, entrances go on the scale.** A spinner, a
+    skeleton shimmer and a pulse ring are ambient - running them at 300ms would
+    be frantic, and they are the one place a hand-written duration is right.
+    Anything that plays once - a panel appearing, a card sliding in, a drawer -
+    uses `var(--mw-duration-*)`.
+26. **`transition: all` is out.** `var(--mw-transition)` lists paint-only
+    properties on purpose. The one exception in the framework is the header
+    burger, which morphs by animating `top` and `bottom`, and it says so in a
+    comment. If your component really does need to animate a size, name that
+    property - do not reach for `all`.
+27. **A control is a `<button>`, never a styled `<div>`.** `mw-tabs-nav-item`,
+    `mw-theme-toggle`, `mw-gallery-dot` and `mw-accordion-header` are all
+    written for one, and all four shipped as divs and spans - the first three
+    until 4.11, the accordion header until 4.12 - that no keyboard could reach.
+    Each class clears what a `<button>` brings with it, so
+    `<button type="button" class="mw-tabs-nav-item" data-tab="...">` is the
+    whole markup. If you build your own clickable thing: the element decides
+    whether anyone without a mouse can use it, the class only decides how it
+    looks.
+28. **A link in running text is `mw-link`, not `mw-btn mw-btn-link`.** Since
+    4.13.0 there is a class for exactly that. `mw-btn` is `inline-flex` with
+    `min-height: var(--mw-control-height)`, so a link written that way pulls its
+    own line up to 2.25rem while every line around it keeps the paragraph's
+    height - in a footer disclaimer at `font-size: sm` that is nearly double,
+    and it reads as a layout bug. `mw-p-0` is not the fix it looks like: the
+    height does it, not the padding. `mw-link` is the same look without the
+    control height and works on an `<a>` and a `<button>` alike.
+    `mw-btn mw-btn-link` stays right where the link really is one of several
+    buttons and has to line up with them - a card's actions, a button bar.

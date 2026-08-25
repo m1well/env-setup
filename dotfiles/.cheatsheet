@@ -25,6 +25,7 @@ docker system df # show docker disk usage (images, container, volumes)
 docker system info # display system-wide information
 docker system prune -f # remove unused images and unused networks
 du -sh * | sort -h # human readable disk usage of content in actual directory - sorted
+du -h -d 1 {1} 2>/dev/null | sort -rh | head -25 # human readable disk usage of given folder and first subfolders - sorted
 du -sh {1} # human readable disk usage sum of a given directory
 echo $(cat /dev/urandom | env LC_CTYPE=C tr -cd '0-9' | head -c {1}) # generate random number with given digits
 find . -name ".git" -type d -exec bash -c "cd '{}/..' && pwd && git remote -v | grep 'fetch' && echo''" \; # find all git remotes (fetch) and print their folder

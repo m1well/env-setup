@@ -78,6 +78,11 @@ installTools() {
   else
     git clone https://github.com/m1well/randomizer.git
   fi
+  if [ -d topomap-skills ]; then
+    printf '## topomap-skills project apparently already exists\n'
+  else
+    git clone https://github.com/m1well/topomap-skills.git
+  fi
 }
 
 copyCliMaster() {

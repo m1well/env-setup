@@ -116,6 +116,10 @@ My global [Claude Code](https://claude.com/claude-code) setup, symlinked into `~
 `settings.json` (permissions, model, statusline), `statusline.sh` (custom status line),
 `CLAUDE.md` (personal context) and `skills/` (custom skills).
 
+Two of those skills live in their own public repo, [topomap-skills](https://github.com/m1well/topomap-skills),
+and are symlinked into `skills/` from there. The install script clones it next to this
+one; without that repo the two links dangle.
+
 #### Brewfile ([link](/homebrew/Brewfile))
 
 A declarative list of my most important CLI tools, casks and fonts.

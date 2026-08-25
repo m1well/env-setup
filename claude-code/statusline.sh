@@ -47,11 +47,11 @@ else
     MODEL_PART="${MODEL}"
 fi
 
-# --- Part 2: context bar (green <=15%, yellow <=50%, red >50%) ---
+# --- Part 2: context bar (green <=20%, yellow <=65%, red >65%) ---
 # The bar itself is colored; the percentage next to it stays plain (LIGHT).
-if [ "$PCT" -le 15 ]; then
+if [ "$PCT" -le 20 ]; then
     BAR_COLOR="$GREEN"
-elif [ "$PCT" -le 50 ]; then
+elif [ "$PCT" -le 65 ]; then
     BAR_COLOR="$YELLOW"
 else
     BAR_COLOR="$RED"

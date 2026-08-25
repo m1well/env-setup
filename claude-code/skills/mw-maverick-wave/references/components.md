@@ -15,13 +15,99 @@ exhaustive: what is not named does not exist.
 ```
 
 - Variants: `mw-btn-primary`, `mw-btn-secondary`, `mw-btn-danger`,
-  `mw-btn-success`, `mw-btn-outline`, `mw-btn-link`, `mw-btn-link-muted`
+  `mw-btn-success`, `mw-btn-outline`, `mw-btn-ghost`, `mw-btn-ghost-danger`,
+  `mw-btn-link`, `mw-btn-link-muted`
+- Shapes: `mw-btn-icon` (square, for an icon-only button), `mw-btn-block`
+  (full width)
 - Sizes: `mw-btn-sm`, `mw-btn-lg`
 - `mw-btn` is `inline-flex` with a gap - icons need no wrapper and no extra class
 - `disabled` gets `opacity: .6` and `not-allowed`; there is no disabled class
-- `active` (no prefix) gives the pressed/selected look on the coloured variants
-- `mw-btn-link` still has the button padding - `mw-p-0` makes it read as inline
-  text
+- `mw-active` gives the pressed/selected look on the coloured variants
+- Every variant dips 1px on `:active`, and the solid ones invert their top
+  highlight into an inner shadow. On touch that press is the only feedback there
+  is, so do not override it away
+- **A link inside a sentence is `mw-link`, not `mw-btn mw-btn-link`.** The base
+  class carries a control height, so in running text it lifts that one line to
+  2.25rem while the lines around it stay where they are. `mw-p-0` does not help
+  - the height does it, not the padding. Keep `mw-btn` only where the link
+    really is a button in a row of buttons and has to line up with them
+- On a coarse pointer or below 768px `mw-btn` grows to a 2.75rem minimum height
+  and `mw-btn-sm` to 2.5rem, on their own
+
+```html
+<!-- a button that happens to look like a link -->
+<button type="button" class="mw-btn mw-btn-link">Read Article</button>
+
+<!-- a link inside a sentence -->
+<p>Built with <a href="https://astro.build" class="mw-link">Astro</a>.</p>
+```
+
+### Text links
+
+`mw-link` and `mw-link-muted` are the inline links, added in 4.13.0. Same look
+as the two button variants - no box, underline on hover - but without
+`inline-flex` and without the control height, which is what makes them sit on
+the line instead of above it. `font` and the focus ring are set explicitly, so
+a `<button>` in the middle of a paragraph works as well as an `<a>`.
+
+```html
+<p>
+  Built with <a href="https://astro.build" class="mw-link">Astro</a> and written
+  up in the
+  <a href="#get-started" class="mw-link-muted">Get Started</a> section.
+</p>
+```
+
+### Three emphasis levels
+
+`mw-btn-primary` (or any solid colour) **fills**, `mw-btn-outline` **draws a
+line**, `mw-btn-ghost` does **neither** until you point at it. Ghost is what a
+toolbar, a card's own actions or a row of icon buttons wants - five outlined
+boxes in a row fight the content they sit on.
+
+```html
+<button type="button" class="mw-btn mw-btn-ghost">Rename</button>
+<button type="button" class="mw-btn mw-btn-ghost mw-btn-ghost-danger">
+  Remove
+</button>
+```
+
+Ghost is not `mw-btn-plain`: it keeps the button's shape, padding and hit area
+and only leaves them unpainted at rest. `mw-btn-plain` has no look at all.
+
+### Icon-only buttons
+
+```html
+<button
+  type="button"
+  class="mw-btn mw-btn-ghost mw-btn-icon"
+  aria-label="Duplicate"
+>
+  <i class="fas fa-copy"></i>
+</button>
+```
+
+`mw-btn-icon` makes the button square and follows the size modifier next to it
+(`mw-btn-sm` / `mw-btn-lg`), growing to 2.75rem on a coarse pointer. It always
+needs an `aria-label` - there is no text to read out. Combine it with any
+variant; ghost is usually the right one.
+
+### `mw-btn-plain` - a button with no button in it
+
+For everywhere a `<button>` is the right element and a button is the wrong look:
+a calendar day, a time in a request row, a settings tab, a modal backdrop.
+
+```html
+<button type="button" class="mw-btn-plain">14:30</button>
+```
+
+It clears `appearance`, background, border, padding and margin, inherits font
+and colour, and keeps exactly two things: the pointer and the focus ring. Used
+on its own - `mw-btn` is neither needed nor wanted next to it.
+
+Not the same as `mw-btn-link`, which is a button dressed as a link and brings
+its own colour and control height, nor as `mw-link`, which is the link inside a
+sentence.
 
 **Destructive actions use `mw-btn-danger`.** `mw-btn-secondary` is a brand
 colour, not a semantic one.
@@ -54,9 +140,56 @@ Row of equally treated buttons, centered by default.
 - Colouring: `mw-button-bar-primary`, `-secondary`, `-outline` style the bare
   `mw-btn` children, so the buttons carry no variant class themselves.
   `mw-button-bar-nav` mixes them for prev/center/next navigation.
-- Alignment: `mw-button-bar-left`, `-right` (default is centered),
-  `mw-button-bar-between` pushes first and last apart.
+- Alignment: `mw-button-bar-left`, `-right`, `-center` (which is also the
+  default), `mw-button-bar-between` pushes first and last apart.
 - Sizes: `mw-button-bar-sm`, `mw-button-bar-lg`.
+- Below 576px it stacks and gives every button the full width. Right for a row of
+  independent actions - wrong for a switch, see below.
+
+### `mw-actions-note` - one line above a row of actions
+
+```html
+<div class="mw-modal-footer">
+  <p class="mw-actions-note">This action cannot be undone.</p>
+  <button class="mw-btn mw-btn-outline">Cancel</button>
+  <button class="mw-btn mw-btn-danger">Delete</button>
+</div>
+```
+
+Right-aligned, muted, one size smaller. For what the buttons apply to, why one
+of them is disabled, or that something cannot be taken back.
+
+- Works in `mw-modal-footer`, `mw-card-footer`, `mw-form-actions` and
+  `mw-panel-footer`. It is a child of the action row, not a wrapper around it:
+  the line takes the full width and pushes the buttons onto the row below.
+- Only rows that actually carry a note start wrapping, so adding one changes
+  nothing anywhere else.
+- Inside `mw-form-actions` the alignment variants steer it as well -
+  `mw-form-actions-left` makes the note left-aligned too.
+- `mw-form-actions-hint` is the old, form-only name for the same thing. Still
+  styled, but use `mw-actions-note`: the hint name is wrong the moment the line
+  sits in a modal.
+
+### Segmented control
+
+Two or three positions of **one** switch: income/expense, offer/quote, a period
+picker.
+
+```html
+<div class="mw-segmented">
+  <button type="button" class="mw-segmented-item mw-active">Income</button>
+  <button type="button" class="mw-segmented-item">Expense</button>
+</div>
+```
+
+- Stays horizontal at every width and splits the row into equal shares - which
+  is the whole point. Stacked in a `mw-button-bar`, two positions of a switch
+  look like two buttons you could press both of.
+- Active position: `mw-active` on the item.
+- `mw-segmented-secondary` switches the active fill to the secondary colour,
+  `mw-segmented-auto` shrinks the control to its content instead of filling the
+  row. `disabled` works on an item.
+- Items reach a 2.5rem minimum height on a coarse pointer.
 
 ## Cards
 
@@ -84,13 +217,20 @@ Row of equally treated buttons, centered by default.
 - `mw-card-simple` is the flat variant with even padding for arbitrary content.
   Use it when you only need a padded surface - it stays a block container, so
   inline children keep flowing side by side.
-- Image height: 210px, `mw-card-lg` 340px, `mw-card-xl` 480px. Set
-  `--mw-card-img-height` on the card for any other height.
+- Image height: 210px, `mw-card-lg` 340px, `mw-card-xl` 480px (260px/340px below
+  `sm`). Set `--mw-card-img-height` on the card for any other height.
   `mw-card-img-contain` shows the whole image instead of cropping it.
 - `mw-card-footer` pushes its last child to the right - with a single child that
   means it sits right, not left. Everything is vertically centered, so plain text
-  lines up with a button next to it. Below `lg` the footer stacks and children go
-  full width.
+  lines up with a button next to it. Actions that no longer fit next to each
+  other wrap.
+- The footer stacks to full-width children once the **card** is narrower than
+  360px, not once the window is - a card in a three-column grid is just as narrow
+  on a 1200px desktop as it is on a phone, and now looks the same in both. This
+  is a container query: a card that has a footer declares
+  `container: mw-card / inline-size` and takes `width: 100%`, so it fills its
+  slot instead of sizing to its content. Give such a card an explicit width if
+  you need it to hug its content.
 - `mw-card-badge` (top right corner) and `mw-card-ribbon` (diagonal banner) are
   absolutely positioned overlays; colour them with `mw-card-addon-primary`,
   `-secondary`, `-success`, `-warning`, `-danger`, `-info`.
@@ -107,6 +247,42 @@ Row of equally treated buttons, centered by default.
 </div>
 ```
 
+**Feature frame** - wraps a card to lift one option out of a grid of equals,
+for the "most booked" plan in a pricing row:
+
+```html
+<div class="mw-card-feature mw-card-feature-secondary">
+  <p class="mw-card-feature-label">Most booked</p>
+  <div class="mw-card">
+    <div class="mw-card-body">...</div>
+  </div>
+</div>
+```
+
+- Unlike badge and ribbon this is a **wrapper around** the card, not an overlay
+  inside it. The card itself stays untouched - same width, same height, same
+  hover as its neighbours - and the frame plus its label bar grow outwards into
+  the grid gap.
+- Colours are `mw-card-feature-secondary` and `mw-card-feature-info`; primary is
+  the default and needs no class. This is a separate set from the
+  `mw-card-addon-*` classes that colour badge and ribbon - the frame only comes
+  in those three.
+- The label is a single line. It is set in uppercase at `2xs` and truncates with
+  an ellipsis rather than wrapping, because the 22px bar height is baked into
+  the frame's negative margins.
+- The frame reaches 29px above the card and 7px below it, so it sticks out of
+  its grid cell. Any `mw-grid-*` that directly contains one therefore gets
+  `row-gap: 56px` automatically, which leaves 20px between two stacked frames.
+  CSS has no per-row gap, so this applies to every row of that grid - expect
+  wrapped rows without a frame to sit further apart than usual. That is also why
+  the bar is kept low: each extra pixel is charged to every row.
+- The space **above the first row** is not covered - the frame reaches into
+  whatever sits there. Give the container the room (`mw-mt-10` on the grid, or
+  `mw-mb-10` on the heading above it).
+- In a layout that is not a `mw-grid-*` - your own flex column, an Angular host
+  with its own grid - nothing raises the gap for you. Leave at least 36px
+  between stacked items yourself.
+
 **Stack card** - icon + title header with a gradient rule, for feature or
 tech-stack grids:
 
@@ -122,6 +298,173 @@ tech-stack grids:
   </div>
 </div>
 ```
+
+## Pricing
+
+Two pieces that are almost always needed together: `mw-price`, the figure on its
+own, and `mw-offer`, the card it is sold from.
+
+### Price
+
+One baseline row - what it cost before, what it costs now, the unit, a discount
+tag:
+
+```html
+<p class="mw-price">
+  <span class="mw-price-original">
+    <span class="mw-sr-only">Regular price:</span>159 Euro
+  </span>
+  <span class="mw-sr-only">Now:</span>
+  <span class="mw-price-amount"
+    >129<span class="mw-price-fraction">,90</span></span
+  >
+  <span class="mw-price-currency">Euro</span>
+  <span class="mw-price-period">/ month</span>
+  <span class="mw-tag mw-tag-secondary">-20%</span>
+</p>
+<p class="mw-price-note">Billed yearly, cancel any time.</p>
+```
+
+- Everything in the row is sized in `em` off `--mw-price-size`, so
+  `mw-price-sm` (1.5rem) and `mw-price-lg` (3rem) move the whole row at once -
+  cents, unit and struck original included. Set the token yourself for any other
+  size.
+- `mw-price-original` is muted **and** struck, and it takes its own line
+  **above** the new price. Muted alone reads as a footnote; the line is what
+  says this is no longer the price. The rule is drawn explicitly, because the
+  browser default hairline disappears at this size against a muted tone.
+- Stacked is the default because inline the row runs long - "199 Euro 159 Euro
+  -20 %" - and the first thing to wrap away when the width gives out is the
+  discount tag, the one part that was there to catch the eye. `mw-price-inline`
+  puts it back on one line for a wide card or a table row.
+- `mw-price-fraction` goes **inside** the amount and sits one step down on the
+  baseline, not raised to the cap height - raised cents are a discounter's idiom
+  and make a service price read cheaper than it is.
+- `mw-price-currency` and `mw-price-period` stop shrinking at 0.8rem, and
+  `mw-price-original` at 0.9rem. Below `mw-price-sm` the `em` chain would put
+  them under 12px, and that is the size most offer cards run at.
+- `mw-price-word` for "On request" or "Free" - bold, so it holds the same slot in
+  a row of cards, but set well below a figure. Its line box is scaled back up to
+  the amount's, so a word and a number in neighbouring cards land on one line.
+- `mw-price-note` is a **sibling** of the row, not a child - inside it, it would
+  inherit the price size and join the baseline.
+- A `mw-tag` or `mw-badge` placed directly in the row is centred against the
+  digits rather than hung off their baseline.
+
+| Class             | What it does                                   |
+| ----------------- | ---------------------------------------------- |
+| `mw-price-sm/lg`  | Retunes `--mw-price-size`, everything follows  |
+| `mw-price-inline` | Old price in front of the new one, on one line |
+| `mw-price-center` | Centres the row                                |
+| `mw-price-plain`  | Body colour instead of the brand               |
+
+A struck-through price is a visual convention a screen reader does not pass on -
+`<s>` is announced by almost none of them. Wherever an old and a new price stand
+next to each other, name them with `mw-sr-only`, as above. Without it the reader
+hears two prices and no way to tell which one is charged.
+
+### Offer card
+
+`mw-offer` goes on a `mw-card` and does the one thing the card cannot: it pushes
+the price to the bottom of the body, so the prices in a row line up even though
+the feature lists have different lengths.
+
+```html
+<article class="mw-card mw-offer">
+  <div class="mw-card-body">
+    <h3 class="mw-card-title">Studio</h3>
+    <hr class="mw-card-title-divider" />
+    <p class="mw-card-text">Description.</p>
+    <ul class="mw-list mw-list-check">
+      <li>10 projects</li>
+    </ul>
+    <p class="mw-price mw-price-sm">…</p>
+    <p class="mw-price-note">Per month, billed yearly.</p>
+    <div class="mw-card-footer">
+      <button class="mw-btn mw-btn-primary">Choose</button>
+    </div>
+  </div>
+</article>
+```
+
+- Bottom-aligned, note included: a card that carries a `mw-price-note` and one
+  that does not will **not** have their prices on the same line. Give every card
+  in a row a note, or none of them.
+- To lift one plan out of the row, wrap it in `mw-card-feature` - the frame is
+  the card's, not the offer's.
+- A price dropped into a `mw-card-footer` instead needs no modifier: it lines up
+  with the button beside it on its own, and `mw-price-sm` keeps it from
+  outweighing the action. That is the layout for a dated event, where the price
+  is a detail rather than the offer.
+- Such a footer keeps its row once the card gets narrow, and gives the action
+  half of it. A footer normally stacks its children to full width down there, so
+  that two buttons do not squeeze - but a price is a label, not a second action,
+  and a full-bleed button under a left-aligned price reads as a banner rather
+  than as the end of a card.
+
+**Head band** - name and price in a solid bar at the top, for when the price is
+the thing being compared and the feature list is only its justification:
+
+```html
+<article class="mw-card mw-offer mw-card-addon-secondary">
+  <div class="mw-offer-head">
+    <p class="mw-offer-name">Studio</p>
+    <p class="mw-price mw-price-sm">…</p>
+  </div>
+  <div class="mw-card-body">…</div>
+</article>
+```
+
+The band reads `mw-card-addon-*` for its colour - the same set the card badge and
+the ribbon use, primary without one. The price inherits the band's ink, and the
+card drops its top corner arc, which the band already owns.
+
+### Billing cycle
+
+A subscription sold on several terms, where the longer one is cheaper. The
+switch is a `mw-segmented` **above** the grid, not one per card - three cards
+with three switches are three states the visitor has to keep in their head.
+
+```html
+<div
+  class="mw-segmented mw-segmented-auto"
+  role="group"
+  aria-label="Billing cycle"
+>
+  <button type="button" class="mw-segmented-item mw-active" aria-pressed="true">
+    Monthly
+  </button>
+  <button type="button" class="mw-segmented-item" aria-pressed="false">
+    6 months <span class="mw-tag mw-tag-secondary">-10%</span>
+  </button>
+  <button type="button" class="mw-segmented-item" aria-pressed="false">
+    Yearly <span class="mw-tag mw-tag-secondary">-20%</span>
+  </button>
+</div>
+```
+
+- The headline figure stays **per month** on every term. "288 Euro" next to
+  "30 Euro" is not a comparison a reader can make in their head; the amount that
+  actually leaves the account belongs in the `mw-price-note` below
+  ("288 Euro charged once for the year, cancel monthly").
+- The full monthly rate goes in `mw-price-original`, the saving in a `mw-tag`
+  next to it. Both carry `hidden` on the monthly term - the framework resets
+  `[hidden]` to `display: none !important`, so it beats a component's own
+  `display` and an `el.hidden = true` or an Angular `[hidden]` binding works on
+  a `mw-tag` too.
+- Wrap the price in `aria-live="polite"` and put `aria-pressed` on the switch
+  items. The figure changes without the page moving, which a screen reader
+  otherwise never hears.
+- Drop trailing zero cents: "24 Euro", not "24,00 Euro". `mw-price-amount` sets
+  tabular figures, so the row does not jump when the term changes.
+- A tag inside the **active** item drops its colour and outlines itself in the
+  item's ink - the colour variants mix their background from the page, and an
+  orange pill on the blue fill comes out purple. Inactive items keep the colour,
+  which is what makes a visitor click them.
+
+The switching itself is the application's job - the framework ships the look,
+not the arithmetic. The showcase wires it in a few lines at the bottom of
+`index.html`.
 
 ## Panels
 
@@ -169,31 +512,43 @@ Tile sizes: `mw-tile-sm`, `mw-tile-lg`.
 ```html
 <div class="mw-accordion">
   <div class="mw-accordion-item">
-    <div class="mw-accordion-header active">
-      <h3>Question</h3>
+    <button
+      type="button"
+      class="mw-accordion-header mw-active"
+      aria-expanded="true"
+      aria-controls="faq-1"
+    >
+      <span>Question</span>
       <i class="fas fa-chevron-down mw-accordion-icon"></i>
-    </div>
-    <div class="mw-accordion-content active">
+    </button>
+    <div class="mw-accordion-content mw-active" id="faq-1">
       <div class="mw-accordion-content-inner">Answer</div>
     </div>
   </div>
 </div>
 ```
 
-Open state = `active` (no prefix) on header **and** content. The icon rotates
-via the header state. Content taller than 500px scrolls. Toggling is JS - see
-`references/javascript.md`.
+The header is a `<button>` - it is the control that opens the panel, and a
+`<div>` is not focusable. A heading is not allowed inside a button, so the
+question is a `<span>` and the header carries the type itself; a nested `h3`
+still renders the same, for markup written before 4.12.
+
+Open state = `mw-active` on header **and** content (bare `active` still works
+but is deprecated). The icon rotates via the **header** state - putting the
+class on the icon instead does nothing. Content taller than 500px scrolls.
+Toggling is JS - see `references/javascript.md`; the shipped script keeps
+`aria-expanded` in step when the header is a button.
 
 ## Tabs
 
 ```html
 <div class="mw-tabs">
   <div class="mw-tabs-nav">
-    <div class="mw-tabs-nav-item active" data-tab="tab1">Details</div>
+    <div class="mw-tabs-nav-item mw-active" data-tab="tab1">Details</div>
     <div class="mw-tabs-nav-item" data-tab="tab2">History</div>
   </div>
   <div class="mw-tabs-content">
-    <div class="mw-tabs-panel active" id="tab1">...</div>
+    <div class="mw-tabs-panel mw-active" id="tab1">...</div>
     <div class="mw-tabs-panel" id="tab2">...</div>
   </div>
 </div>
@@ -202,8 +557,15 @@ via the header state. Content taller than 500px scrolls. Toggling is JS - see
 - Variants: `mw-tabs-vertical` (nav on the left, horizontal again below `sm`),
   `mw-tabs-pills`.
 - `data-tab` matches the panel `id` - that pairing is only needed for the
-  shipped JS. In a SPA, bind `active` yourself and drop the attribute.
-- The nav scrolls horizontally on small screens instead of wrapping.
+  shipped JS. In a SPA, bind `mw-active` yourself and drop the attribute.
+- The nav scrolls horizontally instead of wrapping, and says so: a shadow shows
+  on whichever side still has tabs behind it and disappears once that end is
+  reached. Pure CSS, no scroll listener. The fade colour comes from
+  `--mw-scroll-hint-cover`, which is preset to the page background and
+  re-pointed to the card background inside `mw-card`, `mw-panel`, `mw-modal`,
+  `mw-tile` and `mw-calendar` - override it if the strip sits on some other
+  surface.
+- Tab items reach a 2.75rem minimum height on a coarse pointer.
 
 ## Modal
 
@@ -215,9 +577,10 @@ via the header state. Content taller than 500px scrolls. Toggling is JS - see
       <button class="mw-modal-close" type="button">&#120299;</button>
     </div>
     <div class="mw-modal-body">
-      <p>This cannot be undone.</p>
+      <p>Invoice 2026-0042 will be removed.</p>
     </div>
     <div class="mw-modal-footer">
+      <p class="mw-actions-note">This action cannot be undone.</p>
       <button class="mw-btn mw-btn-outline">Cancel</button>
       <button class="mw-btn mw-btn-danger">Delete</button>
     </div>
@@ -230,11 +593,12 @@ via the header state. Content taller than 500px scrolls. Toggling is JS - see
   class is the whole open/close mechanism.
 - Body scroll lock is automatic: the stylesheet uses
   `body:has(.mw-modal-open)`. Nothing to implement.
-- Sizes: `mw-modal-sm` 370px, default 550px, `mw-modal-lg` 680px,
-  `mw-modal-xl` 900px. Height is capped at 80-92dvh, the body scrolls.
+- Sizes: `mw-modal-sm` 370px, default 520px, `mw-modal-lg` 720px,
+  `mw-modal-xl` 960px. Height is capped at 80-92dvh, the body scrolls.
 - `mw-modal-backdrop` is the click-to-close surface; put the close handler on it.
 - `mw-modal-body` takes a `mw-form` directly - the form brings the field gaps,
   the body brings the padding.
+- `mw-actions-note` is the muted line above the buttons - see below.
 
 Angular: `<div class="mw-modal-overlay" [class.mw-modal-open]="isOpen()">`.
 
@@ -271,6 +635,32 @@ class), `-top-center`, `-bottom-right`. Width is capped at
 `min(380px, 100vw - 2rem)`, clicks pass through everywhere except on a toast,
 the entry animation respects `prefers-reduced-motion`. Auto-dismiss is the
 application's job.
+
+## Announcement
+
+The ribbon glued under the fixed header - a discount, a launch note, a
+maintenance window. One per page.
+
+```html
+<aside class="mw-announcement mw-announcement-secondary">
+  <a class="mw-announcement-content" href="#pricing">
+    <span class="mw-announcement-highlight">-20 %</span>
+    <span>Summer discount on all coachings until 06.09.</span>
+  </a>
+</aside>
+```
+
+Positioned fixed below the header and one z-index layer under it, and it stays
+there - the page scrolls beneath it. Variants: `mw-announcement-secondary`,
+`-success`, `-warning`, `-danger`, `-info` (primary is the default).
+`mw-announcement-highlight` is the pill in front of the text; the content
+element is usually an `<a>` but a plain `<div>` works.
+`mw-announcement-static` puts the ribbon into the document flow instead - it
+then scrolls with the content and shifts no anchor offset.
+
+The height lives in `--mw-announcement-height` and drives the anchor scroll
+offset (`scroll-padding-top`) automatically - a taller ribbon raises the token
+instead of fighting the offset.
 
 ## Empty state
 
@@ -328,20 +718,20 @@ Shapes: `mw-skeleton-title`, `-text`, `-circle`, `-rect` (+ `-rect-sm`,
 <div class="mw-table-responsive">
   <table class="mw-table mw-table-cards">
     <thead>
-    <tr>
-      <th>Name</th>
-      <th>Status</th>
-      <th class="mw-text-numeric">Amount</th>
-    </tr>
+      <tr>
+        <th>Name</th>
+        <th>Status</th>
+        <th class="mw-text-numeric">Amount</th>
+      </tr>
     </thead>
     <tbody>
-    <tr>
-      <td data-label="Name">Jane Doe</td>
-      <td data-label="Status">
-        <span class="mw-tag mw-tag-success">Paid</span>
-      </td>
-      <td data-label="Amount" class="mw-text-numeric">1.204,50</td>
-    </tr>
+      <tr>
+        <td data-label="Name">Jane Doe</td>
+        <td data-label="Status">
+          <span class="mw-tag mw-tag-success">Paid</span>
+        </td>
+        <td data-label="Amount" class="mw-text-numeric">1.204,50</td>
+      </tr>
     </tbody>
   </table>
 </div>
@@ -355,8 +745,16 @@ Shapes: `mw-skeleton-title`, `-text`, `-circle`, `-rect` (+ `-rect-sm`,
 | `mw-table-hover`             | Stronger row hover                                                                                                      |
 | `mw-table-cards`             | Below `md` every row becomes a card; keep `<thead>` (hidden via CSS) and give each cell a `data-label`                  |
 | `mw-table-responsive`        | Wrapper, horizontal scroll                                                                                              |
+| `mw-table-responsive-hint`   | On top of the wrapper: a soft right edge showing there are more columns. Opt-in - see below                             |
 | `mw-table-responsive-scroll` | Wrapper with a height cap (`--mw-table-scroll-height`, 400px / 260px below `sm`) and vertical scroll                    |
 | `mw-table-sticky-head`       | Header stays put while the body scrolls - only works inside a height-limited wrapper, i.e. `mw-table-responsive-scroll` |
+
+`mw-table-responsive-hint` is opt-in, unlike the automatic hint on a tab bar,
+and works differently for a reason: a table paints its own opaque surface, so
+the gradient trick used on `mw-tabs-nav` would sit _behind_ the rows and never
+show. A mask sits in front and does show - but a mask has no `local` attachment,
+so it cannot fade away once the last column is reached. Put the class on the
+tables you know overflow, leave it off the ones that fit.
 
 ```html
 <div class="mw-table-responsive-scroll" style="--mw-table-scroll-height: 250px">
@@ -378,9 +776,9 @@ A board is a grid of equally wide lanes; a ticket is a plain `mw-card` with
       <h5 class="mw-kanban-title">In Progress</h5>
       <span class="mw-kanban-count">2</span>
       <button
-              type="button"
-              class="mw-btn mw-btn-secondary mw-btn-sm mw-kanban-add"
-              aria-label="Add ticket to In Progress"
+        type="button"
+        class="mw-btn mw-btn-secondary mw-btn-sm mw-kanban-add"
+        aria-label="Add ticket to In Progress"
       >
         <i class="fas fa-plus"></i>
       </button>
@@ -398,30 +796,30 @@ A board is a grid of equally wide lanes; a ticket is a plain `mw-card` with
           <div class="mw-kanban-card-actions">
             <div class="mw-avatar mw-avatar-xs mw-avatar-initials">jd</div>
             <button
-                    type="button"
-                    class="mw-kanban-action"
-                    aria-label="Move MW-102 one lane left"
+              type="button"
+              class="mw-kanban-action"
+              aria-label="Move MW-102 one lane left"
             >
               <i class="fas fa-chevron-left"></i>
             </button>
             <button
-                    type="button"
-                    class="mw-kanban-action"
-                    aria-label="Move MW-102 one lane right"
+              type="button"
+              class="mw-kanban-action"
+              aria-label="Move MW-102 one lane right"
             >
               <i class="fas fa-chevron-right"></i>
             </button>
             <button
-                    type="button"
-                    class="mw-kanban-action"
-                    aria-label="Edit MW-102"
+              type="button"
+              class="mw-kanban-action"
+              aria-label="Edit MW-102"
             >
               <i class="fas fa-pen"></i>
             </button>
             <button
-                    type="button"
-                    class="mw-kanban-action mw-kanban-action-danger"
-                    aria-label="Delete MW-102"
+              type="button"
+              class="mw-kanban-action mw-kanban-action-danger"
+              aria-label="Delete MW-102"
             >
               <i class="fas fa-trash"></i>
             </button>
@@ -510,6 +908,139 @@ lane it is needed in.
   them.
 - `mw-kanban-editing` hides the ticket the composer is currently replacing.
 
+## Calendar
+
+A card-shaped surface with a header and a seven column grid. A month is six
+rows, a week is one - same classes, same cell size, the only difference is how
+many cells you render. Which page is on screen is application state: the shipped
+JS renders it from `data-calendar`, an Angular app renders the same markup
+itself.
+
+```html
+<div
+  class="mw-calendar"
+  data-calendar="month"
+  data-calendar-markers='{"2026-08-19": ["success", "warning"]}'
+>
+  <div class="mw-calendar-header">
+    <button
+      type="button"
+      class="mw-btn mw-btn-outline mw-btn-sm mw-calendar-nav"
+      data-calendar-nav="-1"
+      aria-label="Previous month"
+    >
+      <i class="fas fa-chevron-left"></i>
+    </button>
+
+    <div class="mw-calendar-title" aria-live="polite">August 2026</div>
+
+    <button
+      type="button"
+      class="mw-btn mw-btn-outline mw-btn-sm mw-calendar-nav"
+      data-calendar-nav="1"
+      aria-label="Next month"
+    >
+      <i class="fas fa-chevron-right"></i>
+    </button>
+  </div>
+
+  <div class="mw-calendar-grid">
+    <div class="mw-calendar-weekday" aria-hidden="true">Mon</div>
+    ...
+    <div class="mw-calendar-weekday mw-calendar-weekend" aria-hidden="true">
+      Sat
+    </div>
+
+    <button
+      type="button"
+      class="mw-calendar-day mw-calendar-adjacent"
+      aria-label="Monday, 27 July 2026"
+    >
+      <span class="mw-calendar-date">27</span>
+    </button>
+
+    <button
+      type="button"
+      class="mw-calendar-day mw-calendar-today"
+      aria-current="date"
+      aria-pressed="false"
+      aria-label="Wednesday, 19 August 2026"
+    >
+      <span class="mw-calendar-date">19</span>
+      <span class="mw-calendar-dots">
+        <span class="mw-calendar-dot mw-calendar-dot-success"></span>
+        <span class="mw-calendar-dot mw-calendar-dot-warning"></span>
+      </span>
+    </button>
+    ...
+  </div>
+
+  <div class="mw-calendar-legend">
+    <span class="mw-calendar-legend-item">
+      <span class="mw-calendar-dot mw-calendar-dot-success"></span>
+      Slots free
+    </span>
+    ...
+  </div>
+</div>
+```
+
+| Class                     | Role                                                                                                                                                |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `mw-calendar`             | Surface. Same border, radius and shadow as a card, without the hover lift                                                                           |
+| `mw-calendar-plain`       | Drops the surface - for a calendar already sitting on a card or panel                                                                               |
+| `mw-calendar-compact`     | Date picker density: dots hidden, 29px cells, tighter header and labels                                                                             |
+| `mw-calendar-header`      | Arrow, title, arrow                                                                                                                                 |
+| `mw-calendar-nav`         | Sits **on** `mw-btn` - only squares it off around the chevron                                                                                       |
+| `mw-calendar-title`       | Takes the space between the arrows, stays optically centred                                                                                         |
+| `mw-calendar-grid`        | The seven column grid; weekday labels and day cells are its only children                                                                           |
+| `mw-calendar-weekday`     | Column label. Decorative - the day buttons carry the weekday themselves                                                                             |
+| `mw-calendar-day`         | One day. A `button`, so `:disabled` gives you an unavailable day                                                                                    |
+| `mw-calendar-date`        | The number                                                                                                                                          |
+| `mw-calendar-adjacent`    | Day of the neighbouring month - muted, still readable                                                                                               |
+| `mw-calendar-weekend`     | Saturday/Sunday. Tinted cell; on the label it turns the text secondary                                                                              |
+| `mw-calendar-today`       | Outlined in the secondary colour, bold                                                                                                              |
+| `mw-selected`             | Filled with the primary colour                                                                                                                      |
+| `mw-calendar-dots`        | Dot row, absolutely placed at the bottom of the cell                                                                                                |
+| `mw-calendar-dot`         | 5px dot. Colour comes from `--mw-calendar-dot`; the `-primary`, `-secondary`, `-success`, `-warning`, `-danger`, `-info` classes are presets for it |
+| `mw-calendar-legend`      | Rule plus a row of dot/label pairs below the grid                                                                                                   |
+| `mw-calendar-legend-item` | One dot/label pair                                                                                                                                  |
+
+- **Today is outlined in secondary, the picked day is filled with primary.** Two
+  different colours on purpose: an outline and a fill in the same colour read as
+  two states of the same thing. Do not give one day both.
+- The dots are positioned absolutely, so a day without any keeps the exact same
+  height and its number sits on the same line as every other. Two or three per
+  day stay readable, more do not. A dot on a picked day keeps its status colour;
+  only the untoned one flips to the accent text colour.
+- **What a dot means belongs to the caller.** The same calendar reads "request
+  pending / booked / time offered" in a scheduling app and something entirely
+  different on a public booking page, so the colour is a custom property, not a
+  fixed set: `style="--mw-calendar-dot: #7a4fd4"` on the dot, or on the cell to
+  colour all of its dots. The six tone classes are named presets for exactly
+  that property - use them when they fit, ignore them when they do not.
+- **Render the days spilling in from the neighbouring month.** An empty first
+  row reads like a broken calendar, not like a short month. `mw-calendar-adjacent`
+  is what pushes them back.
+- A month gets six rows even when five would do, so the calendar - and
+  everything under it - keeps its height while you page through.
+- Cell height is fixed (38px, 44px on a coarse pointer, 29px compact), width
+  follows the container. No aspect ratio: a full-width calendar would otherwise
+  grow rows several hundred pixels tall. A calendar therefore wants a column,
+  not the full page width - give it one, or cap it.
+- **A week has no class of its own.** Render seven cells instead of forty-two
+  and you have one; everything else is identical.
+- `mw-calendar-compact` hides the dots and shortens the cell - the dots are what
+  a full cell needs its height for, so the two go together. It costs about a
+  third of the calendar height and leaves a plain date picker; drop the legend
+  there, it has nothing left to explain. 29px is below a comfortable tap target,
+  so keep it for pointer-first surfaces. Its grid gap drops to 2px as well, which
+  puts the space back into the cells.
+- Give every day an `aria-label` with the full date - the bare number is not an
+  accessible name. The weekday labels are `aria-hidden`, they would only repeat
+  it. With a `button` per day, keep one tab stop for the grid (roving
+  `tabindex`) instead of 42.
+
 ## Tags
 
 Two forms, picked by count - see also the pitfall list in `SKILL.md`.
@@ -521,15 +1052,21 @@ Two forms, picked by count - see also the pitfall list in `SKILL.md`.
 ```
 
 Variants: `mw-tag-primary`, `-secondary`, `-success`, `-info`, `-warning`,
-`-danger`, `-muted`. Size: `mw-tag-lg`. `mw-tag-muted` is the neutral tone for
-states that should not shout (draft, archived).
+`-danger`, `-muted`, `-neutral`. Size: `mw-tag-lg`.
+
+`mw-tag-muted` and `mw-tag-neutral` are not the same and the difference carries
+meaning. **Muted** means the label steps back - draft, archived, a shortcoming
+("no e-invoice"). **Neutral** is an identifier with no judgement attached and
+keeps the normal text colour - a customer number, a document type, a price on a
+category ("XRechnung" is a property, not a verdict). Both are also available on
+the list container: `mw-tags-muted`, `mw-tags-neutral`.
 
 **List** - the container carries the colour for all its items:
 
 ```html
 <div class="mw-tags mw-tags-primary">
   <span class="mw-tags-item"
-  ><i class="fas fa-check mw-tags-icon"></i>Angular</span
+    ><i class="fas fa-check mw-tags-icon"></i>Angular</span
   >
   <span class="mw-tags-item mw-tags-removable">
     Kotlin
@@ -544,6 +1081,114 @@ Container variants: `mw-tags-primary`, `-secondary`, `-success`, `-info`,
 `-warning`, `-danger`, `-muted`, size `mw-tags-lg`. `mw-tags-remove` only
 positions the button - its look comes from `mw-btn-mini` plus a colour variant.
 
+## Badges
+
+A count or a status, not a label. See the pitfall list in `SKILL.md` for the
+badge-versus-tag rule: a tag names something and sits in a row of its own kind,
+a badge carries a number or a state and usually sits _on_ something.
+
+```html
+<span class="mw-badge mw-badge-danger">99+</span>
+```
+
+Colours: `mw-badge-primary` (the default), `-secondary`, `-success`, `-warning`,
+`-danger`, `-info`, `-muted`, plus `mw-badge-outline`. Sizes: `mw-badge-sm`,
+`mw-badge-lg`.
+
+Round on one character, a pill from two on - a `min-width` the padding grows
+past. The digits are `tabular-nums`, so a counter ticking 9 to 10 does not shift
+what sits beside it.
+
+**On an icon or a button:**
+
+```html
+<span class="mw-badge-anchor">
+  <button class="mw-btn mw-btn-outline">
+    <i class="fas fa-inbox"></i> Inbox
+  </button>
+  <span class="mw-badge mw-badge-danger mw-badge-float">5</span>
+</span>
+```
+
+`mw-badge-anchor` on the thing being badged, `mw-badge-float` on the badge. It
+hangs half off the corner and carries a ring in the surface colour, so it reads
+as a separate object rather than a blob on the icon. The ring follows the
+surface automatically inside a card, panel, modal, tile or the header.
+
+**Status:**
+
+```html
+<span class="mw-badge-status mw-badge-status-success">
+  <span class="mw-badge-dot"></span> Online
+</span>
+```
+
+`mw-badge-status-{primary|secondary|success|warning|danger|info|muted}` colours
+the dot inside it. A bare `mw-badge-dot-{colour}` works on its own too. Add
+`mw-badge-pulse` for something actually running - a job, an open connection: a
+ring grows out and fades while the dot underneath stays put, so a column of them
+in a table stays readable. Not for decoration.
+
+## Dropdown
+
+Built on `<details>` / `<summary>`. That is where the keyboard handling, the
+focus behaviour and the open state a screen reader can see come from, and it
+works with JavaScript switched off. The framework script only adds Escape and
+click-outside.
+
+```html
+<details class="mw-dropdown">
+  <summary class="mw-btn mw-btn-primary">
+    Actions <i class="fas fa-chevron-down mw-dropdown-caret"></i>
+  </summary>
+  <div class="mw-dropdown-menu">
+    <div class="mw-dropdown-label">Manage</div>
+    <button class="mw-dropdown-item"><i class="fas fa-pen"></i> Edit</button>
+    <button class="mw-dropdown-item mw-active">Duplicate</button>
+    <button class="mw-dropdown-item" disabled>Move</button>
+    <hr class="mw-dropdown-divider" />
+    <button class="mw-dropdown-item mw-dropdown-item-danger">
+      <i class="fas fa-trash"></i> Delete
+    </button>
+  </div>
+</details>
+```
+
+Parts: `mw-dropdown-menu`, `-item`, `-item-danger`, `-divider`, `-label`,
+`-caret` (rotates with the open state on its own). Alignment:
+`mw-dropdown-end` anchors the menu to the trigger's right edge,
+`mw-dropdown-up` opens it upward.
+
+`mw-active` (or `aria-checked="true"`) marks the current choice, for a menu that
+picks rather than acts. Icons inside items keep one column, so labels line up
+whether or not every item has one.
+
+The menu is absolutely positioned and is clipped by any ancestor that hides its
+overflow. The framework's own containers lift that clip while a menu is open; on
+your own it is `:has(.mw-dropdown[open]) { overflow: visible }`.
+
+On a coarse pointer the rows grow to 2.75rem and the menu takes at least the
+trigger's full width.
+
+## Keyboard keys
+
+`<kbd>` is styled directly, so a shortcut in prose needs no class:
+
+```html
+<p>
+  Press
+  <span class="mw-kbd-group"
+    ><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd></span
+  >
+  to open the palette, <kbd>Esc</kbd> to close.
+</p>
+```
+
+`mw-kbd` is the same look for a `<span>` when the markup is not yours to change.
+`mw-kbd-group` wraps a combination so the pluses are spaced and the whole thing
+cannot wrap apart. `mw-kbd-pressed` shows a key mid-press - the raised bottom
+edge drops and the key sits 1px lower.
+
 ## Info badges & counters
 
 ```html
@@ -555,7 +1200,7 @@ positions the button - its look comes from `mw-btn-mini` plus a colour variant.
 </a>
 
 <span class="mw-info-mini mw-info-mini-danger"
-><i class="fas fa-times"></i
+  ><i class="fas fa-times"></i
 ></span>
 ```
 
@@ -670,7 +1315,7 @@ Both are chronicles (CV, changelog), not schedulable time axes.
 
 ```html
 <div class="mw-timeline-big">
-  <div class="mw-timeline-big-step active">
+  <div class="mw-timeline-big-step mw-active">
     <div class="mw-timeline-big-date-container">
       <div class="mw-timeline-big-date-main">01/2023 - today</div>
       <div class="mw-timeline-big-date-sub">(3 years)</div>
@@ -686,7 +1331,7 @@ Both are chronicles (CV, changelog), not schedulable time axes.
 </div>
 
 <div class="mw-timeline-simple">
-  <div class="mw-timeline-simple-step active">
+  <div class="mw-timeline-simple-step mw-active">
     <div class="mw-timeline-simple-date">2024-03-22</div>
     <div class="mw-timeline-simple-content">
       <div class="mw-card mw-card-simple">...</div>
@@ -695,8 +1340,8 @@ Both are chronicles (CV, changelog), not schedulable time axes.
 </div>
 ```
 
-The current step gets `active` (no prefix). Any card fits into the content
-wrapper.
+The current step gets `mw-active` (bare `active` still works but is
+deprecated). Any card fits into the content wrapper.
 
 ## Avatars
 
@@ -722,15 +1367,19 @@ wrapper.
 
 Layout containers for arbitrary children - the children need no classes.
 
-| Class                     | Look                                                                         |
-| ------------------------- | ---------------------------------------------------------------------------- |
-| `mw-item-list`            | Plain flex column with gaps                                                  |
-| `mw-item-list-horizontal` | Row, wrapping; column below `sm`                                             |
-| `mw-item-list-cards`      | Wider gaps, for cards                                                        |
-| `mw-item-list-compact`    | Bordered box, divided rows, hover indent (nests)                             |
-| `mw-item-list-menu`       | Elevated menu card, pointer cursor, press feedback                           |
-| `mw-item-list-slide`      | Cards with a sliding accent border on hover (`mw-item-list-slide-secondary`) |
-| `mw-item-list-scroll`     | Scroll box, 300px (`-sm` 200, `-lg` 400, `-xl` 500)                          |
+| Class                     | Look                                                          |
+| ------------------------- | ------------------------------------------------------------- |
+| `mw-item-list`            | Plain flex column with gaps                                   |
+| `mw-item-list-horizontal` | Row, wrapping; column below `sm`                              |
+| `mw-item-list-cards`      | Wider gaps, for cards                                         |
+| `mw-item-list-compact`    | Bordered card-surface box, divided rows, hover indent (nests) |
+| `mw-item-list-menu`       | Elevated menu card, pointer cursor, press feedback            |
+| `mw-item-list-slide`      | Cards sliding sideways with an accent border on hover         |
+| `mw-item-list-scroll`     | Scroll box, 300px tall                                        |
+
+Modifiers are additive - keep the base class and add the modifier:
+`mw-item-list-scroll` + `-sm` (200px), `-lg` (400px) or `-xl` (500px), and
+`mw-item-list-slide` + `-secondary` for the secondary accent.
 
 ```html
 <div class="mw-item-list-compact">
@@ -762,10 +1411,17 @@ Layout containers for arbitrary children - the children need no classes.
 </ul>
 ```
 
-Variants: `mw-item-list-checkbox-compact`, `-large`, `-secondary`,
-`-scroll`. `mw-selected` on the `<li>` is the selected-row highlight - bind it
-to the checkbox state yourself in a SPA. The `mw-checkbox-content` block is
-optional; a bare `mw-checkbox-label` renders a single-line row.
+Add `mw-item-list-checkbox-compact`, `-large` or `-secondary` alongside the
+base class; `mw-item-list-checkbox-scroll` is a standalone class that replaces
+it. `mw-selected` on the `<li>` is the selected-row highlight - bind it to the
+checkbox state yourself in a SPA. The `mw-checkbox-content` block is optional;
+a bare `mw-checkbox-label` renders a single-line row.
+
+The `mw-checkbox` inside is the ordinary form-element checkbox, so
+`mw-checkbox-disabled` and the colour variants (`mw-checkbox-success` and the
+rest, see `references/forms.md`) work here too. Row height is a list concern -
+use the list's own `-compact` / `-large` modifiers rather than
+`mw-checkbox-sm` / `-lg`, which sit on the wrong element to reach the box.
 
 ## HTML lists
 
@@ -803,23 +1459,46 @@ The last item takes `mw-breadcrumbs-current` on the `li` and
 
 ## Pagination
 
-A titled content frame with prev/next controls - not a page-number list.
+A titled content frame with prev/next controls - not a page-number list. Same
+surface and header as `mw-calendar`; only the body differs, and the body is
+yours.
 
 ```html
 <div class="mw-pagination">
   <div class="mw-pagination-header">
-    <button class="mw-pagination-nav"><i class="fas fa-arrow-left"></i></button>
-    <h3 class="mw-pagination-title">Week 10</h3>
-    <button class="mw-pagination-nav">
-      <i class="fas fa-arrow-right"></i>
+    <button
+      type="button"
+      class="mw-btn mw-btn-outline mw-btn-sm mw-pagination-nav"
+      aria-label="Previous week"
+    >
+      <i class="fas fa-chevron-left"></i>
+    </button>
+
+    <div class="mw-pagination-title" aria-live="polite">Week 10</div>
+
+    <button
+      type="button"
+      class="mw-btn mw-btn-outline mw-btn-sm mw-pagination-nav"
+      aria-label="Next week"
+    >
+      <i class="fas fa-chevron-right"></i>
     </button>
   </div>
+
   <div class="mw-pagination-content">...</div>
 </div>
 ```
 
-`mw-pagination-loading` on the container dims the content while it swaps;
-`mw-pagination-slide-left` / `-slide-right` are the directional transitions.
+- `mw-pagination-nav` sits **on** `mw-btn` - it only squares the button off
+  around the chevron. The arrows carry no accessible name of their own, so give
+  each one an `aria-label`; `aria-live="polite"` on the title is what tells a
+  screen reader where you landed.
+- `mw-pagination-loading` goes on `mw-pagination-content` (not on the
+  container) and dims it while the next page is on its way.
+- `mw-pagination-slide-left` / `-slide-right` are the directional transitions,
+  also on the content.
+- The body has a 200px floor so a short page does not collapse the frame. Paging
+  is application state - the framework ships no JavaScript for it.
 
 ## Divider
 
@@ -867,12 +1546,12 @@ shipped JS, as is the track transform. In a SPA, render the dots and set
     <img class="mw-image-slider-base-image" src="base.jpg" alt="" />
   </div>
   <div class="mw-image-slider-overlay">
-    <div class="mw-image-slider-overlay-image active" data-index="1">
+    <div class="mw-image-slider-overlay-image mw-active" data-index="1">
       <img src="a.jpg" alt="" />
     </div>
   </div>
   <div class="mw-image-slider-controls-grid-3">
-    <button class="mw-btn mw-btn-primary active" data-index="0">Base</button>
+    <button class="mw-btn mw-btn-primary mw-active" data-index="0">Base</button>
   </div>
 </div>
 ```
@@ -907,6 +1586,74 @@ current button carry `active`.
 
 `mw-blog-post-content-markdown` styles unclassed HTML - the target for rendered
 markdown. `mw-blog-post-content` is the same wrapper for hand-written markup.
+
+## Testimonial
+
+A quote card with its source - a voice about the product. A `figure`, because
+quote and attribution belong together:
+
+```html
+<figure class="mw-testimonial">
+  <blockquote>
+    The workshop picked me up after a long day of talking.
+  </blockquote>
+  <figcaption class="mw-testimonial-source">
+    Anna M. <span class="mw-testimonial-detail">&middot; voice workshop</span>
+    <time class="mw-testimonial-date" datetime="2026-03">March 2026</time>
+  </figcaption>
+</figure>
+```
+
+The card carries the surface, so inside it the blockquote drops most of its
+tint and keeps only the edge and the quotation marks. `mw-testimonial-source`
+uses `margin-top: auto` - in a grid of equal-height cards every source line
+sits on its card's bottom edge. `mw-testimonial-featured` sets the quote a
+size larger, for the one voice lifted above the grid.
+
+`mw-testimonial-date` is optional: a `<time>` on the right edge of the source
+line, month and year - a full date is review-platform optics, a bare year
+reads as a footnote. It drops to its own line, still right-aligned, when the
+source line runs out of room. Leave it out unless the voices are kept fresh: a
+dated quote ages, and three from years ago say more about the page than about
+the product. The `datetime` attribute is what Schema.org's `datePublished`
+would read.
+
+For a wall of testimonials of unequal length, put them in `mw-columns-2` or
+`mw-columns-3` (`references/layout.md`) instead of a grid.
+
+## Prose
+
+Long-form running text - a legal page, terms, a plain article. One class on
+the container, bare `h2`/`h3`/`p`/`ul` inside:
+
+```html
+<div class="mw-card mw-card-simple mw-prose">
+  <h2>1. Scope</h2>
+  <p>...</p>
+  <h2>2. Contact</h2>
+  <p>...</p>
+</div>
+```
+
+Headings are deliberately small (`lg`/`md`, primary ink) - in a document they
+structure the reading rather than compete with the page title. First and last
+child lose their outer margins, so the container's own padding rules.
+
+## Media
+
+Self-hosted audio and video. The native controls are the player -
+`accent-color` already brands them - the wrapper only makes the element sit
+right:
+
+```html
+<div class="mw-media">
+  <video src="/media/intro.mp4" controls preload="metadata"></video>
+  <p class="mw-media-caption">Two minutes about how a session works.</p>
+</div>
+```
+
+`audio` and `video` become full-width blocks; a video also gets the surface
+silhouette and a resting shadow. Works with `<audio controls>` the same way.
 
 ## Code & terminal
 
@@ -944,9 +1691,9 @@ is no highlighting engine - wrap spans yourself or plug in Prism/highlight.js.
     </div>
   </a>
   <a
-          href="#"
-          class="mw-techstack-item mw-techstack-item-sm"
-          data-tooltip="Docker"
+    href="#"
+    class="mw-techstack-item mw-techstack-item-sm"
+    data-tooltip="Docker"
   >
     <img class="mw-techstack-logo" src="docker.svg" alt="Docker" />
   </a>

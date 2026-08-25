@@ -1,5 +1,31 @@
 # Forms
 
+## Control sizes
+
+`mw-input`, `mw-select`, `mw-textarea` and `mw-btn` share one scale:
+
+| step  | height  | font   |
+| ----- | ------- | ------ |
+| `-sm` | 2rem    | 0.8rem |
+| base  | 2.25rem | 0.9rem |
+| `-lg` | 2.5rem  | 1rem   |
+
+A field and the button beside it are therefore the same height by construction -
+before 4.11.0 each control worked its own height out and an input, a select and
+a button in one row measured 32.2, 34.4 and 37.2 pixels. Buttons sit one font
+step above the fields: a button carries a label, a field carries what the user
+typed.
+
+Never set a height on a control yourself. Pick the step and leave it alone.
+
+The minimum only governs while it is the larger of the two numbers. Block
+padding above it wins, and the control silently leaves the scale - which is
+exactly how a button once ended up 1.2px taller than the field beside it. So if
+you do override `padding-block` on a control, keep
+`2 x padding + line-height + border` under the height its step allows.
+On a coarse pointer or below 768px every control grows to 2.75rem on its own.
+Retune the whole scale through `--mw-control-height*` / `--mw-control-font*`.
+
 ## The field pattern
 
 `mw-field` groups label, control, hint and error into one unit. It is the
@@ -62,7 +88,7 @@ reactive form control.
   </div>
 
   <div class="mw-form-actions">
-    <p class="mw-form-actions-hint">Changes are saved immediately.</p>
+    <p class="mw-actions-note">Changes are saved immediately.</p>
     <button type="button" class="mw-btn mw-btn-outline">Cancel</button>
     <button type="submit" class="mw-btn mw-btn-primary">Save</button>
   </div>
@@ -77,9 +103,13 @@ reactive form control.
   `mw-form-group-title` is the heading hook inside it - put it on the `<h3>` /
   `<h4>`, otherwise the heading keeps its full document-level size.
 - `mw-form-actions` is a right-aligned wrapping button row.
-  `mw-form-actions-hint` is a full-width note above the buttons.
-  Alignment variants: `mw-form-actions-left`, `mw-form-actions-center`,
-  `mw-form-actions-full-width` (stacked, buttons at 100% - login forms).
+  `mw-actions-note` is a full-width note above the buttons and works the same
+  way in a modal, card or panel footer (`references/components.md`). The
+  alignment variants steer it along: `mw-form-actions-left`,
+  `mw-form-actions-center`, `mw-form-actions-full-width` (stacked, buttons at
+  100% - login forms).
+  `mw-form-actions-hint` is the old name for the note and still styled, but new
+  markup should use `mw-actions-note`.
 - Put multi-column layouts inside a group with `mw-grid-2` etc. and let a field
   span everything with `style="grid-column: 1 / -1"`.
 
@@ -165,6 +195,33 @@ Sizes: `mw-select-sm`, `mw-select-lg`.
 Sizes: `mw-textarea-sm`, `mw-textarea-lg`. Resizing is off by default; enable it
 with `mw-textarea-resizable`, `mw-textarea-resizable-vertical` or
 `mw-textarea-resizable-horizontal`.
+
+## Prefilled values
+
+`mw-prefilled` marks a control whose value did not come from the user in this
+session - loaded from an existing record, restored from a draft, filled with a
+default. It draws a small triangle into the top left corner of the control.
+
+```html
+<input type="text" class="mw-input mw-prefilled" value="Max Mustermann" />
+<select class="mw-select mw-select-sm mw-prefilled">
+  ...
+</select>
+<textarea class="mw-textarea mw-prefilled" rows="3"></textarea>
+```
+
+- Works on `mw-input`, `mw-select` and `mw-textarea`, and goes on the control
+  itself, not on the `mw-field` wrapper - so it also works in an input group or
+  on a standalone control.
+- The triangle follows the size modifier (`mw-input-sm`, `mw-select-lg`, ...)
+  and stays visible on `readonly` and `disabled` controls.
+- Colour is `--mw-info-color`, deliberately not primary or danger: it is an
+  information about the value, not a state or an error.
+- Decoration only. Screen readers do not see it, so put the same information in
+  an `mw-field-hint` and reference it with `aria-describedby`.
+- It is drawn as a background layer, not a pseudo element (`input` and `select`
+  never render `::before`/`::after`). A rule that sets the `background`
+  shorthand on the same control wipes it - use `background-color` there.
 
 ## Checkbox
 
