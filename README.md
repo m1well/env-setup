@@ -138,6 +138,11 @@ Two of those skills live in their own public repo, [topomap-skills](https://gith
 and are symlinked into `skills/` from there. The install script clones it next to this
 one; without that repo the two links dangle.
 
+Skills that are not mine sit in `skills/` like the rest but stay out of git, because `.gitignore`
+tracks `skills/mw-*` only. Whatever else lands there is ignored without me having to add anything,
+on this machine and on the next one. Right now that is `design-taste-frontend`, `humanizer` and
+`modern-css`.
+
 `mw-persona-review` walks the running app through the eyes of a persona with low tech literacy:
 `/mw-persona-review persona=julia task="Lege eine Rechnung über 250€ an und sende sie per E-Mail"`.
 It drives the app in Chrome via the Claude Code Chrome extension - the extension has to be installed
@@ -151,9 +156,24 @@ apply when Claude writes code and when it reviews it. Backend: constructor injec
 one-way layering, DTOs at the HTTP boundary, transactions on the service, entity versus
 embeddable, Flyway or Liquibase, default-deny security, the cheapest test slice. It stays
 language- and build-agnostic, so the same rules hold for Kotlin or Java and Gradle or Maven.
-Every rule has an id (`WEB-1`, `MODEL-7`, `MIG-2`), so a review finding points at one instead
-of at an opinion, and the `examples/` folder carries a wrong/right pair for each in both
-languages.
+Frontend: template and styles in their own files, the signal APIs over their decorator
+equivalents, domain state in a state service behind `httpResource` / `rxResource`, native
+control flow, atomic design inside a feature slice, zoneless specs.
+
+Every rule in both has an id - `WEB-1`, `MODEL-7`, `MIG-2` on the backend, `SIG-1`,
+`STATE-9`, `LAYER-7` on the frontend - so a review finding points at one instead of at an
+opinion. The prefixes do not overlap, which is what lets a fullstack review use one
+vocabulary. `mw-springboot/examples/` carries a wrong/right pair per rule in both languages,
+`mw-angular/examples/` a worked `orders` feature with one file per layer. The topomap skills
+stay standalone and know none of it, but they ask for the project's rule ids when writing
+their findings - so feeding them these makes a diagram finding and a review finding about the
+same class read as one.
+
+`mw-analyze-class` summarizes a single class against those rules: `/mw-analyze-class OrderCard`.
+It works out what the class is first - the Spring stereotype, or the Angular layer and whether
+an `@Injectable` is state or api - and then lists what it injects, what it exposes and what it
+renders. A summary, not a review: rule ids appear as pointers, and the review itself is what
+`/mw-springboot` and `/mw-angular` do.
 
 #### Brewfile ([link](/homebrew/Brewfile))
 

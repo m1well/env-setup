@@ -59,11 +59,11 @@ its children are styled through descendant selectors:
 <header class="mw-header">
   <div class="mw-container">
     <div class="mw-logo">
-      <button type="button"><img src="logo.svg" alt="Logo" /></button>
+      <a href="#start"><img src="logo.svg" alt="Logo" /></a>
     </div>
 
     <div class="mw-header-actions">
-      <nav class="mw-navbar mw-navbar-medium">
+      <nav class="mw-navbar mw-navbar-medium" id="main-nav">
         <ul class="mw-navbar-list">
           <li class="mw-navbar-item">
             <a href="#start" class="mw-navbar-link mw-active">Start</a>
@@ -74,17 +74,29 @@ its children are styled through descendant selectors:
         </ul>
       </nav>
 
-      <div class="mw-theme-toggle mw-ml-5">
+      <button
+        type="button"
+        class="mw-theme-toggle mw-ml-5"
+        aria-label="Toggle light and dark theme"
+      >
         <div class="mw-theme-toggle-slider">
           <div class="mw-theme-toggle-icon"><i class="fas fa-moon"></i></div>
         </div>
-      </div>
+      </button>
 
-      <button class="mw-login-btn" type="button">
+      <button class="mw-login-btn" type="button" aria-label="Log in">
         <i class="fas fa-lock"></i>
       </button>
 
-      <div class="mw-menu-btn"><div class="mw-menu-btn-burger"></div></div>
+      <button
+        type="button"
+        class="mw-menu-btn"
+        aria-label="Menu"
+        aria-expanded="false"
+        aria-controls="main-nav"
+      >
+        <span class="mw-menu-btn-burger"></span>
+      </button>
     </div>
   </div>
 </header>
@@ -94,7 +106,9 @@ its children are styled through descendant selectors:
   at `md`, `mw-navbar-medium` (4-5) at `lg`, `mw-navbar-large` (6+) at `xl`.
   Pick the class by how many links you have.
 - Below the breakpoint the list is hidden and `mw-menu-btn` appears. Opening the
-  drawer means adding `open` to **both** `mw-menu-btn` and `mw-navbar`.
+  drawer means adding `open` to **both** `mw-menu-btn` and `mw-navbar`, and
+  setting `aria-expanded` on the button - below the breakpoint it is the only
+  route to the navigation, so it has to be a real `<button>`, not a `<div>`.
 - The active link carries `mw-active` (bare `active` still works but is
   deprecated).
 - `mw-profile-btn` is the signed-in pill, next to or instead of the login button:
@@ -118,6 +132,19 @@ same height as the login and burger buttons.
   colour: the bar is dark in both themes and a light-only project must not have
   to configure dark-theme values to change it. The bar itself is the primary
   darkened toward black, `$header-surface` (14%) - see `theming.md`.
+
+**Reveal on scroll.** `mw-header-reveal` keeps the bar above the screen and
+rides it in over the first 420px of scroll - for a page that opens on a
+full-bleed hero and wants nothing on top of it. It animates `top` and not a
+transform, because a transform on the header would make it the containing block
+of the off-canvas drawer inside it, at every value including the resting one.
+A fixed `mw-announcement` rides along without a class of its own - both cover
+the height of the pair, so they arrive as one block rather than the ribbon
+catching up. Focus inside either brings both back regardless of the scroll
+position, so tabbing never lands on a link that is off screen (WCAG 2.4.11).
+Under `prefers-reduced-motion` the bar is simply there, and so it is without
+scroll timelines unless `maverick-wave.min.js` is on the page - in Firefox that
+is what rides it in (`javascript.md`).
 
 **Localhost indicator.** Put `mw-localhost-indicator-activated` on the header
 and the shipped JS prepends a pulsing bar when the host is localhost/127.0.0.1/
@@ -156,20 +183,20 @@ as the header's first child under the same condition.
 `data-tooltip="..."` is a global attribute hook, not a class - it works on any
 element and shows a tooltip above it on hover or keyboard focus. It is pure CSS
 (a pseudo element on the trigger), which also means anything that clips its
-overflow cuts it off: a scroll container, or a card carrying a ribbon - plain
-cards do not clip. Close to the screen edge the bubble can run out of the
+overflow cuts it off: a scroll container, a tile, or a card carrying a ribbon -
+plain cards do not clip. Close to the screen edge the bubble can run out of the
 viewport, so keep long tooltips off the outermost elements.
 
 ## Sections
 
-| Class                               | Use                                                                                                            |
-| ----------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| `mw-section`                        | Vertical rhythm for a page band - `--mw-section-padding-block`, 3.3rem (2.5rem below `md`, 1.75rem below `sm`) |
-| `mw-section-alternate`              | Diagonal pattern background; combine with `mw-section`                                                         |
-| `mw-section-title`                  | Centered `3xl` heading with a decorative primary underline - landing pages                                     |
-| `mw-section-intro`                  | The lead paragraph under a section title - centred, muted, 46rem measure                                       |
-| `mw-section-subtitle`               | Centered `2xl` heading with a thin secondary underline                                                         |
-| `mw-section-nav` + `mw-section-btn` | Centered, wrapping row of outline-style jump links                                                             |
+| Class                               | Use                                                                                                                |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `mw-section`                        | Vertical rhythm for a page band - `--mw-section-padding-block`, 3.3rem (2.5rem below `md`, 1.75rem below `sm`)     |
+| `mw-section-alternate`              | Diagonal pattern background; combine with `mw-section`                                                             |
+| `mw-section-title`                  | Centered `3xl` heading with a decorative primary underline - landing pages                                         |
+| `mw-section-intro`                  | The lead paragraph under a section title - centred, muted, 46rem measure                                           |
+| `mw-section-subtitle`               | Centered `2xl` heading with a thin secondary underline                                                             |
+| `mw-section-nav` + `mw-section-btn` | Sticky single-row strip of outline-style jump links; parks under the header and scrolls sideways when it overflows |
 
 ```html
 <section class="mw-section mw-section-alternate">
@@ -186,6 +213,10 @@ viewport, so keep long tooltips off the outermost elements.
   </div>
 </section>
 ```
+
+The strip sticks at `--mw-header-height` and is `--mw-section-nav-height` tall
+(3.7rem). Anything it can cover on a jump needs the sum as `scroll-margin-top`;
+a block wrapping a `mw-section-subtitle` gets that from the framework already.
 
 ## Page header
 
@@ -264,6 +295,12 @@ Components that paint their own surface (`mw-card`, `mw-panel`, `mw-modal`,
 `mw-tile`, `mw-calendar`) are exempt and keep the theme's ink - a card in the
 hero is still a card.
 
+`mw-btn-outline` is exempt the other way round: inside the hero it takes the
+hero's ink plus a dark scrim and a blur, because its usual border and label are
+tuned for the page background and go quiet over a photograph. A second call to
+action next to `mw-btn-primary` therefore looks different here than it does
+further down the page - that is deliberate, not a stray override.
+
 **Scroll cue** - `mw-scroll-hint` is the "scroll down" cue on the lower edge of
 the hero. An `<a>` that is a sibling of `mw-hero`, directly in the container:
 
@@ -283,11 +320,90 @@ whose text is not centred either - and gives the hero its full height back.
 Below `md` both variants sit in the corner, because the middle under the text
 is taken on a phone. The bobbing stops under `prefers-reduced-motion`.
 
+**Parallax** - `mw-parallax` on the container plus a `mw-parallax-media` child
+moves the picture into its own layer. The container drops its own background and
+the layer reads `--mw-hero-background`, so the image stays configured in one
+place. Every mode runs on the browser's scroll timeline, and on no
+`background-attachment: fixed`, which iOS ignores. Older Safari and Firefox have
+no timelines; there the shipped JS moves the layers instead, and without it the
+picture simply sits still (`javascript.md`).
+
+```html
+<header class="mw-header mw-header-reveal">...</header>
+
+<main class="mw-main">
+  <section class="mw-section mw-parallax-sticky mw-parallax-rise">
+    <div class="mw-container mw-parallax">
+      <div class="mw-parallax-media"></div>
+      <div class="mw-parallax-media mw-parallax-pattern"></div>
+      <div class="mw-hero">...</div>
+    </div>
+  </section>
+  <section class="mw-section">...</section>
+</main>
+```
+
+On its own, `mw-parallax` drifts the picture against the scroll by
+`--mw-parallax-depth` (`10vh`) - the layer overhangs the block by that much top
+and bottom, so no edge is ever uncovered.
+
+`mw-parallax-sticky` pins the block to the top of the screen and lets the page
+ride up over it. It goes on the element the page content is a **sibling** of -
+the section, not the hero - because everything after it is given
+`--mw-page-background` and a layer above, or the pinned picture shows through
+the transparent ones. Depth drops to `0` there: a pinned block does not travel
+through the viewport, so its `view()` timeline stands still with it.
+`mw-parallax-rise` puts it at `12vh` and runs the layer on the document's own
+scroll instead - the picture lifts, the text stays put. That works out to the
+same travel per scrolled pixel as a drifting band at `20vh`, which is measured
+over a much longer range. It is a hero move only: the range is the first screen
+of document scroll, so further down a page the picture holds still. Several
+pinned blocks on one page are fine, each takes over from the one before.
+
+A second `mw-parallax-media` carrying `mw-parallax-pattern` puts a pattern over
+the picture. It travels a third of the distance the layer below it does, and
+that difference between the two is what reads as depth - one layer alone only
+slides. It matters most over a gradient: the travel is vertical, so only an edge
+across it - a rule, a grid, a hatch - ever shows the movement, and a gradient
+has none. In a hero the layer reads `$mw-hero-pattern`, the way the picture
+reads `$mw-hero-image`; anywhere else set `--mw-parallax-pattern-image` on it.
+`--mw-parallax-pattern-depth` is the dial, `4vh` next to a risen hero.
+
+Outside a hero the same classes build a standalone band: `mw-parallax`
+(`min-height: 42vh`), `mw-parallax-media` as an `<img>` or a div with a
+background image, `mw-parallax-content` for what sits on top, and
+`mw-parallax-dimmed` to turn the picture down and the text light. Drop the
+`mw-container` between section and block and the picture runs full width, with
+a `mw-container` inside `mw-parallax-content` around the text instead.
+
+`mw-parallax-slow` is the third mode and the one for a band mid-page: the block
+keeps its place in the flow and travels slower than the page, so picture and
+text are still moving while the next section closes in from below. Pinning is
+the same move with the tempo at zero. `--mw-parallax-slow-travel` (`45vh`) reads
+against the block's own height - half the height is half speed, the full height
+stands still, past it the block runs backwards. The dial belongs on the element
+carrying `mw-parallax-slow`, the height on the `mw-parallax` block inside it;
+put the dial on the inner block and it never reaches the animation. Everything
+after it gets the same page background and layer that a pinned block gives its
+siblings.
+
+It needs a block at least as tall as the viewport. The travel plays over the
+exit phase, so a flatter one is pushed down faster than it scrolls up and the
+gap it leaves above itself slides into view instead of staying off screen. On a
+page whose hero is `mw-parallax-sticky` that gap is a window onto the pinned
+picture, and no `--mw-parallax-slow-travel` is small enough to close it - below
+one screen the band is a plain `mw-parallax` and drifts its picture instead.
+
+Without scroll timelines, or under `prefers-reduced-motion`, the picture stands
+still and nothing else changes.
+
 ## Grid
 
 All grid classes are `display: grid` with a preset gap (`mw-gap-*` overrides
-it). They collapse to fewer columns on their own - no responsive suffixes to
-manage.
+it). They handle their own column count - no responsive suffixes to manage. One
+column is the base and each breakpoint adds to it, so a phone renders them
+without evaluating a single media query; the table below reads the same either
+way.
 
 | Class             | Columns                                         | Collapses                    |
 | ----------------- | ----------------------------------------------- | ---------------------------- |
@@ -350,7 +466,7 @@ automatically.
 `mw-d-inline-block`, `mw-d-grid`, `mw-d-none`, `mw-d-contents`.
 
 **Responsive display** - `mw-d-{sm|md|lg|xl}-{none|block|flex|inline-flex|grid|inline-block}`.
-Mobile-first and min-width, like everything else here: `mw-d-md-flex` means
+Mobile-first like everything else here: `mw-d-md-flex` means
 "flex from the md breakpoint up", and the unprefixed class beside it is what
 applies below that. The pair `mw-d-none mw-d-md-flex` is hidden on a phone and a
 row from a tablet on. `mw-hide-mobile` (gone below md) and `mw-hide-desktop`
@@ -375,20 +491,28 @@ with it; `mw-text-capitalize` is the plain transform.
 **Elevation** - `mw-elevation-0` through `-5`, the same ramp every component
 uses. See the scale table in `SKILL.md`. Never hand-roll a `box-shadow`.
 
+**Glow** - `mw-glow` plus
+`mw-glow-{primary,secondary,info,success,warning,danger}`. Elevation without the
+offset, so the surface gives off the light instead of casting it. Once per
+screen at most.
+
 **Scroll entrance** - `mw-reveal` lets a block rise briefly as it scrolls into
-view, driven by the browser's scroll timeline (`animation-timeline: view()`) -
-no JavaScript, no observer. The block stays hidden until it is 8dvh above the
-bottom edge and has arrived by 34dvh, the same zone for every block whatever
-its height, so the motion happens where the eye is and is over before the
-block is read. Doubly guarded: `prefers-reduced-motion` turns it
-off, and a browser without scroll timelines renders the block in place instead
-of leaving it invisible. Put it on section content, not on the section itself -
-a screen-high band finishes its entrance before its content is halfway up.
+view, driven by the browser's scroll timeline (`animation-timeline: view()`).
+The block stays hidden while it is still below the bottom edge and has arrived
+three fifths of the way in - measured along its own entry, so it is never still
+transparent once it stands in its place, whatever its height. A block taller
+than the screen is capped at one viewport by the entry phase itself. Doubly guarded:
+`prefers-reduced-motion` turns it off, and a browser without scroll timelines
+renders the block in place instead of leaving it invisible. Firefox is that
+browser - there the shipped JS runs the entrance off an `IntersectionObserver`,
+so a page without the script keeps the block and loses only the motion
+(`javascript.md`). Put it on section content, not on the section itself - a
+screen-high band finishes its entrance before its content is halfway up.
 
 A row of cards crosses the viewport edge together, so `mw-reveal` on each of
 them rises as one slab. `mw-reveal-stagger` goes on the **grid** instead: every
-child reveals, and each one in a row 4dvh of scroll after the one before it -
-a wave across the row. One class, nothing per card. On `mw-grid-2` to `mw-grid-5` and
+child reveals, and each one in a row a tenth of that entry after the one
+before it - a wave across the row. One class, nothing per card. On `mw-grid-2` to `mw-grid-5` and
 their `-lg` variants the wave follows the actual columns at every breakpoint:
 four steps in a four-column row, two once it has collapsed to two. Any other
 container - `mw-columns-*`, a layout of your own - gets a fixed cycle of three.
@@ -413,6 +537,11 @@ most of the outline and the pair reads as a frame instead of as a detail. A
 chip-sized `mw-card-simple`, a swatch, a marker in a layout demo. A card with
 content in it never needs this, and it is not the way to switch the signature
 off across a project - restyle `--mw-corner-accent` for that.
+
+**Squircle corners** - `mw-squircle` draws the same silhouette with a
+superellipse instead of a circular arc: same four radii, fuller curve, and the
+corner accent follows. Opt-in, because `corner-shape` only lands in Chromium so
+far - everywhere else the box is simply the normal one.
 
 **Aspect ratio** - `mw-aspect-square|video|wide|portrait|photo`. Reserves the
 box before the image inside it has loaded, so the page does not reflow when the
@@ -513,11 +642,14 @@ do not.
 **Flex** - `mw-flex-row`, `mw-flex-column`, `mw-flex-wrap`, `mw-flex-nowrap`,
 `mw-flex-1`, `mw-flex-grow-1`, `mw-flex-shrink-0`,
 `mw-justify-start|end|center|between|around|evenly`,
-`mw-items-start|end|center|stretch`.
+`mw-items-start|end|center|stretch`,
+`mw-self-start|end|center|stretch`.
 
 `mw-flex-1` sets `flex: 1` (basis 0, all items equal). `mw-flex-grow-1` only
 grows and keeps the content width as the basis - that is the one you want next
-to an avatar or an icon.
+to an avatar or an icon. `mw-self-*` is the per-item counterpart to
+`mw-items-*`: it goes on the child, for the one that sits differently from the
+rest of the row.
 
 **Text** - alignment `mw-text-left|center|right`; colour `mw-text-primary`,
 `-secondary`, `-success`, `-warning`, `-danger`, `-info`, `-muted`,

@@ -72,7 +72,7 @@ BAR=""
 rate_limit_color() {
     local value_int
     value_int=$(printf '%.0f' "$1")
-    if [ "$value_int" -le 70 ]; then
+    if [ "$value_int" -le 75 ]; then
         echo "$GREEN"
     elif [ "$value_int" -le 90 ]; then
         echo "$YELLOW"

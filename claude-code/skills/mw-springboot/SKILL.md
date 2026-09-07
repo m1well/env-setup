@@ -10,10 +10,13 @@ These are house rules, not a tutorial. Follow them when producing Spring Boot co
 when reviewing, flag every violation with the rule it breaks. Every rule carries an ID
 so it can be pointed at in a review, in a commit message, or in an ArchUnit test.
 
-**Baseline is Spring Boot 3.5 or 4.0.** Read the build file before you write. On an
-older major say so in one line, then apply the closest thing that version supports
-instead of generating code that does not compile - the version-sensitive spots are
-marked below.
+**Baseline is Spring Boot 4.1; 4.0 is still fine.** Read the build file before you
+write. 3.5 has been EOL since 2026-06-30, so a project still on it runs unpatched -
+say that once and move on, it is not the task. On any older major apply the closest
+thing that version supports instead of generating code that does not compile; the
+version-sensitive spots are marked below. The two that bite on every codebase coming
+from 3.x are Jackson 3 (WEB-10) and the `restclient` starter (WEB-8) - neither fails
+at build time, both fail at the first request.
 
 **Language and build tool do not change the rules.** Everything here holds for Kotlin
 and Java, for Gradle and Maven. What differs is how a rule *looks* in code and how you
@@ -31,7 +34,7 @@ Four commands, one round trip, and never assume:
 ```bash
 ls -1 pom.xml build.gradle build.gradle.kts settings.gradle settings.gradle.kts 2>/dev/null
 find . \( -name '*.kt' -o -name '*.java' \) -not -path '*/build/*' -not -path '*/target/*' | sed 's/.*\.//' | sort -u
-grep -rEn 'spring-boot|kotlin.jvm|plugin.spring|plugin.jpa|<java.version>|jvmToolchain|flyway|liquibase' --include='pom.xml' --include='build.gradle*' . | head -30
+grep -rEn 'spring-boot|kotlin.jvm|plugin.spring|plugin.jpa|<java.version>|jvmToolchain|flyway|liquibase|jackson|starter-(restclient|validation)' --include='pom.xml' --include='build.gradle*' . | head -30
 ls -1 src/main/resources/application*.y*ml src/main/resources/application*.properties src/main/resources/db 2>/dev/null
 ```
 
@@ -39,7 +42,9 @@ ls -1 src/main/resources/application*.y*ml src/main/resources/application*.prope
 | --- | --- | --- |
 | Kotlin, Java or both | file extensions in `src/main` | which shape a rule takes - section 9 |
 | Gradle or Maven | `build.gradle(.kts)` vs `pom.xml` | every command you run - section 10 |
-| Spring Boot version | build file, `spring-boot-starter-parent` | 3.4 replaced `@MockBean`, 3.5 goes EOL 2026-06-30, 4.0 needs Java 17+ |
+| Spring Boot version | build file, `spring-boot-starter-parent` | 3.4 replaced `@MockBean`, 3.5 is EOL since 2026-06-30, 4.0 needs Java 17+, 4.1 is current |
+| Jackson major | `tools.jackson` vs `com.fasterxml.jackson` in the imports | which package every mapper, module and custom serializer comes from - WEB-10 |
+| Explicit starters | `starter-restclient`, `starter-validation` in the build file | whether an outbound call and a `@Valid` actually do anything - WEB-8, WEB-2 |
 | Web stack | `-web` vs `-webflux` | MVC and WebFlux have opposite rules on blocking |
 | Persistence | `-data-jpa`, `-data-jdbc`, jOOQ, MyBatis | sections 4 and 5 are JPA-shaped |
 | Migration tool | `flyway-core` vs `liquibase-core`, `db/migration` vs `db/changelog` | section 6 - never introduce the second one |
@@ -95,7 +100,10 @@ Details and wrong/right pairs: `examples/structure.md`.
 - **WEB-2 Every mutating endpoint validates.** Constraints on the DTO *and* `@Valid` on
   the parameter - one without the other validates nothing. Nested elements need `@Valid`
   on the type argument (`List<@Valid ItemRequest>`), and Kotlin needs `@field:` on
-  constructor properties or the annotation never reaches the validator.
+  constructor properties or the annotation never reaches the validator. All of it needs
+  `spring-boot-starter-validation` on the classpath - without it the constraints compile,
+  start and validate nothing, which looks from the outside exactly like a forgotten
+  `@Valid`.
 - **WEB-3 Errors leave as `ProblemDetail`** (RFC 9457) from one `@RestControllerAdvice`.
   No stack traces, no exception messages, no internal ids in the response - the detail
   goes to the log, the client gets a type, a title and a status.
@@ -112,10 +120,22 @@ Details and wrong/right pairs: `examples/structure.md`.
   somewhere to go.
 - **WEB-8 Outbound HTTP has timeouts.** `RestClient` (MVC) or `WebClient` (WebFlux),
   never `RestTemplate` in new code, and never without an explicit connect and read
-  timeout - a missing read timeout turns a slow dependency into your outage.
+  timeout - a missing read timeout turns a slow dependency into your outage. Since 4.0
+  the imperative clients need `spring-boot-starter-restclient`: without it there is no
+  auto-configured `RestClient.Builder` and the context fails on the injection point, not
+  on the call.
 - **WEB-9 WebFlux blocks nowhere**: no `.block()`, no JDBC, no `Thread.sleep`, and in
   Kotlin no `runBlocking` in a request path. If something genuinely has to block it goes
   to `boundedElastic` or `Dispatchers.IO`, and that decision is worth a comment.
+- **WEB-10 Jackson 3 from Spring Boot 4.0 on.** The package moved:
+  `com.fasterxml.jackson.databind` is now `tools.jackson.databind`, and the same for
+  every module and custom (de)serializer. The one exception is `jackson-annotations` -
+  `@JsonProperty`, `@JsonIgnore` and their siblings stay on
+  `com.fasterxml.jackson.annotation`, which is why a half-migrated file compiles.
+  `Jackson2ObjectMapperBuilderCustomizer` is `JsonMapperBuilderCustomizer`. Read an
+  existing import before adding one: a project that pulls Jackson 2 in for a library
+  runs both, and then which package a mapper comes from decides which configuration
+  applies to it.
 
 Details: `examples/web.md`.
 
@@ -259,6 +279,14 @@ Both tools, side by side, with the build wiring: `examples/migrations.md`.
   configuration and memory contents.
 - **SEC-10 Passwords use BCrypt or Argon2** through a delegating encoder. `NoOp`, MD5
   and plain SHA are blockers whatever the salt.
+- **SEC-11 An outbound URL that comes from a request is filtered** (SSRF). A webhook
+  target, an avatar URL, an import link - fetched as given, they reach the metadata
+  endpoint and the internal network. From 4.1 that is an `InetAddressFilter` bean
+  (`org.springframework.boot.http.client`), which applies to every auto-configured HTTP
+  client at once: `InetAddressFilter.externalAddresses()`, or `of(cidr).andNot(...)`
+  for an allow-list. Before 4.1, resolve the host and check it yourself -
+  an allow-list of hosts alone does not survive a redirect or a DNS record pointing at
+  127.0.0.1.
 
 Details: `examples/security.md`.
 
@@ -353,7 +381,11 @@ fall back to the last commit (`git log -1 --no-merges --format=%H`). Read the di
 its context - the class around the changed method, the caller of a changed signature -
 but keep findings inside the scope. A pre-existing problem in an untouched file is a
 footnote, not a numbered finding, unless the change makes it worse. Past roughly 40
-classes, count first and say what you will leave out.
+classes, count first and say what you will leave out - and say once that
+`/mw-topomap-springboot` is the tool for a whole codebase: it maps every module and
+leaves a model behind instead of a chat message. It is a standalone skill and does not
+know these rules, but it asks for the project's rule ids when it writes its findings,
+and these are them.
 
 **Evidence, not suspicion.** N+1 needs the fetch type and the loop. A missing
 transaction needs the write path. Run what is cheap (section 11) and say what you ran;

@@ -28,7 +28,7 @@ exhaustive: what is not named does not exist.
   is, so do not override it away
 - **A link inside a sentence is `mw-link`, not `mw-btn mw-btn-link`.** The base
   class carries a control height, so in running text it lifts that one line to
-  2.25rem while the lines around it stay where they are. `mw-p-0` does not help
+  2.125rem while the lines around it stay where they are. `mw-p-0` does not help
   - the height does it, not the padding. Keep `mw-btn` only where the link
     really is a button in a row of buttons and has to line up with them
 - On a coarse pointer or below 768px `mw-btn` grows to a 2.75rem minimum height
@@ -224,13 +224,21 @@ picker.
   means it sits right, not left. Everything is vertically centered, so plain text
   lines up with a button next to it. Actions that no longer fit next to each
   other wrap.
-- The footer stacks to full-width children once the **card** is narrower than
-  360px, not once the window is - a card in a three-column grid is just as narrow
-  on a 1200px desktop as it is on a phone, and now looks the same in both. This
-  is a container query: a card that has a footer declares
-  `container: mw-card / inline-size` and takes `width: 100%`, so it fills its
-  slot instead of sizing to its content. Give such a card an explicit width if
-  you need it to hug its content.
+- The card measures **itself**, not the window - a card in a three-column grid
+  is just as narrow on a 1200px desktop as it is on a phone, and looks the same
+  in both. Every card declares `container: mw-card / inline-size` and takes
+  `width: 100%`, so it fills its slot instead of sizing to its content. Give a
+  card an explicit width if you need it to hug its content.
+- What steps on the card's own width: the footer stacks to full-width children
+  below 360px, and the title, the subtitle and the body padding step up at
+  420px. The image height is the one that still follows the window, because it
+  is declared on the card itself and a container cannot query itself.
+- `mw-tile` works the same way, and so do `mw-stepper` and both timelines: the
+  step labels shrink and the two-sided timeline collapses to one side once the
+  component is narrow, whatever the window does. One catch on tiles: a tile
+  clips its overflow, and being a container makes it the containing block for
+  `position: fixed`, so a `data-tooltip` **inside** a tile is cut off at its
+  edge. Cards do not clip and are unaffected.
 - `mw-card-badge` (top right corner) and `mw-card-ribbon` (diagonal banner) are
   absolutely positioned overlays; colour them with `mw-card-addon-primary`,
   `-secondary`, `-success`, `-warning`, `-danger`, `-info`.
@@ -536,6 +544,9 @@ still renders the same, for markup written before 4.12.
 Open state = `mw-active` on header **and** content (bare `active` still works
 but is deprecated). The icon rotates via the **header** state - putting the
 class on the icon instead does nothing. Content taller than 500px scrolls.
+The `mw-accordion-content-inner` wrapper is required and not decoration: the
+panel opens by animating a grid row and that wrapper is the row, so content
+placed straight into `mw-accordion-content` never collapses when closed.
 Toggling is JS - see `references/javascript.md`; the shipped script keeps
 `aria-expanded` in step when the header is a button.
 
@@ -544,8 +555,12 @@ Toggling is JS - see `references/javascript.md`; the shipped script keeps
 ```html
 <div class="mw-tabs">
   <div class="mw-tabs-nav">
-    <div class="mw-tabs-nav-item mw-active" data-tab="tab1">Details</div>
-    <div class="mw-tabs-nav-item" data-tab="tab2">History</div>
+    <button type="button" class="mw-tabs-nav-item mw-active" data-tab="tab1">
+      Details
+    </button>
+    <button type="button" class="mw-tabs-nav-item" data-tab="tab2">
+      History
+    </button>
   </div>
   <div class="mw-tabs-content">
     <div class="mw-tabs-panel mw-active" id="tab1">...</div>
@@ -558,6 +573,9 @@ Toggling is JS - see `references/javascript.md`; the shipped script keeps
   `mw-tabs-pills`.
 - `data-tab` matches the panel `id` - that pairing is only needed for the
   shipped JS. In a SPA, bind `mw-active` yourself and drop the attribute.
+- The shipped JS turns the strip into a real tablist: `role`, `aria-selected`,
+  `aria-controls`, `aria-labelledby`, a roving `tabindex` and arrow/Home/End
+  keys. Without it, that is yours to add - see `references/javascript.md`.
 - The nav scrolls horizontally instead of wrapping, and says so: a shadow shows
   on whichever side still has tabs behind it and disappears once that end is
   reached. Pure CSS, no scroll listener. The fade colour comes from
@@ -602,6 +620,35 @@ Toggling is JS - see `references/javascript.md`; the shipped script keeps
 
 Angular: `<div class="mw-modal-overlay" [class.mw-modal-open]="isOpen()">`.
 
+### The same modal as a `<dialog>`
+
+Same classes, no overlay wrapper and no backdrop element:
+
+```html
+<dialog id="delete-modal" class="mw-modal mw-modal-sm" closedby="any">
+  <div class="mw-modal-header">
+    <h4 class="mw-modal-title">Delete invoice</h4>
+    <button class="mw-modal-close" type="button" aria-label="Close">
+      &#120299;
+    </button>
+  </div>
+  <div class="mw-modal-body">…</div>
+  <div class="mw-modal-footer">…</div>
+</dialog>
+```
+
+- Escape, the focus trap, `inert` on the page behind it and the scroll lock all
+  come from the element. Prefer this shape for anything that asks a question.
+- Opened with `showModal()`, closed with `close()`. `main.js` wires the close
+  buttons and exposes `mwOpenModal(id)` / `mwCloseModal(id)`, both of which take
+  either shape. A trigger can also carry `data-mw-modal="delete-modal"`.
+- `closedby="any"` dismisses it on a backdrop click; where that attribute is not
+  understood the script handles the click instead.
+- Sizes, the bottom sheet below 576px and every `mw-modal-*` part behave exactly
+  as above - those rules are class-based.
+
+Angular: bind nothing, call `showModal()` on a `viewChild` ref.
+
 ## Alerts & toasts
 
 ```html
@@ -618,9 +665,10 @@ Angular: `<div class="mw-modal-overlay" [class.mw-modal-open]="isOpen()">`.
 ```
 
 Variants: `mw-alert-primary`, `-secondary`, `-success`, `-warning`, `-danger`,
-`-info`. `mw-alert-title` and the close button are optional. `mw-alert-closed`
-hides a dismissed alert (`display: none`) - in a SPA prefer removing it from the
-list instead.
+`-info`. `mw-alert-title` and the close button are optional. Dismissal runs in
+two steps: `mw-alert-closing` fades the alert out over `--mw-duration-base`, then
+`mw-alert-closed` hides it (`display: none`) - in a SPA prefer removing it from
+the list instead.
 
 **Toasts** are alerts inside a fixed stack:
 
@@ -661,6 +709,10 @@ then scrolls with the content and shifts no anchor offset.
 The height lives in `--mw-announcement-height` and drives the anchor scroll
 offset (`scroll-padding-top`) automatically - a taller ribbon raises the token
 instead of fighting the offset.
+
+On a page whose header carries `mw-header-reveal` the ribbon leaves and arrives
+with it, without a class of its own - both cover the height of the pair, so they
+come in as one block. See `references/layout.md`.
 
 ## Empty state
 
@@ -768,6 +820,10 @@ tables you know overflow, leave it off the ones that fit.
 
 A board is a grid of equally wide lanes; a ticket is a plain `mw-card` with
 `mw-kanban-card` on top. Everything except the counters and the composer is CSS.
+
+The board puts as many lanes in a row as fit at 260px each and wraps the rest
+onto the next. It measures its own width for that, so a board inside a panel or
+a half-width column wraps on a desktop too.
 
 ```html
 <div class="mw-kanban" style="--mw-kanban-column-min-height: 390px">
@@ -1163,12 +1219,62 @@ Parts: `mw-dropdown-menu`, `-item`, `-item-danger`, `-divider`, `-label`,
 picks rather than acts. Icons inside items keep one column, so labels line up
 whether or not every item has one.
 
-The menu is absolutely positioned and is clipped by any ancestor that hides its
-overflow. The framework's own containers lift that clip while a menu is open; on
+Where the browser supports anchor positioning the menu is `position: fixed`,
+anchored to its trigger and flipped into whichever side has room, so it escapes
+a clipping ancestor by itself. Everywhere else it is absolutely positioned and
+is clipped by any ancestor that hides its overflow. The framework's own containers lift that clip while a menu is open; on
 your own it is `:has(.mw-dropdown[open]) { overflow: visible }`.
 
 On a coarse pointer the rows grow to 2.75rem and the menu takes at least the
 trigger's full width.
+
+## Language switcher
+
+A `mw-dropdown` with a quieter trigger: no fill and no border until it is
+hovered, so a header bar does not turn into a row of competing buttons.
+
+```html
+<details class="mw-dropdown mw-dropdown-end mw-lang-switch">
+  <summary aria-label="Language: Deutsch">
+    <span class="mw-flag mw-flag-de"></span>
+    <span class="mw-lang-switch-code">de</span>
+    <i class="fas fa-chevron-down mw-dropdown-caret"></i>
+  </summary>
+  <div class="mw-dropdown-menu">
+    <button
+      type="button"
+      class="mw-dropdown-item mw-active"
+      aria-current="true"
+      data-mw-lang="de"
+    >
+      <span class="mw-flag mw-flag-de"></span>
+      <span class="mw-lang-switch-name" lang="de">Deutsch</span>
+      <i class="fas fa-check mw-lang-switch-check"></i>
+    </button>
+    <button type="button" class="mw-dropdown-item" data-mw-lang="en">
+      <span class="mw-flag mw-flag-gb"></span>
+      <span class="mw-lang-switch-name" lang="en">English</span>
+      <i class="fas fa-check mw-lang-switch-check"></i>
+    </button>
+  </div>
+</details>
+```
+
+The two-letter code carries the state, not the flag: a flag is a country and
+never a language - no country stands for English. Write each language name in
+its own language and put `lang="fr"` on it, so a screen reader pronounces it
+instead of spelling it out.
+
+Parts: `mw-lang-switch-code`, `-name`, `-check` (the tick, shown by `mw-active`
+on the item and kept in the layout while hidden). `mw-lang-switch-inverted` is
+for a dark bar built without `mw-header`; inside `mw-header` those colours apply
+on their own.
+
+Flags: `mw-flag` plus `mw-flag-<iso>` for de, at, ch, gb, us, ie, fr, it, es,
+pt, nl, be, pl, hu, ro, bg, ua, se, dk, no, fi, tr and jp - CSS gradients, all
+in the same 4:3 box whatever the real ratio. Never an emoji flag: Windows ships
+no glyphs for them. Anything outside the set goes as an `<img>` or an inline
+`<svg>` inside `mw-flag`.
 
 ## Keyboard keys
 
@@ -1353,7 +1459,7 @@ deprecated). Any card fits into the content wrapper.
 <div class="mw-avatar mw-avatar-initials mw-avatar-xs">MW</div>
 ```
 
-- Sizes: `mw-avatar-xs` 32, `-sm` 64, default 96, `-lg` 144, `-xl` 250 px.
+- Sizes: `mw-avatar-xs` 32, `-sm` 64, default 96, `-lg` 144, `-xl` 210 px.
 - Shape: `mw-avatar-square`.
 - Colours `mw-avatar-primary`, `-secondary`, `-success`, `-warning`, `-danger`,
   `-info` tint the **border**. On `mw-avatar-initials` the same class also tints
@@ -1362,6 +1468,9 @@ deprecated). Any card fits into the content wrapper.
   the standard display for a signed-in user without a picture.
 - `mw-avatar-group` overlaps its avatars; `mw-avatar-group-sm` / `-lg` change
   the overlap.
+- Hover on an avatar **with an image** zooms the picture and sweeps a light
+  across it. Nothing to switch on. It is skipped on `mw-avatar-initials`, on
+  touch, under `prefers-reduced-motion` and under `mw-hover-static`.
 
 ## Item lists
 

@@ -159,17 +159,6 @@
     "command": "${HOME}/.claude/statusline.sh",
     "padding": 1
   },
-  "enabledPlugins": {
-    "ui-ux-pro-max@ui-ux-pro-max-skill": true
-  },
-  "extraKnownMarketplaces": {
-    "ui-ux-pro-max-skill": {
-      "source": {
-        "source": "github",
-        "repo": "nextlevelbuilder/ui-ux-pro-max-skill"
-      }
-    }
-  },
   "language": "german",
   "effortLevel": "xhigh",
   "theme": "dark",

@@ -20,13 +20,13 @@ or, in the framework repo, `npm run verify`.
 
 Load the one you need - do not read them all up front.
 
-| File                       | Content                                                                                                          |
-| -------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| `references/layout.md`     | Page skeleton, grid, container, section, page header, header/navbar, footer, spacing/flex/display/text utilities |
-| `references/components.md` | Every component: markup, variants, sizes, state classes                                                          |
-| `references/forms.md`      | Inputs, select, textarea, checkbox, radio, toggle, slider, input group, `mw-field` pattern, validation           |
-| `references/theming.md`    | Token model, `color-mix` derivation, light/dark, SCSS configuration, cherry-picking single components            |
-| `references/javascript.md` | What the shipped `main.js` does, why SPAs must not load it, what to implement instead                            |
+| File                       | Content                                                                                                                   |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `references/layout.md`     | Page skeleton, grid, container, section, page header, header/navbar, footer, spacing/flex/display/text utilities          |
+| `references/components.md` | Every component: markup, variants, sizes, state classes                                                                   |
+| `references/forms.md`      | Inputs, select, textarea, checkbox, radio, toggle, slider, input group, `mw-field` pattern, validation                    |
+| `references/theming.md`    | Token model, `color-mix` derivation, light/dark, site-wide variants, SCSS configuration, cherry-picking single components |
+| `references/javascript.md` | What the shipped `main.js` does, why SPAs must not load it, what to implement instead                                     |
 
 ## Examples
 
@@ -44,14 +44,14 @@ Load the one you need - do not read them all up front.
 ```html
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/maverick-wave@4.25.0/maverick-wave.min.css"
+  href="https://cdn.jsdelivr.net/npm/maverick-wave@5.12.0/maverick-wave.min.css"
 />
 <link
   rel="stylesheet"
   href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
 />
 ...
-<script src="https://cdn.jsdelivr.net/npm/maverick-wave@4.25.0/maverick-wave.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/maverick-wave@5.12.0/maverick-wave.min.js"></script>
 ```
 
 Pin the version. The JS file is optional and only for server-rendered/static pages -
@@ -116,18 +116,18 @@ leave a second tab lit.
 
 The classes that mean something _other_ than "on" keep their own names:
 
-| Component                                    | State class                         |
-| -------------------------------------------- | ----------------------------------- |
-| Anything switchable, "on"                    | `mw-active` (`active` deprecated)   |
-| Burger button + navbar drawer                | `open` (no prefix)                  |
-| Stepper indicator / label / connector / step | `mw-active`, `mw-done`              |
-| Checkbox list item (`li`)                    | `mw-selected`                       |
-| Calendar day, picked                         | `mw-selected`                       |
-| Kanban ticket being edited                   | `mw-kanban-editing`                 |
-| Modal overlay                                | `mw-modal-open`                     |
-| Alert, after dismissal                       | `mw-alert-closed` (`display: none`) |
-| Field wrapper in error                       | `mw-field-has-error`                |
-| Single form control in error                 | `mw-form-element-error`             |
+| Component                                    | State class                                              |
+| -------------------------------------------- | -------------------------------------------------------- |
+| Anything switchable, "on"                    | `mw-active` (`active` deprecated)                        |
+| Burger button + navbar drawer                | `open` (no prefix)                                       |
+| Stepper indicator / label / connector / step | `mw-active`, `mw-done`                                   |
+| Checkbox list item (`li`)                    | `mw-selected`                                            |
+| Calendar day, picked                         | `mw-selected`                                            |
+| Kanban ticket being edited                   | `mw-kanban-editing`                                      |
+| Modal overlay                                | `mw-modal-open`                                          |
+| Alert, dismissing / dismissed                | `mw-alert-closing` → `mw-alert-closed` (`display: none`) |
+| Field wrapper in error                       | `mw-field-has-error`                                     |
+| Single form control in error                 | `mw-form-element-error`                                  |
 
 `mw-active` and `mw-selected` are not the same thing and not interchangeable:
 active is the one of several that is currently showing, selected is a choice the
@@ -150,10 +150,26 @@ keys at all (negative gap is invalid CSS and is not generated).
 `sm` 0.9, `base` 1, `md` 1.1, `lg` 1.3, `xl` 1.5, `2xl` 1.8, `3xl` 2.2, `4xl` 2.5,
 `5xl` 3, `6xl` 4.3 rem.
 
-**Breakpoints** (max-width, mobile-first markup / desktop-first media queries):
-`xs` 375, `sm` 576, `md` 768, `lg` 992, `xl` 1200, `2xl` 1400 px.
+**Breakpoints**: `xs` 375, `sm` 576, `md` 768, `lg` 992, `xl` 1200, `2xl` 1400 px.
+Column grids and most components are mobile-first. The mixins emit range syntax
+(`media-up` is `width >= bp`, `media-down` is `width < bp`), so the two never
+overlap at the breakpoint itself and neither has to stop a fraction short of it.
+
+**Overriding.** Everything the framework emits sits in
+`@layer mw.reset, mw.base, mw.forms, mw.components, mw.layout, mw.utilities`.
+Any rule written outside a layer beats all of it, so a single `.mw-card {}` in
+your own stylesheet wins - no `!important`, no doubled selectors. `!important`
+is not a stronger version of this but a weaker one: important declarations
+reverse the layer order and unlayered comes last, so an important rule in
+`mw.base` beats an important one of yours even behind an ID selector. The flip
+side: third-party CSS loaded unlayered also wins, so pull it into a layer of
+its own:
+`@import url('font-awesome.css') layer(vendor);` with `@layer vendor, mw;`
+declared before it.
 
 **Radius** (`mw-radius-none|xs|sm|md|lg|xl|2xl|full`): 0, 2, 5, 10, 15, 20, 30 px, 50%.
+Every one of them is multiplied by `--mw-radius-scale` (default 1), so one number
+squares the framework off or rounds it further; `none` and `full` pass through.
 
 **The surface signature.** Every panel-like component - card, panel, modal,
 accordion, tile, calendar, pagination, login box - shares one silhouette: sharp
@@ -161,7 +177,8 @@ accordion, tile, calendar, pagination, login box - shares one silhouette: sharp
 plus a 2px **corner accent** in the primary tone (`--mw-corner-accent`) sitting
 on the two round corners. It is not a class and not opt-in; the components carry
 it. `mw-corner-plain` drops the accent on a box too small to hold it - see
-`references/layout.md`.
+`references/layout.md` - and `mw-corners-even` on `<html>` drops the whole
+signature site-wide.
 
 **Elevation** (`mw-elevation-0` … `-5`, and `var(--mw-elevation-N)` inside SCSS).
 Two shadows per level - a tight contact layer plus a wide ambient one:
@@ -170,16 +187,23 @@ Two shadows per level - a tight contact layer plus a wide ambient one:
 `0` is explicitly flat. Never write a `box-shadow` by hand - the twelve one-off
 values that used to exist are exactly what this replaced.
 
+**Glow** (`mw-glow`, `mw-glow-{primary,secondary,info,success,warning,danger}`).
+The same two-layer idea without the offset, so the surface reads as giving off
+the light rather than casting a shadow. For the one element on a screen that has
+to be seen first, and for nothing else.
+
 **Motion** `--mw-duration-instant|fast|base|slow|slower` = 110/180/300/520/900ms
 plus `--mw-duration-zoom` (650ms, for a large surface actually travelling),
 `--mw-ease-out` (things arriving - the default), `--mw-ease-in-out` (A to B and
 back), `--mw-ease-spring` (a pop). Two ready-made transitions:
 `var(--mw-transition)` for hover and focus states, `var(--mw-transition-fast)`
 for anything that should feel instant under the pointer. Both list their
-properties explicitly rather than saying `all`.
+properties explicitly rather than saying `all`. All six durations are multiplied
+by `--mw-motion-scale` (default 1), the tempo counterpart to
+`--mw-radius-scale`; `prefers-reduced-motion` overrides the result.
 
-**Control sizes** `--mw-control-height-sm|base|lg` = 2 / 2.25 / 2.5rem (an even
-32 / 36 / 40px step) and
+**Control sizes** `--mw-control-height-sm|base|lg` = 1.875 / 2.125 / 2.375rem (an
+even 30 / 34 / 38px step, moved by `mw-density-compact` and `-roomy`) and
 `--mw-control-font-sm|base|lg` = 0.8 / 0.9 / 1rem, shared by `mw-input`,
 `mw-select`, `mw-textarea` and `mw-btn`. A field and the button beside it are
 the same height by construction. Buttons run one font step above the fields.
@@ -219,9 +243,12 @@ feature frame) ·
 `-highlight`, `-static`, color variants) · `mw-empty-state` ·
 `mw-spinner-border` / `mw-spinner-dots` / `mw-spinner-dual-ring` · `mw-skeleton`
 
-**Navigation** `mw-header` + `mw-navbar` · `mw-breadcrumbs` · `mw-pagination` ·
+**Navigation** `mw-header` (+ `mw-header-reveal`) + `mw-navbar` ·
+`mw-breadcrumbs` · `mw-pagination` ·
 `mw-dropdown` (+ `-menu`, `-item`, `-item-danger`, `-divider`, `-label`,
-`-caret`, `-end`, `-up`) · `mw-section-nav` (`references/layout.md`)
+`-caret`, `-end`, `-up`) · `mw-lang-switch` (+ `-code`, `-name`, `-check`,
+`inverted`) · `mw-flag` (+ 23 country codes) ·
+`mw-section-nav` (`references/layout.md`)
 
 **Media & content** `mw-avatar` (+ `initials`, `group`) · `mw-gallery` ·
 `mw-image-slider` · `mw-blog-post` · `mw-testimonial` (+ `-source`, `-detail`,
@@ -236,13 +263,16 @@ feature frame) ·
 
 **Layout** (`references/layout.md`) `mw-main` · `mw-container` · `mw-content` ·
 `mw-section` (+ `mw-section-intro`) · `mw-page-header` · `mw-grid-*` ·
-`mw-columns-2/3` · `mw-row-split` · `mw-hero` (+ `mw-scroll-hint`, `-end`) · `mw-footer`
+`mw-columns-2/3` · `mw-row-split` · `mw-hero` (+ `mw-scroll-hint`, `-end`) ·
+`mw-parallax` (+ `-media`, `-content`, `-dimmed`, `-sticky`, `-rise`,
+`-slow`, `-pattern`) · `mw-footer`
 
 **Utilities** (`references/layout.md`) `mw-sr-only` / `mw-sr-only-focusable` /
 `mw-skip-link` · `mw-row-split` (+ `center`) · `mw-text-numeric` /
 `mw-text-currency` · `mw-text-truncate` / `mw-text-clamp-2..5` /
 `mw-text-break` / `mw-text-nowrap` · `mw-text-balance` / `mw-text-pretty` /
-`mw-text-eyebrow` / `mw-text-measure` · `mw-elevation-0..5` ·
+`mw-text-eyebrow` / `mw-text-measure` · `mw-elevation-0..5` · `mw-glow` /
+`mw-glow-{primary,secondary,info,success,warning,danger}` ·
 `mw-corner-plain` ·
 `mw-aspect-square|video|wide|portrait|photo` · `mw-d-{sm,md,lg,xl}-*` /
 `mw-hide-mobile` / `mw-hide-desktop` · `mw-overflow-*` / `mw-snap-x` ·
@@ -320,10 +350,12 @@ feature frame) ·
     and the open state come from, and it works without script. The framework JS
     only adds Escape and click-outside. Writing your own div-plus-click loses all
     of it.
-17. **An open dropdown is clipped by anything that hides its overflow.** The menu
-    is absolutely positioned. The framework's own containers - panel, card, tile,
-    modal body, responsive table - lift the clip while a menu is open. On your
-    own container it is one line:
+17. **An open dropdown can be clipped by anything that hides its overflow.**
+    Where the browser supports anchor positioning the menu is `position: fixed`
+    and anchored to its trigger, so it escapes the clip on its own. Everywhere
+    else it is absolutely positioned and cut off. Either way the framework's own
+    containers (panel, card, tile, modal body, responsive table) lift the clip
+    while a menu is open. On your own container it is one line:
     `:has(.mw-dropdown[open]) { overflow: visible }`.
 18. **Never write `box-shadow` by hand.** Use `var(--mw-elevation-1..5)` or the
     `mw-elevation-*` class. A hand-rolled shadow is the wrong colour in one of
@@ -368,21 +400,30 @@ feature frame) ·
     comment. If your component really does need to animate a size, name that
     property - do not reach for `all`.
 27. **A control is a `<button>`, never a styled `<div>`.** `mw-tabs-nav-item`,
-    `mw-theme-toggle`, `mw-gallery-dot` and `mw-accordion-header` are all
-    written for one, and all four shipped as divs and spans - the first three
-    until 4.11, the accordion header until 4.12 - that no keyboard could reach.
-    Each class clears what a `<button>` brings with it, so
-    `<button type="button" class="mw-tabs-nav-item" data-tab="...">` is the
-    whole markup. If you build your own clickable thing: the element decides
-    whether anyone without a mouse can use it, the class only decides how it
-    looks.
+    `mw-theme-toggle`, `mw-gallery-dot`, `mw-accordion-header` and `mw-menu-btn`
+    are all written for one, and all five shipped as divs and spans - the first
+    three until 4.11, the accordion header until 4.12, the burger after that -
+    that no keyboard could reach. Each class clears what a `<button>` brings
+    with it, so `<button type="button" class="mw-tabs-nav-item" data-tab="...">`
+    is the whole markup. The burger is the worst of the five to get wrong:
+    below the collapse breakpoint it is the only route to the navigation.
+    If you build your own clickable thing: the element decides whether anyone
+    without a mouse can use it, the class only decides how it looks.
 28. **A link in running text is `mw-link`, not `mw-btn mw-btn-link`.** Since
     4.13.0 there is a class for exactly that. `mw-btn` is `inline-flex` with
     `min-height: var(--mw-control-height)`, so a link written that way pulls its
-    own line up to 2.25rem while every line around it keeps the paragraph's
+    own line up to 2.125rem while every line around it keeps the paragraph's
     height - in a footer disclaimer at `font-size: sm` that is nearly double,
     and it reads as a layout bug. `mw-p-0` is not the fix it looks like: the
     height does it, not the padding. `mw-link` is the same look without the
     control height and works on an `<a>` and a `<button>` alike.
     `mw-btn mw-btn-link` stays right where the link really is one of several
     buttons and has to line up with them - a card's actions, a button bar.
+29. **`mw-parallax-sticky` goes on the section, not on the hero.** Sticky pins
+    inside its parent, and the rule that lifts the page above the pinned picture
+    reaches that content as a _sibling_. Put the class on the hero itself and
+    nothing pins and nothing covers - no error, no effect, and the picture shows
+    through every transparent section below. `mw-parallax` and the
+    `mw-parallax-media` child stay where the image is: on the container. Same
+    split for `mw-parallax-slow`, and `--mw-parallax-slow-travel` goes with the
+    class on the section - on the inner block it never reaches the animation.

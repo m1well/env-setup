@@ -17,7 +17,7 @@ Read before you judge. Every claim about the code needs a `file:line` you actual
 
 Weigh what it costs to be wrong. Say for each recommendation whether it is cheap to undo or expensive: a package split is a two-way door, a shared database table between two services is not. Effort goes into the expensive ones.
 
-Assessing Angular structure - where a component belongs, how state is layered, library boundaries - means loading the `mw-angular` skill first, because those layering rules are the standard you judge against.
+Assessing Angular structure - where a component belongs, how state is layered, library boundaries - means loading the `mw-angular` skill first, because those layering rules are the standard you judge against. Name the finding after its rule id there too (`LAYER-7`, `STATE-4`, `SIG-3`); the prefixes do not collide with the backend ones, so a fullstack assessment stays one list.
 
 Same on the backend: layering, module boundaries, what belongs in an entity versus an embeddable, whether a schema change can be rolled out at all - load `mw-springboot` first and name the finding after its rule id (`STR-3`, `MODEL-1`, `MIG-6`), so the assessment and the fix use the same vocabulary.
 

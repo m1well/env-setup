@@ -10,3 +10,7 @@ cli/.cli_private
 ### dev files
 .dev
 .test
+
+### skills - only mine are tracked, everything else is somebody else's
+claude-code/skills/*
+!claude-code/skills/mw-*

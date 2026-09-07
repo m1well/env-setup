@@ -4,11 +4,11 @@
 
 `mw-input`, `mw-select`, `mw-textarea` and `mw-btn` share one scale:
 
-| step  | height  | font   |
-| ----- | ------- | ------ |
-| `-sm` | 2rem    | 0.8rem |
-| base  | 2.25rem | 0.9rem |
-| `-lg` | 2.5rem  | 1rem   |
+| step  | height   | font   |
+| ----- | -------- | ------ |
+| `-sm` | 1.875rem | 0.8rem |
+| base  | 2.125rem | 0.9rem |
+| `-lg` | 2.375rem | 1rem   |
 
 A field and the button beside it are therefore the same height by construction -
 before 4.11.0 each control worked its own height out and an input, a select and
@@ -45,14 +45,26 @@ reactive form control.
 ```
 
 - `mw-required` on the label appends a red asterisk (`data-required="true"`
-  works too).
+  works too). A label sitting directly in front of a control with the `required`
+  attribute gets the asterisk without either class - useful for template-driven
+  and plain HTML forms, where the marker then cannot drift out of step with the
+  validation.
 - `mw-field-hint` is the small muted helper line, `mw-field-error` the small red
   one. Render only one of them at a time.
 - `mw-field-has-error` on the **wrapper** turns the border of the contained
   `mw-input` / `mw-select` / `mw-textarea` red and adds a soft red halo.
 - `mw-form-element-error` does the same for a single control that has no field
   wrapper - it also works on `mw-checkbox-group`, `mw-radio-group` and
-  `mw-slider-container`.
+  `mw-slider-container`. On the two groups it adds the inset a field brings with
+  it, so the rows do not sit flush against the border.
+- Native validation is styled too: a control that fails `required`, `type` or
+  `pattern` gets the same red border and halo through `:user-invalid`, and the
+  `mw-field-hint` beside it turns red. `:user-invalid` and not `:invalid`, so an
+  untouched empty field is not red on page load. Nothing has to be bound for
+  this - which is exactly why the classes still exist for the case below, where
+  the validator lives in the component rather than on the element.
+- `mw-textarea` grows with its content (`field-sizing`) between 3 lines and
+  60dvh, where the browser supports it.
 
 > **The framework does not style Angular's `ng-invalid` / `ng-touched` classes.**
 > Bind the framework classes to the control state yourself:

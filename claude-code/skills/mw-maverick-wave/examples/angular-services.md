@@ -7,7 +7,9 @@ service or a component per behaviour, none of them longer than a screen.
 ## Theme service
 
 The framework only needs one class on `<body>`. Everything else - persistence,
-the toggle UI, the initial value - belongs to the application.
+the toggle UI, the initial value - belongs to the application. The second class,
+`mw-theme-switching` on `<html>`, is not optional on a page of any size: without
+it the flip starts a transition on every element that changes colour.
 
 ```ts
 import { Injectable, effect, signal } from '@angular/core';
@@ -16,12 +18,27 @@ const STORAGE_KEY = 'mw-theme';
 
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
-  readonly light = signal(localStorage.getItem(STORAGE_KEY) === 'light');
+  // With nothing stored the stylesheet already follows the OS, so the initial
+  // value only has to agree with what is on screen
+  readonly light = signal(
+    localStorage.getItem(STORAGE_KEY)
+      ? localStorage.getItem(STORAGE_KEY) === 'light'
+      : matchMedia('(prefers-color-scheme: light)').matches
+  );
 
   constructor() {
     effect(() => {
       const light = this.light();
+      const root = document.documentElement;
+
+      root.classList.add('mw-theme-switching');
       document.body.classList.toggle('mw-theme-light', light);
+      // the explicit counterpart - without it a dark choice on a light machine
+      // falls back to the OS preference
+      document.body.classList.toggle('mw-theme-dark', !light);
+      void root.offsetHeight; // commit the colours with transitions off
+      root.classList.remove('mw-theme-switching');
+
       localStorage.setItem(STORAGE_KEY, light ? 'light' : 'dark');
     });
   }
@@ -308,13 +325,17 @@ on every navigation.
             <span class="mw-profile-btn-name">{{ user().name }}</span>
           </button>
 
-          <div
+          <button
+            type="button"
             class="mw-menu-btn"
+            aria-label="Menu"
+            aria-controls="main-nav"
+            [attr.aria-expanded]="menuOpen()"
             [class.open]="menuOpen()"
             (click)="menuOpen.set(!menuOpen())"
           >
-            <div class="mw-menu-btn-burger"></div>
-          </div>
+            <span class="mw-menu-btn-burger"></span>
+          </button>
         </div>
       </div>
     </header>
@@ -357,3 +378,94 @@ about the class name.
 
 `mw-progress-percent` only appends the `%` sign - the number comes from you, and
 so does the width.
+
+## Scroll reveal
+
+`mw-reveal` runs on the browser's scroll timeline and needs nothing from you -
+except in Firefox, which ships none, where the block appears without motion.
+This directive is the Firefox half: it adds to the class, never replaces it.
+
+```ts
+import {
+  DestroyRef,
+  Directive,
+  ElementRef,
+  afterNextRender,
+  inject,
+  signal,
+} from '@angular/core';
+
+@Directive({
+  selector: '[mwReveal]',
+  host: {
+    '[class.mw-reveal-hidden]': "state() === 'hidden'",
+    '[class.mw-reveal-run]': "state() === 'run'",
+    '[style.animation-delay.ms]': 'delay()',
+  },
+})
+export class MwRevealDirective {
+  private readonly host =
+    inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
+
+  protected readonly state = signal<'off' | 'hidden' | 'run'>('off');
+  protected readonly delay = signal(0);
+
+  constructor() {
+    const destroyRef = inject(DestroyRef);
+
+    afterNextRender(() => {
+      if (CSS.supports('animation-timeline', 'view()')) return;
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      // Already on screen: past its entry range in a timeline browser too
+      if (this.host.getBoundingClientRect().top < innerHeight) return;
+
+      this.state.set('hidden');
+
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (!entry.isIntersecting) return;
+          observer.disconnect();
+          this.delay.set(this.columnDelay());
+          this.state.set('run');
+        },
+        { threshold: 0.15 }
+      );
+
+      observer.observe(this.host);
+      destroyRef.onDestroy(() => observer.disconnect());
+    });
+  }
+
+  // The wave a grid draws in CSS, read back from the columns the browser
+  // rendered - one on a phone, so the stagger disappears with them.
+  private columnDelay(): number {
+    const grid = this.host.parentElement;
+    if (!grid?.classList.contains('mw-reveal-stagger')) return 0;
+    const columns =
+      getComputedStyle(grid).gridTemplateColumns.split(' ').length;
+    return ([...grid.children].indexOf(this.host) % columns) * 90;
+  }
+}
+```
+
+A single block carries `mw-reveal`, a grid carries `mw-reveal-stagger` and its
+children carry nothing but the directive:
+
+```html
+<article class="mw-card mw-reveal" mwReveal>...</article>
+
+<div class="mw-grid-4 mw-reveal-stagger">
+  @for (item of items(); track item.id) {
+  <article class="mw-card" mwReveal>...</article>
+  }
+</div>
+```
+
+Unlike the shipped script this also covers what a route renders later - the
+directive runs per element, not once per page.
+
+`mw-header-reveal` and `mw-parallax` need the same treatment and the same
+`CSS.supports` guard. The header is a class toggled past a scroll threshold; the
+parallax writes `--mw-parallax-progress` (0 to 1) on each `mw-parallax-media`
+from a `requestAnimationFrame` loop, reading every layer's rect before writing
+to any of them.
