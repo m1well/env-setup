@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# git-autostage.sh — stages all working tree changes when Claude finishes a turn.
+# git-autostage.sh - stages all working tree changes when Claude finishes a turn.
 # Used as a Stop hook; reads the hook payload (JSON) from stdin.
 #
 # No-op when:

@@ -113,12 +113,47 @@ It gets symlinked to `~/.config/nvim/init.lua`.
 #### claude-code ([link](/claude-code))
 
 My global [Claude Code](https://claude.com/claude-code) setup, symlinked into `~/.claude`:
-`settings.json` (permissions, model, statusline), `statusline.sh` (custom status line),
-`CLAUDE.md` (personal context) and `skills/` (custom skills).
+`settings.json` (permissions, model, hooks, statusline), `statusline.sh` (custom status line),
+`CLAUDE.md` (personal context), `rules/` (topic- and path-scoped instructions),
+`skills/` (custom skills), `agents/` (subagents with their own role and tools)
+and `hooks/` (shell scripts on lifecycle events).
+
+`rules/` keeps `CLAUDE.md` short: `code-comments.md` only loads when a code file is
+touched, the other two load every session. `hooks/` enforces what instructions only
+suggest - a sound on stop and notification, `git add -A` after every turn,
+a confirmation prompt before Claude reads a markdown file that neither I nor a
+`CLAUDE.md` pointed it at (`CLAUDE_MD_GUARD=off` disables it), and one forced
+cleanup plus docs question before Claude calls a task done, but only for turns
+that added 15 lines or more (`CLAUDE_SESSION_REVIEW_MIN` moves that line,
+`CLAUDE_SESSION_REVIEW=off` disables the check). That cleanup step gets a list from
+`unused-imports.sh`, which flags imports in changed Kotlin, Java and TypeScript
+files whose symbol appears nowhere else - candidates to check, not to delete
+blindly, since an extension function or a decorator is used without naming it.
+
+`agents/` holds two roles that pay off through context isolation: `mw-architect`
+reads a lot and answers with an assessment (read-only tools), `mw-test-engineer`
+writes tests and reports only the failures. Both inherit `CLAUDE.md` and `rules/`.
 
 Two of those skills live in their own public repo, [topomap-skills](https://github.com/m1well/topomap-skills),
 and are symlinked into `skills/` from there. The install script clones it next to this
 one; without that repo the two links dangle.
+
+`mw-persona-review` walks the running app through the eyes of a persona with low tech literacy:
+`/mw-persona-review persona=julia task="Lege eine Rechnung über 250€ an und sende sie per E-Mail"`.
+It drives the app in Chrome via the Claude Code Chrome extension - the extension has to be installed
+and the site allowed in its permissions, otherwise the skill falls back to a static review of the
+frontend code and says so in the report. Personas live per project in `.claude/personas/*.md`,
+reports land dated in `.claude/personas/reviews/` so runs can be compared over time. Two example
+personas and a sample report in the skill's `examples/` folder show the format.
+
+`mw-springboot` and `mw-angular` are the house rules for the two stacks I write most - they
+apply when Claude writes code and when it reviews it. Backend: constructor injection and
+one-way layering, DTOs at the HTTP boundary, transactions on the service, entity versus
+embeddable, Flyway or Liquibase, default-deny security, the cheapest test slice. It stays
+language- and build-agnostic, so the same rules hold for Kotlin or Java and Gradle or Maven.
+Every rule has an id (`WEB-1`, `MODEL-7`, `MIG-2`), so a review finding points at one instead
+of at an opinion, and the `examples/` folder carries a wrong/right pair for each in both
+languages.
 
 #### Brewfile ([link](/homebrew/Brewfile))
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# claude-sound.sh — plays a macOS system sound for Claude Code hook events.
+# claude-sound.sh - plays a macOS system sound for Claude Code hook events.
 # Usage: claude-sound.sh <event>
 #   stop         -> Claude finished working ("done, your turn")
 #   notification -> Claude needs you (permission prompt / idle waiting)

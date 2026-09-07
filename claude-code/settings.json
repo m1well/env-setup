@@ -14,7 +14,36 @@
       "Bash(awk '$1>1')",
       "Bash(sort -t: -k2 -rn)",
       "Bash(awk -F: '{s+=$2} END {print s\" total\"}')",
-      "Bash(awk '{s+=$1} END {print s}')"
+      "Bash(awk '{s+=$1} END {print s}')",
+      "Bash(ls:*)",
+      "Bash(find:*)",
+      "Bash(tree:*)",
+      "Bash(wc:*)",
+      "Bash(stat:*)",
+      "Bash(file:*)",
+      "Bash(basename:*)",
+      "Bash(dirname:*)",
+      "Bash(git show:*)",
+      "Bash(git branch:*)",
+      "Bash(git remote:*)",
+      "Bash(git blame:*)",
+      "Bash(git shortlog:*)",
+      "Bash(git stash list:*)",
+      "Bash(./gradlew test:*)",
+      "Bash(./gradlew check:*)",
+      "Bash(./gradlew build:*)",
+      "Bash(./mvnw test:*)",
+      "Bash(./mvnw verify:*)",
+      "Bash(npm test:*)",
+      "Bash(npm run test:*)",
+      "Bash(npm run lint:*)",
+      "Bash(npm run build:*)",
+      "Bash(npx ng test:*)",
+      "Bash(npx ng lint:*)",
+      "Bash(npx ng build:*)",
+      "Bash(docker ps:*)",
+      "Bash(docker compose ps:*)",
+      "Bash(docker logs:*)"
     ],
     "deny": [
       "Bash(rm -rf:*)",
@@ -56,6 +85,34 @@
   },
   "model": "opus[1m]",
   "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${HOME}/.claude/hooks/md-read-guard.sh record",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "${HOME}/.claude/hooks/session-review.sh baseline",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${HOME}/.claude/hooks/md-read-guard.sh check",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
     "Stop": [
       {
         "hooks": [
@@ -71,6 +128,15 @@
           {
             "type": "command",
             "command": "${HOME}/.claude/hooks/git-autostage.sh",
+            "timeout": 15
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${HOME}/.claude/hooks/session-review.sh check",
             "timeout": 15
           }
         ]
@@ -106,5 +172,6 @@
   },
   "language": "german",
   "effortLevel": "xhigh",
-  "theme": "dark"
+  "theme": "dark",
+  "inputNeededNotifEnabled": true
 }
