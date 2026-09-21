@@ -188,7 +188,8 @@ picker.
 - Active position: `mw-active` on the item.
 - `mw-segmented-secondary` switches the active fill to the secondary colour,
   `mw-segmented-auto` shrinks the control to its content instead of filling the
-  row. `disabled` works on an item.
+  row - capped at `100%`, so labels wider than a 320px screen truncate instead
+  of pushing the row off it. `disabled` works on an item.
 - Items reach a 2.5rem minimum height on a coarse pointer.
 
 ## Cards
@@ -233,9 +234,10 @@ picker.
   below 360px, and the title, the subtitle and the body padding step up at
   420px. The image height is the one that still follows the window, because it
   is declared on the card itself and a container cannot query itself.
-- `mw-tile` works the same way, and so do `mw-stepper` and both timelines: the
-  step labels shrink and the two-sided timeline collapses to one side once the
-  component is narrow, whatever the window does. One catch on tiles: a tile
+- `mw-tile` works the same way, and so do `mw-stepper`, both timelines, the
+  gallery wrapper and the image slider: the step labels shrink and the two-sided
+  timeline collapses to one side once the component is narrow, whatever the
+  window does. One catch on tiles: a tile
   clips its overflow, and being a container makes it the containing block for
   `position: fixed`, so a `data-tooltip` **inside** a tile is cut off at its
   edge. Cards do not clip and are unaffected.
@@ -334,9 +336,9 @@ tag:
 ```
 
 - Everything in the row is sized in `em` off `--mw-price-size`, so
-  `mw-price-sm` (1.5rem) and `mw-price-lg` (3rem) move the whole row at once -
-  cents, unit and struck original included. Set the token yourself for any other
-  size.
+  `mw-price-xs` (1.3rem), `mw-price-sm` (1.5rem) and `mw-price-lg` (3rem) move
+  the whole row at once - cents, unit and struck original included. Set the
+  token yourself for any other size.
 - `mw-price-original` is muted **and** struck, and it takes its own line
   **above** the new price. Muted alone reads as a footnote; the line is what
   says this is no longer the price. The rule is drawn explicitly, because the
@@ -349,8 +351,8 @@ tag:
   baseline, not raised to the cap height - raised cents are a discounter's idiom
   and make a service price read cheaper than it is.
 - `mw-price-currency` and `mw-price-period` stop shrinking at 0.8rem, and
-  `mw-price-original` at 0.9rem. Below `mw-price-sm` the `em` chain would put
-  them under 12px, and that is the size most offer cards run at.
+  `mw-price-original` at 0.9rem. At `mw-price-xs` the `em` chain would put them
+  under 10px, which is where the floor earns its keep.
 - `mw-price-word` for "On request" or "Free" - bold, so it holds the same slot in
   a row of cards, but set well below a figure. Its line box is scaled back up to
   the amount's, so a word and a number in neighbouring cards land on one line.
@@ -359,12 +361,12 @@ tag:
 - A `mw-tag` or `mw-badge` placed directly in the row is centred against the
   digits rather than hung off their baseline.
 
-| Class             | What it does                                   |
-| ----------------- | ---------------------------------------------- |
-| `mw-price-sm/lg`  | Retunes `--mw-price-size`, everything follows  |
-| `mw-price-inline` | Old price in front of the new one, on one line |
-| `mw-price-center` | Centres the row                                |
-| `mw-price-plain`  | Body colour instead of the brand               |
+| Class               | What it does                                   |
+| ------------------- | ---------------------------------------------- |
+| `mw-price-xs/sm/lg` | Retunes `--mw-price-size`, everything follows  |
+| `mw-price-inline`   | Old price in front of the new one, on one line |
+| `mw-price-center`   | Centres the row                                |
+| `mw-price-plain`    | Body colour instead of the brand               |
 
 A struck-through price is a visual convention a screen reader does not pass on -
 `<s>` is announced by almost none of them. Wherever an old and a new price stand
@@ -588,43 +590,6 @@ Toggling is JS - see `references/javascript.md`; the shipped script keeps
 ## Modal
 
 ```html
-<div id="delete-modal" class="mw-modal-overlay">
-  <div class="mw-modal mw-modal-sm">
-    <div class="mw-modal-header">
-      <h4 class="mw-modal-title">Delete invoice</h4>
-      <button class="mw-modal-close" type="button">&#120299;</button>
-    </div>
-    <div class="mw-modal-body">
-      <p>Invoice 2026-0042 will be removed.</p>
-    </div>
-    <div class="mw-modal-footer">
-      <p class="mw-actions-note">This action cannot be undone.</p>
-      <button class="mw-btn mw-btn-outline">Cancel</button>
-      <button class="mw-btn mw-btn-danger">Delete</button>
-    </div>
-  </div>
-  <div class="mw-modal-backdrop"></div>
-</div>
-```
-
-- The overlay is `display: none` until `mw-modal-open` is added to it. That
-  class is the whole open/close mechanism.
-- Body scroll lock is automatic: the stylesheet uses
-  `body:has(.mw-modal-open)`. Nothing to implement.
-- Sizes: `mw-modal-sm` 370px, default 520px, `mw-modal-lg` 720px,
-  `mw-modal-xl` 960px. Height is capped at 80-92dvh, the body scrolls.
-- `mw-modal-backdrop` is the click-to-close surface; put the close handler on it.
-- `mw-modal-body` takes a `mw-form` directly - the form brings the field gaps,
-  the body brings the padding.
-- `mw-actions-note` is the muted line above the buttons - see below.
-
-Angular: `<div class="mw-modal-overlay" [class.mw-modal-open]="isOpen()">`.
-
-### The same modal as a `<dialog>`
-
-Same classes, no overlay wrapper and no backdrop element:
-
-```html
 <dialog id="delete-modal" class="mw-modal mw-modal-sm" closedby="any">
   <div class="mw-modal-header">
     <h4 class="mw-modal-title">Delete invoice</h4>
@@ -632,22 +597,58 @@ Same classes, no overlay wrapper and no backdrop element:
       &#120299;
     </button>
   </div>
-  <div class="mw-modal-body">…</div>
-  <div class="mw-modal-footer">…</div>
+  <div class="mw-modal-body">
+    <p>Invoice 2026-0042 will be removed.</p>
+  </div>
+  <div class="mw-modal-footer">
+    <p class="mw-actions-note">This action cannot be undone.</p>
+    <button class="mw-modal-close mw-btn mw-btn-outline">Cancel</button>
+    <button class="mw-btn mw-btn-danger">Delete</button>
+  </div>
 </dialog>
 ```
 
-- Escape, the focus trap, `inert` on the page behind it and the scroll lock all
-  come from the element. Prefer this shape for anything that asks a question.
+- Escape, the focus trap, `inert` on the page behind it and the body scroll lock
+  all come from the element. There is no overlay wrapper and no backdrop div.
 - Opened with `showModal()`, closed with `close()`. `main.js` wires the close
-  buttons and exposes `mwOpenModal(id)` / `mwCloseModal(id)`, both of which take
-  either shape. A trigger can also carry `data-mw-modal="delete-modal"`.
+  buttons and exposes `mwOpenModal(id)` / `mwCloseModal(id)`; a trigger can also
+  carry `data-mw-modal="delete-modal"` and needs no script at all.
 - `closedby="any"` dismisses it on a backdrop click; where that attribute is not
-  understood the script handles the click instead.
-- Sizes, the bottom sheet below 576px and every `mw-modal-*` part behave exactly
-  as above - those rules are class-based.
+  understood yet the script handles the click instead.
+- Sizes: `mw-modal-sm` 370px, default 520px, `mw-modal-lg` 720px,
+  `mw-modal-xl` 960px. Height is capped at 80-92dvh, the body scrolls. Below
+  576px it becomes a bottom sheet.
+- `mw-modal-close` is the hook, not a look: on the header X it styles the button,
+  on a footer action it only closes. Combine it with `mw-btn mw-btn-primary` and
+  the button keeps its own paint.
+- `mw-modal-body` takes a `mw-form` directly - the form brings the field gaps,
+  the body brings the padding.
+- `mw-actions-note` is the muted line above the buttons - see below.
+- Name it with `aria-labelledby` pointing at the `mw-modal-title`; `role` and
+  `aria-modal` come from `showModal()`. Without `autofocus` the browser focuses
+  the first focusable element, usually the close button.
 
-Angular: bind nothing, call `showModal()` on a `viewChild` ref.
+Angular: `[open]="isOpen()"` does **not** work - the attribute opens a non-modal
+dialog with no top layer, backdrop or focus trap. It takes a directive calling
+`showModal()`, see `examples/angular-services.md`.
+
+### The older overlay div
+
+Still styled, for markup that predates the `<dialog>` above. It cannot trap
+focus or make the page inert, so it is not what to write now.
+
+```html
+<div id="delete-modal" class="mw-modal-overlay">
+  <div class="mw-modal mw-modal-sm">…</div>
+  <div class="mw-modal-backdrop"></div>
+</div>
+```
+
+- `display: none` until `mw-modal-open` is added to the overlay - that class is
+  the whole open/close mechanism, in Angular
+  `[class.mw-modal-open]="isOpen()"`.
+- Body scroll lock comes from `body:has(.mw-modal-open)`.
+- `mw-modal-backdrop` is the click-to-close surface; put the handler on it.
 
 ## Alerts & toasts
 
@@ -890,26 +891,26 @@ a half-width column wraps on a desktop too.
 </div>
 ```
 
-| Class                     | Role                                                                                     |
-| ------------------------- | ---------------------------------------------------------------------------------------- |
-| `mw-kanban`               | Board. Grid, one column per lane, same width for all of them                             |
-| `mw-kanban-plain`         | Board without its own surface or padding - for a board that already sits on a panel      |
-| `mw-kanban-compact`       | Tighter padding, description clamped to 2 lines instead of 4, lane floor 90px            |
-| `mw-kanban-column`        | Lane: dashed border, flex column                                                         |
-| `mw-kanban-column-header` | Title + counter + add button in one row                                                  |
-| `mw-kanban-title`         | Lane title, uppercase, truncates                                                         |
-| `mw-kanban-count`         | Ticket counter pill                                                                      |
-| `mw-kanban-add`           | Sits **on** `mw-btn` - only trims it to the header line height                           |
-| `mw-kanban-column-body`   | Ticket stack; fills the lane so the empty state stays centred                            |
-| `mw-kanban-card`          | Ticket. Needs `mw-card` next to it                                                       |
-| `mw-kanban-card-title`    | Ticket title                                                                             |
-| `mw-kanban-card-text`     | Description, clamped to 4 lines (2 on a compact board)                                   |
-| `mw-kanban-card-footer`   | Rule + key on the left, avatar and actions on the right                                  |
-| `mw-kanban-card-id`       | Ticket key, monospaced so equal-length keys line up across cards                         |
-| `mw-kanban-card-actions`  | Right-hand group; resets the avatar margin                                               |
-| `mw-kanban-action`        | 26px square icon button (32px below `md`), `mw-kanban-action-danger` turns the hover red |
-| `mw-kanban-empty`         | Placeholder; hides itself as soon as the lane holds a ticket or an open composer         |
-| `mw-kanban-card-in`       | One-shot entry animation for a freshly created ticket                                    |
+| Class                     | Role                                                                                                             |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `mw-kanban`               | Board. Grid, one column per lane, same width for all of them                                                     |
+| `mw-kanban-plain`         | Board without its own surface or padding - for a board that already sits on a panel                              |
+| `mw-kanban-compact`       | Tighter padding, description clamped to 2 lines instead of 4, lane floor 90px                                    |
+| `mw-kanban-column`        | Lane: dashed border, flex column                                                                                 |
+| `mw-kanban-column-header` | Title + counter + add button in one row                                                                          |
+| `mw-kanban-title`         | Lane title, uppercase, truncates                                                                                 |
+| `mw-kanban-count`         | Ticket counter pill                                                                                              |
+| `mw-kanban-add`           | Sits **on** `mw-btn` - only trims it to the header line height                                                   |
+| `mw-kanban-column-body`   | Ticket stack; fills the lane so the empty state stays centred                                                    |
+| `mw-kanban-card`          | Ticket. Needs `mw-card` next to it                                                                               |
+| `mw-kanban-card-title`    | Ticket title                                                                                                     |
+| `mw-kanban-card-text`     | Description, clamped to 4 lines (2 on a compact board)                                                           |
+| `mw-kanban-card-footer`   | Rule + key on the left, avatar and actions on the right                                                          |
+| `mw-kanban-card-id`       | Ticket key, monospaced so equal-length keys line up across cards                                                 |
+| `mw-kanban-card-actions`  | Right-hand group; resets the avatar margin                                                                       |
+| `mw-kanban-action`        | 26px square icon button (32px below `md`, hit area grown to 44px), `mw-kanban-action-danger` turns the hover red |
+| `mw-kanban-empty`         | Placeholder; hides itself as soon as the lane holds a ticket or an open composer                                 |
+| `mw-kanban-card-in`       | One-shot entry animation for a freshly created ticket                                                            |
 
 - **Priority is the regular `mw-card-ribbon`** and brings its own colour through
   `mw-card-addon-danger|warning|info`. It has to be a **direct child** of the
@@ -1472,6 +1473,81 @@ deprecated). Any card fits into the content wrapper.
   across it. Nothing to switch on. It is skipped on `mw-avatar-initials`, on
   touch, under `prefers-reduced-motion` and under `mw-hover-static`.
 
+## Date stamp
+
+The date on a dated card - an event, a changelog entry, a day on a menu. It
+answers to the **card**, not the viewport: narrow, it is a muted line above the
+title; once the card is wide enough that a single column would leave its right
+half empty, the same markup becomes a column on the left.
+
+```html
+<article class="mw-card mw-offer">
+  <div class="mw-card-body">
+    <p class="mw-date-stamp mw-date-stamp-today">
+      <span class="mw-date-stamp-day">Fri</span>
+      <span class="mw-date-stamp-date">18.09.</span>
+    </p>
+    <div class="mw-date-stamp-body">
+      <h4 class="mw-text-base mw-text-bold mw-mb-2">Baked fish fillet</h4>
+      <p class="mw-text-sm mw-text-muted mw-mb-0">In beer batter.</p>
+    </div>
+    <p class="mw-price mw-price-xs">
+      <span class="mw-price-amount">11.90</span>
+      <span class="mw-price-currency">Euro</span>
+    </p>
+  </div>
+</article>
+```
+
+- `mw-date-stamp-body` wraps everything that is not the stamp or the price. It
+  is `display: contents` on a narrow card, so the body still sees the title and
+  the price as its own children - which is what `mw-offer` selects on. On a wide
+  card it becomes the middle column.
+- The price is a **sibling** of the wrapper, not inside it. Give the card one
+  and it gets a third column at the right edge; leave it out and the card is two
+  columns. With more than one dish per card, put the price on a
+  `mw-leader-row` with the dish instead - an empty third track would still
+  charge the card a gap.
+- Write the day as `Fri`, not `FRI` - the uppercase is `text-transform`, so a
+  screen reader still reads a word rather than three letters.
+- Day column width, day font size, the column gap and the card's block padding
+  all ramp with the **card**, from 420px to 900px wide, via
+  `fluid-container()`. A narrow card in a wide window gets narrow-card sizing -
+  which is the point of putting the switch in a container query at all.
+- `mw-date-stamp-today` drops the muting for a **fill**: on a wide card it spans
+  the full card height, rounded to the card's own left corners and cut square
+  against the content. A text colour would compete with the price, which is
+  already the brand colour.
+- Cards in a stack want `mw-grid-even` next to `mw-grid-1`, or the card with the
+  longer description ends up taller than the rest of the week.
+
+## Contact
+
+How to reach someone - postal address, phone, mail. It belongs on an
+`<address>`, and undoing that element's italics is most of what the component
+does; the rest is a label column wide enough that the values line up.
+
+```html
+<address class="mw-contact">
+  <p class="mw-text-bold">Gasthaus Lamm</p>
+  <p>Marktplatz 3<br />72622 Musterhausen</p>
+  <p class="mw-contact-row">
+    <span class="mw-contact-label">Phone</span>
+    <a class="mw-link" href="tel:+497123456789">07123 456789</a>
+  </p>
+</address>
+```
+
+- `<address>` is for the contact details of its nearest `<article>` or of the
+  page - not for any postal address that happens to be on it.
+- The label column is 5rem and fixed. An auto column is as wide as its own word,
+  so "Phone" and "Email" would start their values in different places.
+- Wrap phone and mail in `tel:` and `mailto:` links and mark them `mw-link` -
+  in a block of plain lines an unstyled link reads as text.
+- Opening hours are **not** part of this. A day, its times and a line between
+  them is a `mw-leader-row` in a `<dl>`, one row per day, and a note for the
+  rest.
+
 ## Item lists
 
 Layout containers for arbitrary children - the children need no classes.
@@ -1531,6 +1607,43 @@ The `mw-checkbox` inside is the ordinary form-element checkbox, so
 rest, see `references/forms.md`) work here too. Row height is a list concern -
 use the list's own `-compact` / `-large` modifiers rather than
 `mw-checkbox-sm` / `-lg`, which sit on the wrong element to reach the box.
+
+## Leader row
+
+A label on the left, its value on the right, a dotted line bridging the gap -
+the row a menu, a table of contents and an invoice all draw. The markup is two
+spans; the line is the row's own `::before`, so it stays out of the
+accessibility tree and no filler element needs `aria-hidden`.
+
+```html
+<p class="mw-leader-row mw-leader-row-top">
+  <span class="mw-leader-row-label mw-text-bold">Roast pork with dumpling</span>
+  <span class="mw-leader-row-value mw-text-bold mw-text-primary">17.50</span>
+</p>
+```
+
+- Label and value is what `<dl>` is for, and since HTML 5.2 a `<div>` may group
+  a `<dt>` and its `<dd>` inside one - so the semantic version costs no extra
+  element over the `<p>`. Put `mw-leader-row` on that `<div>`. Use it where the
+  pair **is** the content; where every row also carries a description, a `<p>`
+  stays simpler.
+- `mw-leader-row-top` keeps the value beside the **first** line of a wrapping
+  label instead of the last. On a menu that is where the price belongs - next to
+  the dish, not somewhere down in its description.
+- A second `mw-leader-row-value` needs no extra class. Both sit after the
+  leader, with a mark in the leader's colour between them - "11.30 - 14.00 |
+  17.00 - 23.00". Without it the pair reads as one long range.
+- Values are set in tabular figures and never break, so a column of them lines
+  up. The label wraps between its words and stops at its longest one; past that
+  the whole row wraps, with the values dropping under the label. Nothing shrinks
+  to one letter per line.
+- Keep `mw-price` out of a leader row: it sets its own baseline and the leader
+  would no longer meet it. Plain text in the value span, or the price in a
+  column of its own.
+
+`mw-leader-row-dashed` and `mw-leader-row-solid` swap the line style; a single
+row retunes with `--mw-leader-row-color`, `--mw-leader-row-style` and
+`--mw-leader-row-width`.
 
 ## HTML lists
 
@@ -1645,7 +1758,14 @@ variants apply to it too), `mw-divider-vertical` needs a flex row with a height.
 
 The dots (`mw-gallery-dot`, active one gets `mw-active`) are generated by the
 shipped JS, as is the track transform. In a SPA, render the dots and set
-`transform: translateX(...)` yourself.
+`transform: translateX(...)` yourself. Swipe is single-finger and decided by the
+dominant axis, so a page scroll that drifts sideways does not page the gallery.
+
+`mw-gallery-container` is a query container (`mw-gallery`), and the caption size,
+the dot size and the 4:3 crop follow _its_ width - 688px and 512px - not the
+viewport. A gallery in a half-width column therefore takes its narrow layout
+there. Keep the wrapper: a container query only reaches descendants, and the
+caption and the dots are siblings of `mw-gallery`.
 
 `mw-image-slider` swaps a base image against overlays through indexed buttons:
 
@@ -1666,7 +1786,10 @@ shipped JS, as is the track transform. In a SPA, render the dots and set
 ```
 
 Control grids: `mw-image-slider-controls-grid-2`, `-grid-3`. Visible overlay and
-current button carry `active`.
+current button carry `active`. `mw-image-slider` is its own query container
+(`mw-slider`): the three heights (250 / 320 / 370px) and the control columns
+switch at 420px and 560px of slider width, because the slider caps at 600px and
+past a tablet the viewport says nothing about the room it has.
 
 ## Blog post
 
@@ -1809,7 +1932,9 @@ is no highlighting engine - wrap spans yourself or plug in Prism/highlight.js.
 </div>
 ```
 
-`mw-techstack-item-sm` is the logo-only chip; the info block is optional.
+`mw-techstack-item-sm` is the logo-only chip; the info block is optional. On a
+coarse pointer the chip itself grows from 32px to 2.5rem - it often carries a
+`data-tooltip`, which owns the pseudo-element a grown hit area would need.
 
 ## Coming soon
 

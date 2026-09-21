@@ -248,40 +248,44 @@ export class InvoiceListComponent {
 </div>
 }
 
-<!-- Delete confirmation -->
-<div class="mw-modal-overlay" [class.mw-modal-open]="toDelete() !== null">
-  <div class="mw-modal mw-modal-sm">
-    <div class="mw-modal-header">
-      <h4 class="mw-modal-title">Delete invoice</h4>
-      <button type="button" class="mw-modal-close" (click)="toDelete.set(null)">
-        &#120299;
-      </button>
-    </div>
-    <div class="mw-modal-body">
-      <p class="mw-text-center">
-        <strong>Delete {{ toDelete()?.number }}?</strong>
-      </p>
-      <p class="mw-text-center mw-text-muted">This action cannot be undone.</p>
-    </div>
-    <div class="mw-modal-footer">
-      <button
-        type="button"
-        class="mw-btn mw-btn-outline"
-        (click)="toDelete.set(null)"
-      >
-        Cancel
-      </button>
-      <button
-        type="button"
-        class="mw-btn mw-btn-danger"
-        (click)="confirmDelete()"
-      >
-        <i class="fas fa-trash"></i> Delete
-      </button>
-    </div>
+<!-- Delete confirmation - ModalDirective is in angular-services.md -->
+<dialog
+  class="mw-modal mw-modal-sm"
+  closedby="any"
+  appModal
+  [isOpen]="toDelete() !== null"
+  (dismiss)="toDelete.set(null)"
+  aria-labelledby="delete-title"
+>
+  <div class="mw-modal-header">
+    <h4 class="mw-modal-title" id="delete-title">Delete invoice</h4>
+    <button type="button" class="mw-modal-close" (click)="toDelete.set(null)">
+      &#120299;
+    </button>
   </div>
-  <div class="mw-modal-backdrop" (click)="toDelete.set(null)"></div>
-</div>
+  <div class="mw-modal-body">
+    <p class="mw-text-center">
+      <strong>Delete {{ toDelete()?.number }}?</strong>
+    </p>
+    <p class="mw-text-center mw-text-muted">This action cannot be undone.</p>
+  </div>
+  <div class="mw-modal-footer">
+    <button
+      type="button"
+      class="mw-btn mw-btn-outline"
+      (click)="toDelete.set(null)"
+    >
+      Cancel
+    </button>
+    <button
+      type="button"
+      class="mw-btn mw-btn-danger"
+      (click)="confirmDelete()"
+    >
+      <i class="fas fa-trash"></i> Delete
+    </button>
+  </div>
+</dialog>
 ```
 
 ## Notes
@@ -298,7 +302,8 @@ export class InvoiceListComponent {
   sits left while the figures sit right.
 - **`mw-tag`, not `mw-tags`**, for a single status chip in a cell.
 - **`mw-btn-danger` for the destructive action** in the modal footer.
-- The modal is always in the DOM and toggled through `mw-modal-open`; the body
-  scroll lock happens automatically via `body:has(.mw-modal-open)`.
+- The modal is always in the DOM; `ModalDirective` calls `showModal()` when the
+  signal turns true, and Escape, the focus trap and the scroll lock follow from
+  the element.
 - The toast stack lives in the app shell, not on this page - see
   `angular-services.md`.

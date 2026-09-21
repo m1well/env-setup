@@ -220,6 +220,11 @@ colima_restart() {
   colima stop --force && colima start --cpu 4 --memory 4 --disk 50 --vm-type vz
 }
 
+# kill all astro dev server
+astrokill() {
+  pkill -f 'astro\.mjs (dev|preview)' && echo "done" || echo "there was nothing running";
+}
+
 # get a random chuck norris joke one of a given category
 chucknorris() {
   if [ $# -ne 0 ] ; then

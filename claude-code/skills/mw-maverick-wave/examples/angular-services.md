@@ -159,45 +159,94 @@ from the signal is cleaner.
 
 ## Modal
 
-No service needed - the overlay is toggled by one class and the body scroll lock
-is pure CSS (`body:has(.mw-modal-open)`).
+A `<dialog>` with the same `mw-modal` classes. Escape, the focus trap, the inert
+page behind it and the body scroll lock all come from the element, so what is
+left to write is opening it.
+
+`[open]="isOpen()"` does **not** work: the attribute opens a non-modal dialog -
+no top layer, no backdrop, no focus trap. It has to be `showModal()`, which
+needs a directive.
+
+```ts
+@Directive({
+  selector: 'dialog[appModal]',
+  host: {
+    '(close)': 'onClose()',
+    '(click)': 'onClick($event)',
+  },
+})
+export class ModalDirective {
+  readonly isOpen = input(false);
+  /** the dialog closed itself - Escape, a backdrop click or a form submit */
+  readonly dismiss = output<void>();
+
+  private readonly host =
+    inject<ElementRef<HTMLDialogElement>>(ElementRef).nativeElement;
+
+  constructor() {
+    const isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+
+    effect(() => {
+      const open = this.isOpen();
+      if (!isBrowser) return;
+      if (open && !this.host.open) this.host.showModal();
+      else if (!open && this.host.open) this.host.close();
+    });
+  }
+
+  // Only when the dialog closed itself - closing it through the signal already
+  // went through whatever set the signal, and reporting that back would run the
+  // caller's dismiss handler a second time.
+  protected onClose(): void {
+    if (this.isOpen()) this.dismiss.emit();
+  }
+
+  // A click on the dialog element is a click on its backdrop; the content sits
+  // in .mw-modal-header/body/footer inside it. Stands in for `closedby="any"`
+  // where that is not supported yet.
+  protected onClick(event: MouseEvent): void {
+    if (event.target === this.host) this.host.close();
+  }
+}
+```
 
 ```ts
 @Component({
   selector: 'app-confirm-dialog',
+  imports: [ModalDirective],
   template: `
-    <div class="mw-modal-overlay" [class.mw-modal-open]="open()">
-      <div class="mw-modal mw-modal-sm">
-        <div class="mw-modal-header">
-          <h4 class="mw-modal-title">{{ title() }}</h4>
-          <button
-            type="button"
-            class="mw-modal-close"
-            (click)="cancelled.emit()"
-          >
-            &#120299;
-          </button>
-        </div>
-        <div class="mw-modal-body"><ng-content /></div>
-        <div class="mw-modal-footer">
-          <button
-            type="button"
-            class="mw-btn mw-btn-outline"
-            (click)="cancelled.emit()"
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            class="mw-btn mw-btn-danger"
-            (click)="confirmed.emit()"
-          >
-            Delete
-          </button>
-        </div>
+    <dialog
+      class="mw-modal mw-modal-sm"
+      closedby="any"
+      appModal
+      [isOpen]="open()"
+      (dismiss)="cancelled.emit()"
+      aria-labelledby="confirm-title"
+    >
+      <div class="mw-modal-header">
+        <h4 class="mw-modal-title" id="confirm-title">{{ title() }}</h4>
+        <button type="button" class="mw-modal-close" (click)="cancelled.emit()">
+          &#120299;
+        </button>
       </div>
-      <div class="mw-modal-backdrop" (click)="cancelled.emit()"></div>
-    </div>
+      <div class="mw-modal-body"><ng-content /></div>
+      <div class="mw-modal-footer">
+        <button
+          type="button"
+          class="mw-btn mw-btn-outline"
+          (click)="cancelled.emit()"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="mw-btn mw-btn-danger"
+          (click)="confirmed.emit()"
+        >
+          Delete
+        </button>
+      </div>
+    </dialog>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -208,6 +257,19 @@ export class ConfirmDialogComponent {
   readonly cancelled = output<void>();
 }
 ```
+
+`role="dialog"` and `aria-modal` come from `showModal()`; the title is named
+with `aria-labelledby`. Without `autofocus` on something the browser focuses the
+first focusable element, usually the close button - put it on the field or the
+safe action instead.
+
+In tests, jsdom implements none of `<dialog>` - not `showModal`, `show` or
+`close`, only the `open` attribute reflects. Specs that render an open modal
+fail with `showModal is not a function` until a setup file adds them.
+
+The `mw-modal-overlay` div toggled by `mw-modal-open` is still styled, for
+markup that predates this - it cannot trap focus or make the page inert, so it
+is not what to write now.
 
 ## Accordion
 
@@ -285,8 +347,10 @@ export class FaqComponent {
 
 ## Header with mobile navigation
 
-The drawer needs `open` on **both** the burger button and the navbar. Close it
-on every navigation.
+The panel needs `open` on **both** the burger button and the navbar, plus
+`mw-nav-open` on the `<body>` - the scrim, the scroll lock and the rules that
+hold the bar and the burger in place all key off that one class, and nothing in
+the template can reach the body element. Close it on every navigation.
 
 ```ts
 @Component({
@@ -344,8 +408,11 @@ on every navigation.
 })
 export class HeaderComponent {
   protected readonly menuOpen = signal(false);
+  private readonly body = inject(DOCUMENT).body;
 
   constructor(router: Router) {
+    effect(() => this.body.classList.toggle('mw-nav-open', this.menuOpen()));
+
     router.events
       .pipe(
         filter((e) => e instanceof NavigationEnd),

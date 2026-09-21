@@ -42,20 +42,26 @@ Load the one you need - do not read them all up front.
 ### Plain HTML / CDN
 
 ```html
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+/>
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/maverick-wave@5.12.0/maverick-wave.min.css"
+  href="https://cdn.jsdelivr.net/npm/maverick-wave@5/maverick-wave.min.css"
 />
 <link
   rel="stylesheet"
   href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
 />
 ...
-<script src="https://cdn.jsdelivr.net/npm/maverick-wave@5.12.0/maverick-wave.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/maverick-wave@5/maverick-wave.min.js"></script>
 ```
 
-Pin the version. The JS file is optional and only for server-rendered/static pages -
-see below.
+`@5` keeps this snippet current; in a real project pin the exact version so a
+build stays reproducible. The JS file is optional and only for
+server-rendered/static pages - see below. `viewport-fit=cover` is not optional -
+see pitfall 30.
 
 ### Angular (or any SPA)
 
@@ -66,7 +72,8 @@ see below.
 ```
 
 Or from the npm package via SCSS: `@use 'maverick-wave/src/scss/main';`
-(details and configuration in `references/theming.md`).
+(details and configuration in `references/theming.md`). The viewport meta above
+belongs in `src/index.html` there, with `viewport-fit=cover` just the same.
 
 > **Never load `maverick-wave.min.js` in a SPA.** Everything in it is wired up
 > once on `DOMContentLoaded` and writes straight into the DOM. In an Angular
@@ -119,12 +126,12 @@ The classes that mean something _other_ than "on" keep their own names:
 | Component                                    | State class                                              |
 | -------------------------------------------- | -------------------------------------------------------- |
 | Anything switchable, "on"                    | `mw-active` (`active` deprecated)                        |
-| Burger button + navbar drawer                | `open` (no prefix)                                       |
+| Burger button + navbar panel                 | `open` (no prefix), plus `mw-nav-open` on `<body>`       |
 | Stepper indicator / label / connector / step | `mw-active`, `mw-done`                                   |
 | Checkbox list item (`li`)                    | `mw-selected`                                            |
 | Calendar day, picked                         | `mw-selected`                                            |
 | Kanban ticket being edited                   | `mw-kanban-editing`                                      |
-| Modal overlay                                | `mw-modal-open`                                          |
+| Modal, older overlay div                     | `mw-modal-open` (a `<dialog>` carries `open` itself)     |
 | Alert, dismissing / dismissed                | `mw-alert-closing` → `mw-alert-closed` (`display: none`) |
 | Field wrapper in error                       | `mw-field-has-error`                                     |
 | Single form control in error                 | `mw-form-element-error`                                  |
@@ -148,7 +155,12 @@ keys at all (negative gap is invalid CSS and is not generated).
 
 **Font sizes** (`mw-text-3xs` … `mw-text-6xl`): `3xs` 0.6, `2xs` 0.7, `xs` 0.8,
 `sm` 0.9, `base` 1, `md` 1.1, `lg` 1.3, `xl` 1.5, `2xl` 1.8, `3xl` 2.2, `4xl` 2.5,
-`5xl` 3, `6xl` 4.3 rem.
+`5xl` 3, `6xl` 4.3 rem. The utility classes are single steps; `h1`, `h2`,
+`mw-section-title` and `mw-section-subtitle` interpolate instead - `h1` runs
+`3xl` to `5xl` between 375px and 768px, `h2` `2xl` to `4xl`, the two section
+headings one step each up to 576px. The endpoints are the values the old
+breakpoint steps had, so a phone and a desktop look the same and only the widths
+between them moved.
 
 **Breakpoints**: `xs` 375, `sm` 576, `md` 768, `lg` 992, `xl` 1200, `2xl` 1400 px.
 Column grids and most components are mobile-first. The mixins emit range syntax
@@ -213,6 +225,25 @@ the same height by construction. Buttons run one font step above the fields.
 `--mw-focus-halo-opacity` 28% for the soft ring a form field gets instead of a
 hard outline. SCSS: `@include focus-ring`, `focus-ring-inset`, `field-focus`.
 
+**SCSS helpers** - `@use 'maverick-wave/src/scss/abstracts' as *` brings them in;
+none of them survive into the compiled CSS. Full list in `references/theming.md`.
+
+- `fluid($min, $max, $from: 'xs', $to: 'md')` - a clamp between two sizes, each
+  end a key of `$font-sizes` or a plain rem/px length. The rem term is the
+  point: a vw-only clamp ignores the reader's font size and stops responding to
+  zoom. A headline passes `$to: 'xl'`.
+- `fluid-container($min, $max, $from, $to)` - the same ramp in `cqi` against the
+  container. Use it instead of `fluid()` inside a `@container` block.
+- `media-up($bp)` / `media-down($bp)` - the breakpoint map as a query.
+- `touch-context($bp: 'md')` - coarse pointer _or_ narrow viewport, the condition
+  every target-size rule in the framework hangs under.
+- `touch-floor($size: 2.75rem)` - that condition plus a `min-height`.
+- `hit-area($grow: 6px, $box: 1.5rem)` - grows the hit area through `::after`
+  without touching the silhouette. An element carrying a `data-tooltip` owns that
+  pseudo for its arrow, so those are skipped and grow to `$box` instead.
+- `hover` / `hover-move`, `focus-ring`, `focus-ring-inset`, `field-focus`,
+  `truncate`, `surface`.
+
 ## Component index
 
 Everything below is documented in `references/components.md` unless marked otherwise.
@@ -226,10 +257,13 @@ Everything below is documented in `references/components.md` unless marked other
 **Containers** `mw-card` (+ `simple`, `lg`, `xl`, `stack`, badge, ribbon,
 feature frame) ·
 `mw-panel` · `mw-tile` · `mw-accordion` · `mw-tabs` · `mw-modal` ·
-`mw-item-list` family · `mw-offer` (+ `-head`, `-name`)
+`mw-item-list` family · `mw-offer` (+ `-head`, `-name`) ·
+`mw-leader-row` (+ `-label`, `-value`, `-top`, `-dashed`, `-solid`) ·
+`mw-date-stamp` (+ `-day`, `-date`, `-body`, `-today`) ·
+`mw-contact` (+ `-row`, `-label`)
 
 **Pricing** `mw-price` (+ `-amount`, `-fraction`, `-currency`, `-original`,
-`-period`, `-word`, `-note`, `sm`/`lg`, `inline`, `center`, `plain`)
+`-period`, `-word`, `-note`, `xs`/`sm`/`lg`, `inline`, `center`, `plain`)
 
 **Data & status** `mw-table` (+ `subtle`, `sticky-head`, `cards`, `compact`,
 `hover`, responsive wrappers) · `mw-kanban` (+ `plain`, `compact`) ·
@@ -243,8 +277,8 @@ feature frame) ·
 `-highlight`, `-static`, color variants) · `mw-empty-state` ·
 `mw-spinner-border` / `mw-spinner-dots` / `mw-spinner-dual-ring` · `mw-skeleton`
 
-**Navigation** `mw-header` (+ `mw-header-reveal`) + `mw-navbar` ·
-`mw-breadcrumbs` · `mw-pagination` ·
+**Navigation** `mw-header` (+ `mw-header-reveal`, `mw-header-keep`) +
+`mw-navbar` · `mw-breadcrumbs` · `mw-pagination` ·
 `mw-dropdown` (+ `-menu`, `-item`, `-item-danger`, `-divider`, `-label`,
 `-caret`, `-end`, `-up`) · `mw-lang-switch` (+ `-code`, `-name`, `-check`,
 `inverted`) · `mw-flag` (+ 23 country codes) ·
@@ -261,8 +295,10 @@ feature frame) ·
 `mw-input-group` · `mw-prefilled` · `mw-form` / `mw-form-group` /
 `mw-form-actions` · `mw-login`
 
-**Layout** (`references/layout.md`) `mw-main` · `mw-container` · `mw-content` ·
-`mw-section` (+ `mw-section-intro`) · `mw-page-header` · `mw-grid-*` ·
+**Layout** (`references/layout.md`) `mw-main` · `mw-container` (+ `-narrow`) ·
+`mw-content` ·
+`mw-section` (+ `mw-section-intro`) · `mw-page-header` · `mw-grid-*`
+(+ `mw-grid-even`) ·
 `mw-columns-2/3` · `mw-row-split` · `mw-hero` (+ `mw-scroll-hint`, `-end`) ·
 `mw-parallax` (+ `-media`, `-content`, `-dimmed`, `-sticky`, `-rise`,
 `-slow`, `-pattern`) · `mw-footer`
@@ -323,8 +359,13 @@ feature frame) ·
     44px, and list rows / menu items / pager pages / accordion headers 2.75rem.
     `mw-btn-mini` keeps its 18px circle - it sits in tag rows and table cells
     where a bigger one would shift the layout - and grows its _hit area_ to 28px
-    via a pseudo-element. Nothing to switch on, and no reason to write the media
-    query again in an app.
+    via a pseudo-element, and `mw-kanban-action` does the same - its 32px box
+    stays and the hit area around it reaches 44px.
+    `mw-techstack-item-sm` takes a real 2.5rem minimum instead, because half of
+    those chips carry a `data-tooltip` and that owns the pseudo-element.
+    Nothing to switch on, and no reason to write the media query again in an
+    app: your own control gets `@include touch-floor` for a height or
+    `@include hit-area` where the size is the design.
 12. **`mw-empty-state` has a `-desc`, not a `-text`.** The parts are
     `mw-empty-state-icon`, `-title`, `-desc`, plus the size variant
     `mw-empty-state-sm`. Invented names fail silently, as always.
@@ -360,7 +401,11 @@ feature frame) ·
 18. **Never write `box-shadow` by hand.** Use `var(--mw-elevation-1..5)` or the
     `mw-elevation-*` class. A hand-rolled shadow is the wrong colour in one of
     the two themes - the dark theme's shadow is a light rim over a dark contact
-    layer, not a black blur.
+    layer, not a black blur. The one place the ramp is wrong is a shadow that
+    lands on a picture instead of on a theme surface: its light-theme layers are
+    cut for paper and vanish over a photograph. That is why the edge after a
+    parallax block carries fixed values, and why `mw-parallax-dimmed` hardcodes
+    its brightness and text-shadow.
 19. **Never write a duration or an easing curve by hand** either. Use
     `var(--mw-transition)` for a hover or focus state,
     `var(--mw-transition-fast)` for something that should feel instant, and
@@ -427,3 +472,23 @@ feature frame) ·
     `mw-parallax-media` child stay where the image is: on the container. Same
     split for `mw-parallax-slow`, and `--mw-parallax-slow-travel` goes with the
     class on the section - on the inner block it never reaches the animation.
+    That same sibling rule also puts an upward shadow on the one section
+    directly after the block, so the overlap reads as a surface and not a cut.
+    It sits at `:where()` weight, so a plain `box-shadow` of your own on that
+    section replaces it.
+30. **`viewport-fit=cover` belongs in the viewport meta.** The container
+    gutter, the mobile nav panel and the modal padding all budget for the
+    cutout with `env(safe-area-inset-*)`, and iOS resolves every one of those
+    to `0` without it - on a notched phone the content then sits under the
+    rounded corner. Nothing errors, which is why the shipped JS writes a
+    console warning on localhost when the meta is missing.
+31. **Half the layout reads its own width, not the viewport.** `mw-card`,
+    `mw-tile`, `mw-stepper`, both timelines and - since 5.13.0 -
+    `mw-gallery-container` and `mw-image-slider` are `@container` queries, so
+    any of them in a half-width column takes its narrow layout there while the
+    window is still a desktop. Two consequences: the query only reaches
+    _descendants_, which is why the gallery wrapper around `mw-gallery`,
+    `mw-gallery-desc` and `mw-gallery-dots` cannot be dropped; and
+    `container-type: inline-size` computes the width as if the element were
+    empty, so one dropped into a flex or grid slot needs a width - the
+    framework sets `width: 100%` on its own containers already.
