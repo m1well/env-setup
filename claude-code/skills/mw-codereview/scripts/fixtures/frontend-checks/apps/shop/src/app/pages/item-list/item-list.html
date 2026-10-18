@@ -1,0 +1,9 @@
+<h1>Items</h1>
+@for (item of state.items(); track item) {
+  <app-item-row [id]="item" (removed)="state.remove($event)" />
+  <app-item-row [id]="item" (removed)="state.hide($event)" />
+  <app-confirm-row [id]="item" (deleted)="state.remove($event)" />
+} @empty {
+  <p>No items yet.</p>
+}
+<app-order-lines />

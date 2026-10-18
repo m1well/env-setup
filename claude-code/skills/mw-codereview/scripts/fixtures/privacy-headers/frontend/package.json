@@ -1,0 +1,1 @@
+{ "name": "praxis", "dependencies": { "@angular/core": "21.0.0", "@angular/common": "21.0.0", "@sentry/angular": "9.0.0" } }

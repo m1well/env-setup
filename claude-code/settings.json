@@ -43,7 +43,8 @@
       "Bash(npx ng build:*)",
       "Bash(docker ps:*)",
       "Bash(docker compose ps:*)",
-      "Bash(docker logs:*)"
+      "Bash(docker logs:*)",
+      "Bash(npx astro dev:*)"
     ],
     "deny": [
       "Bash(rm -rf:*)",
@@ -83,7 +84,7 @@
     "defaultMode": "acceptEdits",
     "blockReadsOutsideWorkingDirectories": false
   },
-  "model": "opus[1m]",
+  "model": "opus",
   "hooks": {
     "UserPromptSubmit": [
       {
@@ -152,6 +153,18 @@
           }
         ]
       }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "^(startup|resume|clear|compact|fork)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash '/Users/m1well/.claude/hooks/herdr-agent-state.sh' session",
+            "timeout": 10
+          }
+        ]
+      }
     ]
   },
   "statusLine": {
@@ -161,6 +174,15 @@
   },
   "language": "german",
   "effortLevel": "xhigh",
+  "modelSettings": {
+    "claude-fable-5-1": {
+      "effortLevel": "high"
+    },
+    "claude-opus-5-5": {
+      "effortLevel": "xhigh"
+    }
+  },
   "theme": "dark",
-  "inputNeededNotifEnabled": true
+  "inputNeededNotifEnabled": true,
+  "agentPushNotifEnabled": true
 }

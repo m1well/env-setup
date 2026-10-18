@@ -1,0 +1,48 @@
+{
+  "realm": "saas",
+  "sslRequired": "external",
+  "bruteForceProtected": true,
+  "organizationsEnabled": true,
+  "clients": [
+    {
+      "clientId": "saas-app",
+      "publicClient": true,
+      "redirectUris": [
+        "https://app.acme.io/*"
+      ],
+      "attributes": {
+        "pkce.code.challenge.method": "S256"
+      },
+      "protocolMappers": [
+        {
+          "name": "tenant",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "config": {
+            "user.attribute": "tenant_id",
+            "claim.name": "tenant_id"
+          }
+        },
+        {
+          "name": "plan",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "config": {
+            "user.attribute": "plan",
+            "claim.name": "plan"
+          }
+        }
+      ]
+    }
+  ],
+  "components": {
+    "org.keycloak.userprofile.UserProfileProvider": [
+      {
+        "providerId": "declarative-user-profile",
+        "config": {
+          "kc.user.profile.config": [
+            "{\"unmanagedAttributePolicy\": \"ENABLED\", \"attributes\": [{\"name\": \"username\", \"permissions\": {\"view\": [\"admin\", \"user\"], \"edit\": [\"admin\", \"user\"]}}, {\"name\": \"tenant_id\", \"permissions\": {\"view\": [\"admin\", \"user\"], \"edit\": [\"admin\", \"user\"]}}]}"
+          ]
+        }
+      }
+    ]
+  }
+}

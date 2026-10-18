@@ -203,7 +203,7 @@ export class InvoiceListComponent {
         <th>Customer</th>
         <th>Date</th>
         <th>Status</th>
-        <th class="mw-text-numeric">Total</th>
+        <th class="mw-text-currency">Total</th>
         <th></th>
       </tr>
     </thead>
@@ -218,7 +218,7 @@ export class InvoiceListComponent {
             {{ invoice.status | titlecase }}
           </span>
         </td>
-        <td data-label="Total" class="mw-text-numeric">
+        <td data-label="Total" class="mw-text-currency">
           {{ invoice.total | currency: 'EUR' : 'symbol' : '1.2-2' }}
         </td>
         <td data-label="">
@@ -251,7 +251,6 @@ export class InvoiceListComponent {
 <!-- Delete confirmation - ModalDirective is in angular-services.md -->
 <dialog
   class="mw-modal mw-modal-sm"
-  closedby="any"
   appModal
   [isOpen]="toDelete() !== null"
   (dismiss)="toDelete.set(null)"
@@ -298,12 +297,13 @@ export class InvoiceListComponent {
 - **`mw-table-cards` needs `data-label` on every cell**, including the action
   column (empty string is fine) - below `md` each row becomes a card and the
   label is rendered as the cell heading.
-- **`mw-text-numeric` on the header cell as well**, otherwise the column heading
+- **`mw-text-currency` on the header cell as well**, otherwise the column heading
   sits left while the figures sit right.
 - **`mw-tag`, not `mw-tags`**, for a single status chip in a cell.
 - **`mw-btn-danger` for the destructive action** in the modal footer.
 - The modal is always in the DOM; `ModalDirective` calls `showModal()` when the
-  signal turns true, and Escape, the focus trap and the scroll lock follow from
-  the element.
+  signal turns true. Escape and a backdrop click come back as `dismiss`, which
+  resets the signal; the focus trap follows from the element, the scroll lock
+  from the stylesheet.
 - The toast stack lives in the app shell, not on this page - see
   `angular-services.md`.

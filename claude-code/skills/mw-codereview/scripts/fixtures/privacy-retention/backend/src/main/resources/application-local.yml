@@ -1,0 +1,6 @@
+spring:
+  mail:
+    host: localhost
+app:
+  ocr:
+    url: http://localhost:9000

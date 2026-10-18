@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    username: saas_app
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://login.acme.io/realms/saas
+          audiences: saas-api
+  jpa:
+    hibernate:
+      ddl-auto: validate

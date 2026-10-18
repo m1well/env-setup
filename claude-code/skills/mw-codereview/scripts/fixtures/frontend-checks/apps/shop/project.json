@@ -1,0 +1,15 @@
+{
+  "name": "shop",
+  "projectType": "application",
+  "sourceRoot": "apps/shop/src",
+  "targets": {
+    "build": {
+      "executor": "@angular/build:application",
+      "options": {
+        "browser": "apps/shop/src/main.ts",
+        "polyfills": [],
+        "tsConfig": "apps/shop/tsconfig.app.json"
+      }
+    }
+  }
+}

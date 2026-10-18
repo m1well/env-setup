@@ -6,7 +6,7 @@ service or a component per behaviour, none of them longer than a screen.
 
 ## Theme service
 
-The framework only needs one class on `<body>`. Everything else - persistence,
+The framework only needs one class on `<html>`. Everything else - persistence,
 the toggle UI, the initial value - belongs to the application. The second class,
 `mw-theme-switching` on `<html>`, is not optional on a page of any size: without
 it the flip starts a transition on every element that changes colour.
@@ -32,10 +32,10 @@ export class ThemeService {
       const root = document.documentElement;
 
       root.classList.add('mw-theme-switching');
-      document.body.classList.toggle('mw-theme-light', light);
+      root.classList.toggle('mw-theme-light', light);
       // the explicit counterpart - without it a dark choice on a light machine
       // falls back to the OS preference
-      document.body.classList.toggle('mw-theme-dark', !light);
+      root.classList.toggle('mw-theme-dark', !light);
       void root.offsetHeight; // commit the colours with transitions off
       root.classList.remove('mw-theme-switching');
 
@@ -159,25 +159,35 @@ from the signal is cleaner.
 
 ## Modal
 
-A `<dialog>` with the same `mw-modal` classes. Escape, the focus trap, the inert
-page behind it and the body scroll lock all come from the element, so what is
-left to write is opening it.
+A `<dialog>` with the same `mw-modal` classes. Escape, the focus trap and the
+inert page behind it come from the element, the page scroll lock from the
+stylesheet (`:root:has(dialog.mw-modal[open])`), so what is left to write is
+opening it.
 
 `[open]="isOpen()"` does **not** work: the attribute opens a non-modal dialog -
 no top layer, no backdrop, no focus trap. It has to be `showModal()`, which
 needs a directive.
 
+The open state stays the parent's. Escape and a backdrop click only report
+`dismiss`; the dialog closes once the parent turns the signal off. That is what
+lets a parent hold it open while something runs - `closable` off also sets
+`closedby="none"`, so Chrome and Firefox do not close it on a repeated Escape
+either.
+
 ```ts
 @Directive({
   selector: 'dialog[appModal]',
   host: {
-    '(close)': 'onClose()',
+    '[attr.closedby]': "closable() ? null : 'none'",
+    '(cancel)': 'onCancel($event)',
     '(click)': 'onClick($event)',
+    '(close)': 'onClose()',
   },
 })
 export class ModalDirective {
   readonly isOpen = input(false);
-  /** the dialog closed itself - Escape, a backdrop click or a form submit */
+  /** Escape and the backdrop only - a close button stays the template's */
+  readonly closable = input(true);
   readonly dismiss = output<void>();
 
   private readonly host =
@@ -194,18 +204,21 @@ export class ModalDirective {
     });
   }
 
-  // Only when the dialog closed itself - closing it through the signal already
-  // went through whatever set the signal, and reporting that back would run the
-  // caller's dismiss handler a second time.
-  protected onClose(): void {
-    if (this.isOpen()) this.dismiss.emit();
+  // Escape arrives as `cancel`: held, and handed to whoever owns the signal
+  protected onCancel(event: Event): void {
+    event.preventDefault();
+    if (this.closable()) this.dismiss.emit();
   }
 
   // A click on the dialog element is a click on its backdrop; the content sits
-  // in .mw-modal-header/body/footer inside it. Stands in for `closedby="any"`
-  // where that is not supported yet.
+  // in .mw-modal-header/body/footer inside it
   protected onClick(event: MouseEvent): void {
-    if (event.target === this.host) this.host.close();
+    if (event.target === this.host && this.closable()) this.dismiss.emit();
+  }
+
+  // The browser closed it anyway - a `method="dialog"` form, a repeated Escape
+  protected onClose(): void {
+    if (this.isOpen()) this.dismiss.emit();
   }
 }
 ```
@@ -217,7 +230,6 @@ export class ModalDirective {
   template: `
     <dialog
       class="mw-modal mw-modal-sm"
-      closedby="any"
       appModal
       [isOpen]="open()"
       (dismiss)="cancelled.emit()"
@@ -265,11 +277,11 @@ safe action instead.
 
 In tests, jsdom implements none of `<dialog>` - not `showModal`, `show` or
 `close`, only the `open` attribute reflects. Specs that render an open modal
-fail with `showModal is not a function` until a setup file adds them.
+fail with `showModal is not a function` until a setup file adds them - a stub
+that sets `open` and dispatches `close` is enough.
 
-The `mw-modal-overlay` div toggled by `mw-modal-open` is still styled, for
-markup that predates this - it cannot trap focus or make the page inert, so it
-is not what to write now.
+There is no div variant any more - the overlay div of 5.x and its open class
+were removed in 6.0.0. Move such markup to a `<dialog>` with this directive.
 
 ## Accordion
 
@@ -482,7 +494,12 @@ export class MwRevealDirective {
 
     afterNextRender(() => {
       if (CSS.supports('animation-timeline', 'view()')) return;
-      if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      if (
+        matchMedia('(prefers-reduced-motion: reduce)').matches ||
+        document.documentElement.classList.contains('mw-motion-off')
+      ) {
+        return;
+      }
       // Already on screen: past its entry range in a timeline browser too
       if (this.host.getBoundingClientRect().top < innerHeight) return;
 

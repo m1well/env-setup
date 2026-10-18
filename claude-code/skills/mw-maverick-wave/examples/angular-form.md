@@ -1,8 +1,9 @@
 # Example: reactive form
 
-Every control type in one form, with the error handling the framework expects:
-`mw-field-has-error` on the wrapper, `mw-field-error` for the message. Nothing
-reacts to `ng-invalid` on its own - the bindings below are the whole mechanism.
+Every control type in one form, with the error handling the framework expects.
+A control turns red from Angular's own `ng-invalid ng-touched`; the
+`mw-field-has-error` bindings below add the wrapper state for the controls the
+framework cannot see, and `mw-field-error` carries the message.
 
 ## Component
 
@@ -231,13 +232,15 @@ export class ProjectFormComponent {
 
 ## Notes
 
-- **The error state is two bindings**: `mw-field-has-error` on the wrapper
-  (border and halo) and the `mw-field-error` element (the message). Hint and
-  error should not be visible at the same time.
+- **The red border needs no binding** - `ng-invalid ng-touched` sets it.
+  `mw-field-has-error` on the wrapper covers what Angular's classes miss (here
+  the `dirty` case), `mw-field-error` carries the message. Hint and error should
+  not be visible at the same time.
 - **For a control without a wrapper** - a checkbox group, radio group or slider
   container - use `mw-form-element-error` instead.
 - **`disabled`/`readonly` are attributes**, not classes. With reactive forms use
-  `control.disable()`; the muted look comes from the `:disabled` selector.
+  `control.disable()`; the muted look comes from `:disabled` - on checkbox,
+  radio and toggle too, no class on the label needed.
 - **Prefilled values** take `mw-prefilled` on the control, not on the wrapper.
   In an edit form that starts from `patchValue()`, bind it to your own flag:
   `[class.mw-prefilled]="loaded() && !form.controls.name.dirty"`. Repeat the
@@ -251,15 +254,15 @@ export class ProjectFormComponent {
 
 ## Number formatting
 
-`mw-text-numeric` aligns from the right edge, so it works with both `1,204.50`
+`mw-text-currency` aligns from the right edge, so it works with both `1,204.50`
 and `1.204,50` - what matters is a constant number of decimals per column. Let
 the pipe do it:
 
 ```html
-<td class="mw-text-numeric">
+<td class="mw-text-currency">
   {{ invoice.total | currency: 'EUR' : 'symbol' : '1.2-2' }}
 </td>
-<td class="mw-text-numeric">{{ item.amount | number: '1.2-2' }}</td>
+<td class="mw-text-currency">{{ item.amount | number: '1.2-2' }}</td>
 ```
 
 ```ts

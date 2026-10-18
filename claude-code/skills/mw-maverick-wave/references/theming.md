@@ -13,8 +13,9 @@ Writing those tokens on `<html>` at runtime is how a palette is swapped without
 a reload. It repaints the same breadth the theme flip does and needs the same
 guard against a page-wide interpolation - see **Light & dark** below.
 
-Browser floor for that: `color-mix()` **and** `oklch(from ...)` - Chrome 119+,
-Safari 16.4+, Firefox 128+. The same range is declared as `browserslist` in
+Browser floor: Chrome and Edge 123+, Firefox 140+ (the ESR), Safari and iOS
+17.5+ - the first versions with `color-mix()`, `oklch(from ...)` **and**
+`light-dark()` together. The same range is declared as `browserslist` in
 `package.json`, so Autoprefixer and cssnano target exactly it.
 
 ```css
@@ -50,53 +51,59 @@ Safari 16.4+, Firefox 128+. The same range is declared as `browserslist` in
 
 ## Which token for what
 
-| Token                                                                                                                                                                        | Role                                                                                                                                                                                                                                                                                                                                    |
-| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `--mw-primary-color`                                                                                                                                                         | Brand colour as a **fill**: primary buttons, table headers, bars, badges - the label on top is `--mw-primary-accent-text-color`                                                                                                                                                                                                         |
-| `--mw-primary-text-color`                                                                                                                                                    | Brand colour as **ink** on a theme surface: text, icons, focus rings, accent borders. Derived by clamping OKLch lightness (`max(l, .68)` on dark, `min(l, .55)` on light), so a colour already in range is used untouched                                                                                                               |
-| `--mw-primary-color-hover`                                                                                                                                                   | Solid hover surface (derived: base + `$hover-shift` black, in both themes)                                                                                                                                                                                                                                                              |
-| `--mw-primary-background`                                                                                                                                                    | 20% tint - focus halo, alert/badge/tag surface, scrollbar tracks                                                                                                                                                                                                                                                                        |
-| `--mw-primary-background-hover`                                                                                                                                              | 45% tint - row and list hover                                                                                                                                                                                                                                                                                                           |
-| `--mw-primary-info-background`                                                                                                                                               | Alias of `--mw-primary-background`, so a component can interpolate one name across all six colours                                                                                                                                                                                                                                      |
-| `--mw-border-accent`                                                                                                                                                         | Translucent accent **line**: panel rules, dividers, tab underlines. Theme-aware (70% of `--mw-*-text-color`)                                                                                                                                                                                                                            |
-| `--mw-secondary-*`                                                                                                                                                           | Same set for the second brand colour                                                                                                                                                                                                                                                                                                    |
-| `--mw-success/warning/danger/info-color`                                                                                                                                     | Status colours, each with `-text-color`, `-color-hover`, `-info-background`, `-info-background-hover`                                                                                                                                                                                                                                   |
-| `--mw-accent-text-color`                                                                                                                                                     | Text on any solid coloured surface (buttons, table/panel headers, badges, stepper dots)                                                                                                                                                                                                                                                 |
-| `--mw-primary-accent-text-color`                                                                                                                                             | Per colour override of that label. Same for `secondary`, `success`, `warning`, `danger`, `info`. Defaults to `--mw-accent-text-color`, so set one only when a colour needs the opposite label - a neon primary on a dark palette                                                                                                        |
-| `--mw-gray-color`                                                                                                                                                            | Neutral foreground: muted icons, tooltips                                                                                                                                                                                                                                                                                               |
-| `--mw-gray-background`                                                                                                                                                       | Subtle neutral surface (20% alpha): zebra rows, disabled fields, tracks, skeletons                                                                                                                                                                                                                                                      |
-| `--mw-corner-accent`                                                                                                                                                         | The accent arc on the two round corners of every card, panel, modal and tile. Theme-aware: the full `--mw-*-text-color` tone in the dark theme, held to 80% in the light one, where the same blue carries far more contrast on a near-white card. Restyle it to recolour the signature, or `mw-corner-plain` on a single box to drop it |
-| `--mw-surface-muted`                                                                                                                                                         | Alias of `--mw-gray-background` under the name you reach for: a slightly set-off area _inside_ a card - hint block, framed paragraph, form summary                                                                                                                                                                                      |
-| `--mw-overlay-background`                                                                                                                                                    | Heavy scrim (60%) behind modals and blocking spinners                                                                                                                                                                                                                                                                                   |
-| `--mw-page-background`, `--mw-card-background`, `--mw-footer-background`, `--mw-border`, `--mw-shadow`, `--mw-text-color`, `--mw-text-muted-color`, `--mw-hero-image-filter` | The **active theme** - aliases pointing at the `--mw-dark-*` or `--mw-light-*` set                                                                                                                                                                                                                                                      |
-| `--mw-header-*`                                                                                                                                                              | Header chrome: `background`, `text-color`, `navbar-list-color`, `navbar-list-active-color`, `burgerbutton-color`, `burgerbutton-open-color`, `border` - dark in both themes. The two burger tokens default to the primary and secondary label ink, because the burger sits on those two surfaces                                        |
-| `--mw-form-elements-background`, `--mw-form-elements-color`                                                                                                                  | Form controls stay light in both themes and therefore have their own pair                                                                                                                                                                                                                                                               |
-| `--mw-font-family-base`, `-heading`, `-mono`                                                                                                                                 | Font stacks - system stacks by default (`-mono` leads with Fira Code); no font is bundled. Configurable in SCSS, see below                                                                                                                                                                                                              |
-| `--mw-hero-background`, `--mw-hero-text-color`                                                                                                                               | Hero image (`url(...)`) and the ink on it. Fixed across themes - the photo does not change with the theme, so its text must not either. Defaults to the light end of the palette                                                                                                                                                        |
-| `--mw-transition`                                                                                                                                                            | Hover and focus states - an explicit paint-only property list at `--mw-duration-base`, never `all`                                                                                                                                                                                                                                      |
-| `--mw-card-img-height`                                                                                                                                                       | Per-card image height (default `210px`; `mw-card-lg`/`-xl` set it to 340px/480px, 260px/340px below `sm`)                                                                                                                                                                                                                               |
-| `--mw-card-addon-color`                                                                                                                                                      | Background of `mw-card-badge` / `mw-card-ribbon`; the `mw-card-addon-*` classes set it, override it for a custom colour                                                                                                                                                                                                                 |
-| `--mw-card-addon-text-color`                                                                                                                                                 | Label on that badge/ribbon; the `mw-card-addon-*` classes point it at the matching `--mw-*-accent-text-color`                                                                                                                                                                                                                           |
-| `--mw-progress-ink`                                                                                                                                                          | Label inside `mw-progress-inline-label`; the `mw-progress-*` colour classes point it at the matching `--mw-*-accent-text-color`                                                                                                                                                                                                         |
-| `--mw-table-scroll-height`                                                                                                                                                   | Per-table height cap for `mw-table-responsive-scroll`                                                                                                                                                                                                                                                                                   |
-| `--mw-kanban-background`, `--mw-kanban-lane-border`, `--mw-kanban-column-min-height`                                                                                         | Per-board surface, lane border and lane floor (120px, 90px on `mw-kanban-compact`)                                                                                                                                                                                                                                                      |
-| `--mw-container-gutter`, `--mw-container-width`                                                                                                                              | Page gutter of `mw-container` (fluid `clamp(1rem, 4.2vw + 0.5rem, 4rem)`, never below the safe-area inset) and the width derived from it (`min(1200px, 100% - 2 * gutter)`)                                                                                                                                                             |
-| `--mw-section-padding-block`                                                                                                                                                 | Top/bottom rhythm of `mw-section` (3.3rem, stepping down to 2.5rem below `md` and 1.75rem below `sm`)                                                                                                                                                                                                                                   |
-| `--mw-section-padding-fluid`                                                                                                                                                 | The fluid alternative to the value above - 1.75rem on a phone up to 5.5rem at `xl`. Not applied by itself: set `--mw-section-padding-block: var(--mw-section-padding-fluid)`                                                                                                                                                            |
-| `--mw-section-nav-height`                                                                                                                                                    | Height the sticky `mw-section-nav` reserves (3.7rem). Add it to `--mw-header-height` for the `scroll-margin-top` of anything the strip can cover                                                                                                                                                                                        |
-| `--mw-root-font-size`                                                                                                                                                        | Percentage the whole rem scale is built on (`100%`). Type, spacing and control heights move with it; px breakpoints do not                                                                                                                                                                                                              |
-| `--mw-calendar-dot`                                                                                                                                                          | Colour of a single calendar dot - set it per dot or per cell; the `mw-calendar-dot-*` classes are presets for it                                                                                                                                                                                                                        |
-| `--mw-scroll-hint-cover`                                                                                                                                                     | Colour the scroll hint on a tab bar fades into. Preset to the page, re-pointed to the card background inside `mw-card`, `mw-panel`, `mw-modal`, `mw-tile`, `mw-calendar`                                                                                                                                                                |
-| `--mw-elevation-1` … `-5`                                                                                                                                                    | Every shadow in the framework. Two layers per level - contact plus ambient. Never write a `box-shadow` by hand: a hand-rolled one is the wrong colour in one of the two themes                                                                                                                                                          |
-| `--mw-shadow-near`, `--mw-shadow-far`                                                                                                                                        | The two tones the ramp above is mixed from, per theme                                                                                                                                                                                                                                                                                   |
-| `--mw-transition-fast`                                                                                                                                                       | The same property list at `--mw-duration-fast` - for a state change that should feel instant under the pointer                                                                                                                                                                                                                          |
-| `--mw-duration-instant\|fast\|base\|slow\|slower`                                                                                                                            | 110 / 180 / 300 / 520 / 900ms. Anything built on these is covered by `prefers-reduced-motion` for free                                                                                                                                                                                                                                  |
-| `--mw-duration-zoom`                                                                                                                                                         | 650ms, for a large surface actually travelling - an image scaling inside a card, a slider track                                                                                                                                                                                                                                         |
-| `--mw-ease-out`, `--mw-ease-in-out`, `--mw-ease-spring`                                                                                                                      | Things arriving (the default) / A to B and back / a pop                                                                                                                                                                                                                                                                                 |
-| `--mw-control-height-sm\|·\|lg`, `--mw-control-font-sm\|·\|lg`, `--mw-control-line-height`                                                                                   | One size scale for input, select, textarea and button, so a field and the button beside it line up by construction                                                                                                                                                                                                                      |
-| `--mw-focus-ring-width\|offset\|color`                                                                                                                                       | The keyboard focus ring                                                                                                                                                                                                                                                                                                                 |
-| `--mw-focus-halo-size\|opacity`                                                                                                                                              | The soft ring a form field gets instead of a hard outline                                                                                                                                                                                                                                                                               |
-| `--mw-internal-theme-mode`                                                                                                                                                   | Read-only: what `$mw-theme-mode` was compiled to                                                                                                                                                                                                                                                                                        |
+| Token                                                                                                                                                                        | Role                                                                                                                                                                                                                                                                                                                                                                              |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--mw-primary-color`                                                                                                                                                         | Brand colour as a **fill**: primary buttons, table headers, bars, badges - the label on top is `--mw-primary-accent-text-color`                                                                                                                                                                                                                                                   |
+| `--mw-primary-text-color`                                                                                                                                                    | Brand colour as **ink** on a theme surface: text, icons, focus rings, accent borders. Derived by clamping OKLch lightness (`max(l, .68)` on dark, `min(l, .55)` on light), so a colour already in range is used untouched                                                                                                                                                         |
+| `--mw-primary-color-hover`                                                                                                                                                   | Solid hover surface (derived: base + `$hover-shift` black, in both themes)                                                                                                                                                                                                                                                                                                        |
+| `--mw-primary-background`                                                                                                                                                    | 20% tint - focus halo, alert/badge/tag surface, scrollbar tracks                                                                                                                                                                                                                                                                                                                  |
+| `--mw-primary-background-hover`                                                                                                                                              | 45% tint - row and list hover                                                                                                                                                                                                                                                                                                                                                     |
+| `--mw-primary-info-background`                                                                                                                                               | Alias of `--mw-primary-background`, so a component can interpolate one name across all six colours                                                                                                                                                                                                                                                                                |
+| `--mw-border-accent`                                                                                                                                                         | Translucent accent **line**: panel rules, dividers, tab underlines. Theme-aware (70% of `--mw-*-text-color`)                                                                                                                                                                                                                                                                      |
+| `--mw-secondary-*`                                                                                                                                                           | Same set for the second brand colour                                                                                                                                                                                                                                                                                                                                              |
+| `--mw-success/warning/danger/info-color`                                                                                                                                     | Status colours, each with `-text-color`, `-color-hover`, `-info-background`, `-info-background-hover`                                                                                                                                                                                                                                                                             |
+| `--mw-accent-text-color`                                                                                                                                                     | Text on any solid coloured surface (buttons, table/panel headers, badges, stepper dots)                                                                                                                                                                                                                                                                                           |
+| `--mw-primary-accent-text-color`                                                                                                                                             | Per colour override of that label. Same for `secondary`, `success`, `warning`, `danger`, `info`. Defaults to `--mw-accent-text-color`, so set one only when a colour needs the opposite label - a neon primary on a dark palette. `mw-accent-text-auto` on `<html>` lets `contrast-color()` pick black or white for all six                                                       |
+| `--mw-gray-color`                                                                                                                                                            | Neutral foreground: muted icons, tooltips                                                                                                                                                                                                                                                                                                                                         |
+| `--mw-gray-background`                                                                                                                                                       | Subtle neutral surface (20% alpha): zebra rows, disabled fields, tracks, skeletons                                                                                                                                                                                                                                                                                                |
+| `--mw-corner-accent`                                                                                                                                                         | The accent arc on the two round corners of every card, panel, modal and tile, and on the top-right corner of an avatar. Theme-aware: the full `--mw-*-text-color` tone in the dark theme, held to 80% in the light one, where the same blue carries far more contrast on a near-white card. Restyle it to recolour the signature, or `mw-corner-plain` on a single box to drop it |
+| `--mw-surface-muted`                                                                                                                                                         | Alias of `--mw-gray-background` under the name you reach for: a slightly set-off area _inside_ a card - hint block, framed paragraph, form summary                                                                                                                                                                                                                                |
+| `--mw-overlay-background`                                                                                                                                                    | Heavy scrim (60%) behind modals and blocking spinners                                                                                                                                                                                                                                                                                                                             |
+| `--mw-page-background`, `--mw-card-background`, `--mw-footer-background`, `--mw-border`, `--mw-shadow`, `--mw-text-color`, `--mw-text-muted-color`, `--mw-hero-image-filter` | The **active theme** - `light-dark(var(--mw-light-*), var(--mw-dark-*))` under `switchable`, a plain alias onto one set in a fixed theme mode                                                                                                                                                                                                                                     |
+| `--mw-header-*`                                                                                                                                                              | Header chrome: `background`, `text-color`, `navbar-list-color`, `navbar-list-active-color`, `burgerbutton-color`, `burgerbutton-open-color`, `border`, `glass`, `island-border`, `navbar-mark` - dark in both themes. The two burger tokens default to the primary and secondary label ink, because the burger sits on those two surfaces                                         |
+| `--mw-form-elements-background`, `--mw-form-elements-color`, `--mw-form-elements-readonly-background`, `--mw-form-elements-disabled-background`                              | Form controls stay light in both themes and therefore have their own set; readonly and disabled share one opaque grey, told apart by their ink                                                                                                                                                                                                                                    |
+| `--mw-font-family-base`, `-heading`, `-mono`                                                                                                                                 | Font stacks - system stacks by default (`-mono` leads with Fira Code); no font is bundled. Configurable in SCSS, see below                                                                                                                                                                                                                                                        |
+| `--mw-hero-background`, `--mw-hero-text-color`                                                                                                                               | Hero image (`url(...)`) and the ink on it. Fixed across themes - the photo does not change with the theme, so its text must not either. Defaults to the light end of the palette                                                                                                                                                                                                  |
+| `--mw-transition`                                                                                                                                                            | Hover and focus states - an explicit paint-only property list at `--mw-duration-base`, never `all`                                                                                                                                                                                                                                                                                |
+| `--mw-card-img-height`                                                                                                                                                       | Per-card image height (default `210px`; `mw-card-lg`/`-xl` set it to 340px/480px, 260px/340px below `sm`)                                                                                                                                                                                                                                                                         |
+| `--mw-card-addon-color`                                                                                                                                                      | Background of `mw-card-badge` / `mw-card-ribbon`; the `mw-card-addon-*` classes set it, override it for a custom colour                                                                                                                                                                                                                                                           |
+| `--mw-card-addon-text-color`                                                                                                                                                 | Label on that badge/ribbon; the `mw-card-addon-*` classes point it at the matching `--mw-*-accent-text-color`                                                                                                                                                                                                                                                                     |
+| `--mw-progress-ink`                                                                                                                                                          | Label inside `mw-progress-inline-label`; the `mw-progress-*` colour classes point it at the matching `--mw-*-accent-text-color`                                                                                                                                                                                                                                                   |
+| `--mw-table-scroll-height`                                                                                                                                                   | Per-table height cap for `mw-table-responsive-scroll`                                                                                                                                                                                                                                                                                                                             |
+| `--mw-modal-max-height`                                                                                                                                                      | Per-modal height cap (default `85dvh`; `mw-modal-sm`/`-lg`/`-xl` set it to 80/90/92dvh, the bottom sheet below `sm` to 92dvh). The body scrolls inside it                                                                                                                                                                                                                         |
+| `--mw-dropdown-min-width`                                                                                                                                                    | Minimum width of a dropdown menu, set on the dropdown or any wrapper (default `200px`, `mw-lang-switch` 170px). On a coarse pointer the menu still widens to the trigger, at least 240px                                                                                                                                                                                          |
+| `--mw-kanban-background`, `--mw-kanban-lane-border`, `--mw-kanban-column-min-height`                                                                                         | Per-board surface, lane border and lane floor (120px, 90px on `mw-kanban-compact`)                                                                                                                                                                                                                                                                                                |
+| `--mw-container-gutter`, `--mw-container-width`                                                                                                                              | Page gutter of `mw-container` (fluid `clamp(1rem, 4.2vw + 0.5rem, 4rem)`, never below the safe-area inset) and the width derived from it (`min(1200px, 100% - 2 * gutter)`)                                                                                                                                                                                                       |
+| `--mw-section-padding-block`                                                                                                                                                 | Top/bottom rhythm of `mw-section` (3.3rem, stepping down to 2.5rem below `md` and 1.75rem below `sm`)                                                                                                                                                                                                                                                                             |
+| `--mw-section-padding-fluid`                                                                                                                                                 | The fluid alternative to the value above - 1.75rem on a phone up to 5.5rem at `xl`. Not applied by itself: set `--mw-section-padding-block: var(--mw-section-padding-fluid)`                                                                                                                                                                                                      |
+| `--mw-section-padding-compact`, `--mw-section-padding-airy`                                                                                                                  | The two presets, as tokens so the phone steps reach them - point `--mw-section-padding-block` at one                                                                                                                                                                                                                                                                              |
+| `--mw-section-head-step`                                                                                                                                                     | One step of the head rhythm, derived from `--mw-section-padding-block`. Every measure in a head and around a subtitle is a multiple of it, so a spacing preset moves them all                                                                                                                                                                                                     |
+| `--mw-section-nav-height`                                                                                                                                                    | Height the sticky `mw-section-nav` reserves (3.75rem). A page carrying a strip adds it to `scroll-padding-top` itself, through the offset token below                                                                                                                                                                                                                             |
+| `--mw-announcement-offset`, `--mw-section-nav-offset`                                                                                                                        | What each layer of sticky chrome below the header adds to `scroll-padding-top`. `0px` until the component switches it on, so a page with both a ribbon and a strip reserves for both. For a sticky bar of your own, override `scroll-padding-top` on `html` - the calc names these two                                                                                            |
+| `--mw-action-bar-height`, `--mw-action-bar-reserve`                                                                                                                          | Height of `mw-action-bar` (3.75rem) and what the page reserves for it - bar plus bottom safe area while one is on screen (on `mw-action-bar-island` its 4px lower height plus its gap), `0px` from `md` up unless it carries `mw-action-bar-always`. Read with a `0px` fallback, because it only exists while a bar does; the bottom toast stack sits above it that way           |
+| `--mw-root-font-size`                                                                                                                                                        | Percentage the whole rem scale is built on (`100%`). Type, spacing and control heights move with it; px breakpoints do not                                                                                                                                                                                                                                                        |
+| `--mw-calendar-dot`                                                                                                                                                          | Colour of a single calendar dot - set it per dot or per cell; the `mw-calendar-dot-*` classes are presets for it                                                                                                                                                                                                                                                                  |
+| `--mw-scroll-hint-cover`                                                                                                                                                     | Colour the scroll hint on a tab bar fades into. Preset to the page, re-pointed to the card background inside `mw-card`, `mw-panel`, `mw-modal`, `mw-tile`, `mw-calendar`                                                                                                                                                                                                          |
+| `--mw-elevation-1` … `-5`                                                                                                                                                    | Every shadow in the framework. Two layers per level - contact plus ambient. Never write a `box-shadow` by hand: a hand-rolled one is the wrong colour in one of the two themes                                                                                                                                                                                                    |
+| `--mw-shadow-near`, `--mw-shadow-far`                                                                                                                                        | The two tones the ramp above is mixed from, per theme                                                                                                                                                                                                                                                                                                                             |
+| `--mw-transition-fast`                                                                                                                                                       | The same property list at `--mw-duration-fast` - for a state change that should feel instant under the pointer                                                                                                                                                                                                                                                                    |
+| `--mw-duration-instant\|fast\|base\|slow\|slower`                                                                                                                            | 110 / 180 / 300 / 520 / 900ms. Anything built on these is covered by `prefers-reduced-motion` and `mw-motion-off` for free                                                                                                                                                                                                                                                        |
+| `--mw-duration-zoom`                                                                                                                                                         | 650ms, for a large surface actually travelling - an image scaling inside a card, a slider track                                                                                                                                                                                                                                                                                   |
+| `--mw-ease-out`, `--mw-ease-in-out`, `--mw-ease-spring`                                                                                                                      | Things arriving (the default) / A to B and back / a pop                                                                                                                                                                                                                                                                                                                           |
+| `--mw-control-height-sm\|·\|lg`, `--mw-control-font-sm\|·\|lg`, `--mw-control-line-height`                                                                                   | One size scale for input, select, textarea and button, so a field and the button beside it line up by construction                                                                                                                                                                                                                                                                |
+| `--mw-focus-ring-width\|offset\|color`                                                                                                                                       | The keyboard focus ring                                                                                                                                                                                                                                                                                                                                                           |
+| `--mw-focus-halo-size\|opacity`                                                                                                                                              | The soft ring a form field gets instead of a hard outline                                                                                                                                                                                                                                                                                                                         |
+| `--mw-internal-theme-mode`                                                                                                                                                   | Read-only: what `$mw-theme-mode` was compiled to                                                                                                                                                                                                                                                                                                                                  |
 
 `--mw-container-gutter`, `--mw-container-width` and `--mw-section-padding-block`
 are the knobs a good default cannot settle, because the right answer differs per
@@ -125,8 +132,8 @@ Two rules that prevent most colour bugs:
    anything else, and `--mw-focus-ring-*` / `--mw-focus-halo-*` for the ring.
    A hand-rolled shadow is the wrong colour in one of the two themes: the dark
    theme's shadow is a light rim over a dark contact layer, not a black blur.
-   A hand-rolled duration also opts out of `prefers-reduced-motion`, which works
-   by turning the duration tokens down.
+   A hand-rolled duration also opts out of `prefers-reduced-motion` and
+   `mw-motion-off`, which work by turning the duration tokens down.
 
 4. **The header has two knobs of its own.** `$header-surface` sets how dark the
    bar sits under the primary colour (lower is darker); `$header-active-tint`
@@ -140,13 +147,11 @@ Two rules that prevent most colour bugs:
   Which half applies is decided by `color-scheme` on the element that **uses**
   the token, and `:root` carries `color-scheme: light dark` - so a page follows
   the OS until someone chooses otherwise.
-- `mw-theme-light` and `mw-theme-dark` on `<body>` are that choice. They set
-  little more than `color-scheme`, and every token follows. `mw-theme-dark` is
-  not redundant: without it, a reader who picks dark on a machine set to light
-  would be pulled straight back to the OS preference.
-- Chrome 119-122 and Safari 16.4-17.4 are in the browserslist but predate
-  `light-dark()`. `base/_base.scss` keeps the old route for them behind
-  `@supports` - dark on `:root`, light by class, no OS tracking.
+- `mw-theme-light` and `mw-theme-dark` on `<html>` are that choice. They set
+  `color-scheme` and the one non-colour token below, nothing else, and every
+  token follows. `mw-theme-dark` is not redundant: without it, a reader who
+  picks dark on a machine set to light would be pulled straight back to the OS
+  preference. On any other element the class switches that subtree only.
 - `--mw-hero-image-filter` is the one theme value that is not a colour and so
   cannot ride along; it follows `prefers-color-scheme` instead.
 - Card, footer and border are derived from the page background by scaling its
@@ -202,66 +207,78 @@ Two rules that prevent most colour bugs:
 const root = document.documentElement;
 
 root.classList.add('mw-theme-switching');
-document.body.classList.toggle('mw-theme-light', isLight);
-document.body.classList.toggle('mw-theme-dark', !isLight);
+root.classList.toggle('mw-theme-light', isLight);
+root.classList.toggle('mw-theme-dark', !isLight);
 void root.offsetHeight; // commit the new colours with transitions off
 root.classList.remove('mw-theme-switching');
 ```
 
+## Contrast and transparency
+
+Two OS settings are answered without a class:
+
+- `prefers-contrast: more` - borders from 55% of the ink instead of a shade of
+  the surface, muted text close to the text colour, `--mw-border-accent` and
+  the corner arc at full ink strength, a 3px focus ring, and all six
+  `--mw-*-text-color` clamped to about 4.5:1 on a card instead of 3:1. It
+  overrides the `--mw-dark-*` / `--mw-light-*` sources, so both themes follow.
+- `prefers-reduced-transparency: reduce` - the announcement ribbon, the hero
+  badge and the outline button on the hero lose their `backdrop-filter` and sit
+  on a solid fill. Chromium only so far; elsewhere nothing changes.
+
 ## Site-wide variants
 
-Fifteen classes on `<html>` and six custom properties retune the whole look
+Nineteen classes on `<html>` and six custom properties retune the whole look
 without a rebuild. They stack, and none of them need a class per element. The
 showcase at https://maverick-wave.m1well.com has a picker for the set, and its
 URL carries the choice - a link is how a look gets agreed on before it is built.
 
-| Class                | Effect                                                                                                                                                                              |
-| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `mw-corners-even`    | Drops the surface signature - every card, panel and modal becomes an evenly rounded `radius('md')` box                                                                              |
-| `mw-accent-single`   | `--mw-secondary-color` follows the primary; `mw-btn-secondary` turns outline so the two stay apart                                                                                  |
-| `mw-shadows-flat`    | Elevation 1-3 to `none`. The dropdown (4) and the modal (5) keep their shadow                                                                                                       |
-| `mw-surfaces-flush`  | Card, panel and footer background drop to the page colour and the border is redrawn from the ink, because the old one is a neighbouring shade of a surface that is now the page     |
-| `mw-hover-static`    | No hover travels - lifts, image zooms and slides go. Colour and border still respond                                                                                                |
-| `mw-scroll-static`   | No scroll entrance - `mw-reveal` and `mw-reveal-stagger` blocks sit where they land                                                                                                 |
-| `mw-sections-plain`  | The diagonal hatch behind `mw-section-alternate` collapses into the page colour                                                                                                     |
-| `mw-headings-caps`   | `h1`-`h3` in capitals with 0.045em tracking                                                                                                                                         |
-| `mw-links-underline` | `mw-link`, `mw-link-muted` and `mw-btn-link` carry their underline at rest. The hover signal moves to the stroke, which thickens to 3px - `mw-link` has no colour change of its own |
-| `mw-btn-pill`        | `mw-btn` fully rounded. Form fields keep their own radius                                                                                                                           |
-| `mw-btn-square`      | `mw-btn` to `border-radius: 0`. The other end of the same axis, and unlike `--mw-radius-scale: 0` it leaves the rest of the page rounded                                            |
-| `mw-btn-glass`       | Filled buttons become tinted glass: translucent wash, vertical ramp, specular top edge. No `backdrop-filter` - it would trap a fixed-position tooltip inside the button             |
-| `mw-btn-tactile`     | The four solid variants stand on a 3px edge mixed toward black and travel its full height on `:active`. Outline, ghost and link have no fill to darken and are untouched            |
-| `mw-density-compact` | Card and panel padding and the three control heights drop one step down the spacing scale. Type is untouched - `--mw-root-font-size` is the switch that scales everything together  |
-| `mw-density-roomy`   | The same one step up                                                                                                                                                                |
+| Class                 | Effect                                                                                                                                                                                                                 |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `mw-corners-even`     | Drops the surface signature - every card, panel and modal becomes an evenly rounded `radius('md')` box                                                                                                                 |
+| `mw-accent-single`    | `--mw-secondary-color` follows the primary; `mw-btn-secondary` turns outline so the two stay apart                                                                                                                     |
+| `mw-accent-text-auto` | The label on every filled colour turns black or white, whichever reads better, through `contrast-color()` on all six `--mw-*-accent-text-color`. Behind `@supports` - without it the set tokens stay                   |
+| `mw-shadows-flat`     | Elevation 1-3 to `none`, and the buttons' colour shadow through `--mw-btn-shadow` / `-hover` (`0 0 #0000`, list-safe). The dropdown (4) and the modal (5) keep their shadow                                            |
+| `mw-shadows-hard`     | All five elevations become a hard offset without blur (2 / 4 / 6 / 8 / 10px), in a near-black `--mw-shadow-hard` in both themes - point the token at the brand ink for a louder look. Buttons take elevation 1 / 2 through `--mw-btn-shadow` / `-hover` |
+| `mw-surfaces-flush`   | Card, panel and footer background drop to the page colour and the border is redrawn from the ink, because the old one is a neighbouring shade of a surface that is now the page                                        |
+| `mw-hover-static`     | No hover travels - lifts, image zooms and slides go. Colour and border still respond                                                                                                                                   |
+| `mw-scroll-static`    | No scroll entrance - `mw-reveal` and `mw-reveal-stagger` blocks sit where they land                                                                                                                                    |
+| `mw-motion-off`       | The reduced-motion page for every reader: durations to 1ms, no loops, no scroll effects, no page-transition fade, and `main.js` skips what it would animate. Includes what `mw-hover-static` and `mw-scroll-static` do |
+| `mw-header-bar`       | The flat header bar instead of the island: full width, fixed at the top, 62px, no docking - `mw-header-reveal` still rides it in                                                                                       |
+| `mw-sections-plain`   | The diagonal hatch behind `mw-section-alternate` collapses into the page colour                                                                                                                                        |
+| `mw-headings-caps`    | `h1`-`h3` in capitals with 0.045em tracking                                                                                                                                                                            |
+| `mw-links-underline`  | `mw-link`, `mw-link-muted` and `mw-btn-link` carry their underline at rest. The hover signal moves to the stroke, which thickens to 3px - `mw-link` has no colour change of its own                                    |
+| `mw-btn-pill`         | `mw-btn` fully rounded. Form fields keep their own radius                                                                                                                                                              |
+| `mw-btn-square`       | `mw-btn` to `border-radius: 0`. The other end of the same axis, and unlike `--mw-radius-scale: 0` it leaves the rest of the page rounded                                                                               |
+| `mw-btn-glass`        | Filled buttons become tinted glass (6.13.0): light rim all round, gloss band over the upper half, soft darker lower edge, tint 92/80 so the label keeps the fill's contrast. No `backdrop-filter` - it would trap a fixed-position tooltip inside the button |
+| `mw-btn-tactile`      | The four solid variants stand on a 4px edge mixed toward black (6.13.0), rise onto 5px on hover and sink onto 1px on `:active` - the face travels like a key. Outline, ghost and link have no fill to darken and are untouched |
+| `mw-density-compact`  | Padding in cards, panels and modals drops two steps, never below the second (7px); a card's inline padding drops one, so a full-width footer button stays off the border. The three control heights shrink too. Type is untouched - `--mw-root-font-size` is the switch that scales everything together |
+| `mw-density-roomy`    | The same one step up                                                                                                                                                                                                   |
 
-| Property                     | Effect                                                                                                                      |
-| ---------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `--mw-radius-scale`          | Multiplies the whole radius scale - `0` squares everything off                                                              |
-| `--mw-root-font-size`        | Percentage on `html`. The scale is rem, so type, padding and control heights move together; breakpoints are px and stay put |
-| `--mw-font-family-heading`   | Headline typeface; body copy is untouched                                                                                   |
-| `--mw-container-width`       | Where the content stops growing                                                                                             |
-| `--mw-section-padding-block` | Air above and below each section                                                                                            |
-| `--mw-section-padding-fluid` | The same, but growing with the screen - point the line above at it                                                          |
-| `--mw-motion-scale`          | Multiplies all six duration tokens - `0.6` brisk, `1.6` relaxed. `prefers-reduced-motion` still overrides it                |
+| Property                                                    | Effect                                                                                                                          |
+| ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `--mw-radius-scale`                                         | Multiplies the whole radius scale - `0` squares everything off                                                                  |
+| `--mw-root-font-size`                                       | Percentage on `html`. The scale is rem, so type, padding and control heights move together; breakpoints are px and stay put     |
+| `--mw-font-family-heading`                                  | Headline typeface; body copy is untouched                                                                                       |
+| `--mw-container-width`                                      | Where the content stops growing                                                                                                 |
+| `--mw-section-padding-block`                                | Air above and below each section                                                                                                |
+| `--mw-section-padding-fluid`                                | The same, but growing with the screen - point the line above at it                                                              |
+| `--mw-section-padding-compact`, `--mw-section-padding-airy` | A tighter and an airier fixed rhythm - point the line above at one                                                              |
+| `--mw-section-head-step`                                    | Scales every gap in a section head and around a subtitle at once                                                                |
+| `--mw-motion-scale`                                         | Multiplies all six duration tokens - `0.6` brisk, `1.6` relaxed. `prefers-reduced-motion` and `mw-motion-off` still override it |
 
-**Writing your own.** A variant that retunes a _theme-bound_ token - anything in
-the dark/light maps - cannot be written on `:root` alone: `mw-theme-light`
-re-declares those on `<body>`, which shadows the root value for the entire
-subtree and the switch does nothing in light mode. Target both:
+**Writing your own.** `:root` alone is enough. The theme tokens are declared
+once there and resolve where they are used, so a copy keeps both halves -
+`--mw-card-background: var(--mw-page-background)` on `:root.my-variant` is the
+page colour in either theme. The one exception is `--mw-hero-image-filter`: not
+a colour, so a theme class on an element below `<html>` re-declares it there,
+and a copy taken on `:root` misses that.
 
 ```scss
-:root.my-variant,
-:root.my-variant .mw-theme-light {
+:root.my-variant {
   --mw-card-background: var(--mw-page-background);
 }
 ```
-
-`--mw-elevation-1..5` are the exception and need only `:root`: the ramp is one
-set for both themes and reaches the theme through `--mw-shadow-near/-far`, so
-there is no second declaration further down the tree to shadow it.
-
-The same trap the other way round: never copy a theme alias _into_ a token on
-`:root` (`--mw-x: var(--mw-page-background)`), because up there it still holds
-the dark value. Write that rule on the element instead.
 
 ## SCSS configuration
 
@@ -272,6 +289,8 @@ effect, because the root colours are declared with `!default`.
 @use 'maverick-wave/src/scss/main' with (
   $mw-theme-mode: 'switchable',
   // 'switchable' | 'dark' | 'light'
+  // cross-document view transitions - layout.md, Page transitions
+  $mw-page-transitions: true,
   $primary-color: #0f766e,
   $secondary-color: #b45309,
   $success-color: #15803d,
@@ -289,12 +308,18 @@ effect, because the root colours are declared with `!default`.
   $hover-shift: 15%,
   $ink-lightness-dark: 0.68,
   $ink-lightness-light: 0.55,
+  // mw-text-* inside mw-home-text, which sits on the hero photo
+  $hero-ink-lightness: 0.72,
   $muted-tint: 12%,
   // the surface stack - distance of card and footer from the page
   $card-surface-dark: 0.85,
   $card-surface-light: 1.05,
   $footer-surface-dark: 0.75,
   $footer-surface-light: 0.95,
+  // padding inside cards, panels and modals - a factor on its spacing step;
+  // the first carries default and roomy, the second mw-density-compact
+  $padding-scale: 1.125,
+  $padding-scale-compact: 1.25,
   // the header bar - how much of the primary survives darkening toward black
   $header-surface: 16%,
   // how far the active navbar link sits off the primary colour - lower is a
@@ -335,7 +360,8 @@ needs none.
 
 `$mw-theme-mode: 'dark'` or `'light'` compiles a single theme - the other set of
 variables is omitted and `mw-theme-light` has no effect. The theme toggle
-component reads `--mw-internal-theme-mode` and disables itself.
+component reads `--mw-internal-theme-mode` and disables itself; a disabled
+`mw-theme-toggle` is greyed out with a `not-allowed` cursor.
 
 Overriding a value that is not on the list above is done in CSS afterwards -
 they are all `var()` references anyway:
@@ -361,7 +387,8 @@ they are all `var()` references anyway:
 tokens, the functions and the mixins. They exist on the SCSS path only; the
 compiled CSS carries none of them, so a CDN project cannot reach them.
 
-Functions read the maps: `spacing('4')`, `font-size('lg')`,
+Functions read the maps: `spacing('4')` (a second argument scales the step -
+`spacing('4', $padding-scale)` is how cards, panels and modals pad), `font-size('lg')`,
 `font-weight('bold')`, `radius('md')`, `breakpoint('md')`, `color('primary-color')`,
 `z-index('menu')`, `motion('base')`.
 
@@ -396,6 +423,10 @@ Functions read the maps: `spacing('4')`, `font-size('lg')`,
   container widths, not breakpoint names, because a container has none.
 - `media-up($bp)` / `media-down($bp)` - the `$breakpoints` map as range syntax,
   `width >= bp` and `width < bp`, so the two never overlap at the breakpoint.
+  `media-up` is the direction the framework is written in: the base block is the
+  phone and each breakpoint adds to it. `media-down` is for a rule that sets what
+  the base never sets - turned around it would hard-wire an inherited value - and
+  for a narrow layout that costs more properties than the wide one.
 - `touch-context($bp: 'md')` - coarse pointer _or_ narrow viewport. Every
   target-size rule in the framework hangs under it; put your own control under
   the same condition instead of guessing it.
@@ -412,8 +443,15 @@ Functions read the maps: `spacing('4')`, `font-size('lg')`,
   See the pitfall on latching `:hover`.
 - `focus-ring`, `focus-ring-inset`, `field-focus`, `focus-halo` - the ring, in
   its four shapes.
+- `motion-safe` / `motion-reduced` - inside a rule, for motion of your own.
+  The first emits its content only where neither the OS nor `mw-motion-off`
+  asks for less, the second where one of them does. The rule's selector is
+  unified with `:root`, so a selector that starts with `:root` merges.
+- `visually-hidden` - the declarations behind `mw-sr-only`.
 - `truncate`, `scrollbar`, `surface`, `corner-accent` - the shared silhouette
-  and the one-line helpers the components use.
+  and the one-line helpers the components use. `scrollbar` sets only the
+  standard `scrollbar-width` and `scrollbar-color`, so Safari before 26.2 draws
+  its default scrollbar in those containers.
 
 ## Overriding a component
 
@@ -440,7 +478,7 @@ Give it a layer of its own:
 
 ## Importing only what you need
 
-The full stylesheet is ~281 kB raw / ~40 kB gzipped. Marketing components
+The full stylesheet is ~518 kB raw / ~72 kB gzipped. Marketing components
 (`blog-post`, `gallery`, `content-slider`, `techstack-bucket`, `tiles`,
 `coming-soon`, `ratings`, `home`, `hero`) are dead weight in an application, and
 Angular bundle budgets notice.
@@ -451,6 +489,23 @@ boundary, so partial imports are safe. **The one thing you must not drop is
 colourless. The cascade layer order comes along on its own: every module loads
 `abstracts`, which declares it, so a hand-picked subset orders itself the same
 way the full build does.
+
+**The short way is `main-lean`**: the whole framework minus the components -
+tokens, reset, typography, the complete layout and all utilities, ~121 kB raw /
+~19 kB gzipped. Tooltip and hero badge ride along, because the footer and the
+hero use them. Configure it like `main` and add the components next to it:
+
+```scss
+@use 'maverick-wave/src/scss/main-lean' with (
+  $primary-color: #0f766e
+);
+@use 'maverick-wave/src/scss/components/buttons';
+@use 'maverick-wave/src/scss/components/cards';
+@use 'maverick-wave/src/scss/components/alerts';
+```
+
+Those three land at ~19 kB gzipped against ~41 kB for the full build. Pick the
+files by hand, as below, when you also want to leave parts of the layout out.
 
 ```scss
 // styles.scss - configure first, then pick
@@ -498,4 +553,8 @@ Details worth knowing:
   (`utilities`, `form-elements`), wasteful for `components`.
 - Some components expect a sibling: `lists` styles checkbox rows and looks best
   with `form-elements/checkbox`; `tags` uses `mw-btn-mini` from `buttons` for
-  its remove button.
+  its remove button. `mosaic` needs `lightbox` for its viewer, and
+  `portrait-gallery` needs `utilities/fit` for a photo it shows whole instead of
+  cropping. `overlay-btn` comes along with every component that uses it. The
+  `chat` composer is a `mw-textarea` and a `mw-btn`, so it wants
+  `form-elements/textarea` and `buttons` next to it.
