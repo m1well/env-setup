@@ -1,0 +1,4 @@
+app:
+  payment:
+    base-url: http://localhost:9090
+    api-key: Zq8vR2mT6wX1pL9kD4hF7jN3bC5sA0yE

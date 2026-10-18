@@ -1,0 +1,5 @@
+{
+  "targetDefaults": {
+    "@angular/build:application": { "cache": true }
+  }
+}

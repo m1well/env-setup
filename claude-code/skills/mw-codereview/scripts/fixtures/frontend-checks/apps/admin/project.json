@@ -1,0 +1,15 @@
+{
+  "name": "admin",
+  "projectType": "application",
+  "sourceRoot": "apps/admin/src",
+  "targets": {
+    "build": {
+      "executor": "@angular/build:application",
+      "options": {
+        "browser": "apps/admin/src/main.ts",
+        "polyfills": [],
+        "tsConfig": "apps/admin/tsconfig.app.json"
+      }
+    }
+  }
+}

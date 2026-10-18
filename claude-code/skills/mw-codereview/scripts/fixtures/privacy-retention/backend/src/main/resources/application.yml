@@ -1,0 +1,11 @@
+spring:
+  mail:
+    host: smtp.ionos.de
+app:
+  meldung:
+    slack-webhook: ${SLACK_WEBHOOK:}
+  ocr:
+    url: ${OCR_URL:https://api.ocr-anbieter.cloud}
+  cors:
+    allowed-origins: https://app.beispiel-firma.de
+  frontend-url: https://portal.beispiel-firma.de

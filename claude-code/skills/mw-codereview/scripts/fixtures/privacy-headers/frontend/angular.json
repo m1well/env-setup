@@ -1,0 +1,1 @@
+{ "version": 1, "projects": { "praxis": { "projectType": "application", "root": "", "sourceRoot": "src", "architect": { "build": { "options": { "index": "src/index.html" } } } } } }

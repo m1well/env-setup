@@ -1,0 +1,33 @@
+{
+  "name": "frontend-checks",
+  "private": true,
+  "scripts": {
+    "build": "nx run-many -t build",
+    "e2e": "playwright test"
+  },
+  "dependencies": {
+    "@angular/build": "22.0.0",
+    "@angular/common": "22.0.0",
+    "@angular/core": "22.0.0",
+    "@angular/platform-browser": "22.0.0",
+    "@angular/router": "22.0.0",
+    "@angular/ssr": "22.0.0",
+    "express": "^5.1.0",
+    "keycloak-angular": "^22.0.0",
+    "keycloak-js": "^26.2.0",
+    "lodash-es": "^4.17.21",
+    "rxjs": "~7.8.0",
+    "zone.js": "~0.16.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.50.0",
+    "@types/express": "^5.0.0",
+    "@types/lodash-es": "^4.17.12",
+    "@vitest/coverage-v8": "^4.0.0",
+    "jsdom": "^27.0.0",
+    "nx": "22.0.0",
+    "prettier": "^3.6.0",
+    "typescript": "~5.9.0",
+    "vitest": "^4.0.0"
+  }
+}

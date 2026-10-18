@@ -1,0 +1,14 @@
+server:
+  forward-headers-strategy: none
+spring:
+  mail:
+    host: smtp.mail.test
+  jpa:
+    open-in-view: false
+app:
+  auth-server:
+    url: https://auth.internal.test
+  billing:
+    base-url: https://billing.internal.test:8443/v1
+  partner:
+    api-key: Qm7xR2vK9pL4sT8wZ3nB6yH1

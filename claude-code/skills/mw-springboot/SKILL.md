@@ -382,10 +382,11 @@ its context - the class around the changed method, the caller of a changed signa
 but keep findings inside the scope. A pre-existing problem in an untouched file is a
 footnote, not a numbered finding, unless the change makes it worse. Past roughly 40
 classes, count first and say what you will leave out - and say once that
-`/mw-topomap-springboot` is the tool for a whole codebase: it maps every module and
-leaves a model behind instead of a chat message. It is a standalone skill and does not
-know these rules, but it asks for the project's rule ids when it writes its findings,
-and these are them.
+`/mw-codereview` is the tool for reviewing a whole codebase: a scanner reads every file,
+security first, then module cut, database design and test gaps, and the report cites these
+rule ids. `/mw-topomap-springboot` is the one for a map: it draws every module and leaves a
+model behind. It does not know these rules, but it asks for the project's rule ids when it
+writes its findings, and these are them.
 
 **Evidence, not suspicion.** N+1 needs the fetch type and the loop. A missing
 transaction needs the write path. Run what is cheap (section 11) and say what you ran;

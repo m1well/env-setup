@@ -175,6 +175,33 @@ an `@Injectable` is state or api - and then lists what it injects, what it expos
 renders. A summary, not a review: rule ids appear as pointers, and the review itself is what
 `/mw-springboot` and `/mw-angular` do.
 
+`mw-codereview` reviews Spring Boot and Angular in one pass, security first: `/mw-codereview [path]`.
+It asks first whether to review the whole repo with a written report, or only one branch or
+directory with the findings fixed right away and the result in the chat (`scan.py --diff [base]`,
+`--focus <dir>`). A Python scanner finds the candidates and Claude only verifies and rates
+them. Config files and files with secret hits are read only through `scan.py --cat`, which masks
+the values. Security includes Keycloak and the authorization model: which concepts the code uses, where
+the tenant comes from and what enforces the isolation (RLS, `@TenantId`, tenant context in async
+code and caches), rated in the report's "Authorization model" table. After security come seven
+design passes: calls between systems, module
+cut of Gradle modules and Nx libs, database design against the migrations, correctness (DST
+durations, insert-only seeds, bulk updates past `@Version`), test gaps, usability of
+forms and deletes plus duplication, and privacy. The privacy pass maps every table with personal
+data to whom it is about and a protection need (BSI 200-2 normal / high / very high, plus a score
+to compare runs), flags GDPR Art. 9 data and personal data in logs, responses, URLs and seed files,
+and asks whether the app's purpose needs what it collects; the report gets a "Privacy profile" with
+the worst case and the duties that follow. For logic bugs the skill starts Claude Code's built-in
+`/code-review high <dir>` on the directories `--show hotspots` ranks first and merges its findings
+as `correctness` - never `ultra`, never `--fix`. The full review writes `docs/mw-codereview-<date>/review.md` with
+prioritized findings (P1-P4), low-priority recommendations (R01 ...), `scan.json` and `findings.json`.
+The previous run serves as baseline: its open findings come back re-anchored under the same id, and
+hits marked with `scan.py --decide <ids> discarded|accepted "<reason>"` stay quiet until their
+evidence changes. gitleaks and npm audit are used when present,
+osv-scanner, trivy, semgrep and zizmor too. CVE floors and EOL dates sit in
+`scripts/data/versions.json` with a check date - refresh it every three months.
+After a scanner change, run `python3 scripts/test_scan.py`: it scans every fixture in `scripts/fixtures/`
+and fails when a check hits more or less often than expected.
+
 #### Brewfile ([link](/homebrew/Brewfile))
 
 A declarative list of my most important CLI tools, casks and fonts.

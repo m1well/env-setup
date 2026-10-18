@@ -1,0 +1,6 @@
+@for (line of lines(); track $index; let i = $index) {
+  <label>Line <input [value]="line" /></label>
+  <button type="button" (click)="removeLine(i)">Remove</button>
+} @empty {
+  <p>No lines.</p>
+}

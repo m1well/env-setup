@@ -1,7 +1,6 @@
 ---
 name: mw-temper
-description: Interview the user relentlessly about a plan, design, or decision until reaching a shared understanding - surfacing hidden assumptions first, weighting each decision by reversibility, and logging the outcome at the end. Invoked only via /mw-temper.
-disable-model-invocation: true
+description: Interview the user relentlessly about a plan, design, or decision until reaching a shared understanding - surfacing hidden assumptions first, weighting each decision by reversibility, and logging the outcome at the end. Invoked only via /mw-temper, or when a CLAUDE.md asks for it before a plan is approved.
 ---
 
 # Temper

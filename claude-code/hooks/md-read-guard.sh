@@ -43,7 +43,7 @@ case "${FILE}" in
 esac
 
 case "${FILE}" in
-  */.claude/*|*/CLAUDE.md|*/CLAUDE.local.md|*/AGENTS.md|*/SKILL.md) exit 0 ;;
+  */.claude/*|*/CLAUDE.md|*/CLAUDE.local.md|*/AGENTS.md|*/SKILL.md|*/mw-vault/*) exit 0 ;;
 esac
 
 BASE="$(basename "${FILE}")"

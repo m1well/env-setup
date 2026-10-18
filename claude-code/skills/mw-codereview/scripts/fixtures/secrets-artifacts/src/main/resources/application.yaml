@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: demo
+app:
+  payment:
+    api-key: ${PAYMENT_API_KEY}

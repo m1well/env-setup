@@ -416,6 +416,75 @@ npm_update() {
   npm -v
 }
 
+# latest releases of my stack from endoflife.date and github - all or some, e.g. latest_versions java spring-boot
+latest_versions() {
+  local items=(
+    "java (lts)|eclipse-temurin|lts"
+    "spring-boot|spring-boot"
+    "kotlin|kotlin"
+    "gradle|gradle"
+    "angular|angular"
+    "nodejs (lts)|nodejs|lts"
+    "postgres|postgresql"
+    "keycloak|gh:keycloak/keycloak"
+    "k3s|gh:k3s-io/k3s"
+    "traefik|traefik"
+    "nginx|nginx"
+    "ubuntu (lts)|ubuntu|lts"
+  )
+  # shellcheck disable=SC2016
+  local filter='
+    def days_since: (now - (.[0:10] | strptime("%Y-%m-%d") | mktime)) / 86400 | floor;
+    def age: if . == null then "-" elif . < 365 then "\(.)d" else "\(. / 365 * 10 | floor / 10)y" end;
+    .result.releases as $r
+    | (if $sel == "lts" then [$r[] | select(.isLts)] else $r end)[0:3][]
+    | (if .latest.date then .latest.date | days_since else null end) as $age
+    | [ .name,
+        (.latest.name // "-"),
+        ($age | age),
+        (.releaseDate // "-"),
+        (if .releaseDate then .releaseDate | days_since else null end | age),
+        (.eolFrom // "-"),
+        (if .isEol then "eol"
+         elif .eolFrom and (.eolFrom | days_since) > -90 then "soon"
+         elif $age and $age <= 14 then "new"
+         else "-" end) ]
+    | map(tostring) | @tsv'
+  local green=$'\033[32m' yellow=$'\033[33m' red=$'\033[31m' reset=$'\033[0m'
+  local sep='- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -'
+  local item label product sel url json cycle latest age released cycle_age eol state color
+  printf '%-12s | %-8s | %-13s %6s | %-11s %6s | %s\n' "product" "cycle" "latest" "age" "released" "age" "eol"
+  for item in "${items[@]}" ; do
+    IFS='|' read -r label product sel <<< "${item}"
+    if [ $# -ne 0 ] && [[ " $* " != *" ${label%% *} "* ]] ; then continue ; fi
+    echo "${sep}"
+    url="https://endoflife.date/api/v1/products/${product}"
+    if [[ "${product}" == gh:* ]] ; then url="https://api.github.com/repos/${product#gh:}/releases?per_page=100" ; fi
+    if ! json=$(curl -fs --max-time 10 "${url}") ; then
+      printf '%-12s | %s\n' "${label}" "fetch failed"
+      continue
+    fi
+    if [[ "${product}" == gh:* ]] ; then
+      json=$(jq '
+        [ .[] | select((.draft or .prerelease) | not) | select(.tag_name | test("^v?[0-9]+\\.[0-9]+\\.[0-9]+"))
+          | (.tag_name | ltrimstr("v") | split("+")[0] | split(".")) as $v
+          | {name: ($v[0:2] | join(".")), latest: {name: .tag_name, date: .published_at[0:10]}, v: ($v | map(tonumber))} ]
+        | group_by(.name) | map(max_by(.v) + {releaseDate: min_by(.v).latest.date}) | sort_by(.v) | reverse
+        | {result: {releases: .}}' <<< "${json}")
+    fi
+    while IFS=$'\t' read -r cycle latest age released cycle_age eol state ; do
+      case "${state}" in
+        eol) color="${red}" ;;
+        soon) color="${yellow}" ;;
+        new) color="${green}" ;;
+        *) color="" ;;
+      esac
+      printf '%s%-12s | %-8s | %-13s %6s | %-11s %6s | %s%s\n' "${color}" "${label}" "${cycle}" "${latest}" "${age}" "${released}" "${cycle_age}" "${eol}" "${reset}"
+    done < <(jq -r --arg sel "${sel}" "${filter}" <<< "${json}")
+  done
+  echo "${sep}"
+}
+
 # remove some build and dev folders
 rm_builds() {
   find . -name node_modules -type d -exec rm -rf {} + # npm
