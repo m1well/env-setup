@@ -23,7 +23,7 @@ accordion FAQ.
 
     <link
       rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/maverick-wave@5/maverick-wave.min.css"
+      href="https://cdn.jsdelivr.net/npm/maverick-wave@6/maverick-wave.min.css"
     />
     <link
       rel="stylesheet"
@@ -119,7 +119,7 @@ accordion FAQ.
                   dashboard for the whole company, live in an afternoon.
                 </p>
               </div>
-              <div class="mw-d-flex mw-gap-8 mw-justify-center">
+              <div class="mw-home-actions">
                 <button
                   type="button"
                   class="mw-btn mw-btn-primary mw-btn-lg"
@@ -143,11 +143,13 @@ accordion FAQ.
       <!-- Features -->
       <section id="features" class="mw-section mw-section-alternate">
         <div class="mw-container">
-          <h2 class="mw-section-title">Features</h2>
-          <p class="mw-section-intro">
-            Three things every team asks about on the first call - and the
-            numbers behind them.
-          </p>
+          <div class="mw-section-head">
+            <h2 class="mw-section-head-title">Features</h2>
+            <p class="mw-section-head-intro">
+              Three things every team asks about on the first call - and the
+              numbers behind them.
+            </p>
+          </div>
 
           <!-- mw-reveal-stagger on the grid: every card rises as it scrolls
                in, the second and third of each row a beat later -->
@@ -217,10 +219,12 @@ accordion FAQ.
       <!-- Pricing -->
       <section id="pricing" class="mw-section">
         <div class="mw-container">
-          <h2 class="mw-section-title">Pricing</h2>
-          <p class="mw-section-intro">
-            Per workspace, per month. Every plan starts with a 14 day trial.
-          </p>
+          <div class="mw-section-head">
+            <h2 class="mw-section-head-title">Pricing</h2>
+            <p class="mw-section-head-intro">
+              Per workspace, per month. Every plan starts with a 14 day trial.
+            </p>
+          </div>
 
           <!-- mw-offer pushes the price row to the bottom of the body, so the
                three prices line up although the lists differ in length. The
@@ -316,10 +320,12 @@ accordion FAQ.
       <!-- Voices -->
       <section id="voices" class="mw-section mw-section-alternate">
         <div class="mw-container">
-          <h2 class="mw-section-title">Voices</h2>
-          <p class="mw-section-intro">
-            What teams say after the first quarter.
-          </p>
+          <div class="mw-section-head">
+            <h2 class="mw-section-head-title">Voices</h2>
+            <p class="mw-section-head-intro">
+              What teams say after the first quarter.
+            </p>
+          </div>
 
           <!-- Quotes of unequal length: columns, not a grid. The stagger
                works on the column children just the same -->
@@ -367,7 +373,9 @@ accordion FAQ.
       <!-- FAQ -->
       <section id="faq" class="mw-section">
         <div class="mw-container">
-          <h2 class="mw-section-title">FAQ</h2>
+          <div class="mw-section-head">
+            <h2 class="mw-section-head-title">FAQ</h2>
+          </div>
 
           <div class="mw-accordion">
             <div class="mw-accordion-item">
@@ -485,7 +493,7 @@ accordion FAQ.
       </div>
     </dialog>
 
-    <script src="https://cdn.jsdelivr.net/npm/maverick-wave@5/maverick-wave.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/maverick-wave@6/maverick-wave.min.js"></script>
   </body>
 </html>
 ```
@@ -494,11 +502,12 @@ accordion FAQ.
 
 - The theme toggle needs no code - the script persists the choice under
   `localStorage['mw-theme']`, toggles `mw-theme-light` / `mw-theme-dark` on
-  `<body>` and wraps the
+  `<html>` and wraps the
   flip in `mw-theme-switching` so it starts no transitions.
 - The scroll spy sets `mw-active` on the `mw-navbar-link` whose `href` matches
   the `section[id]` currently in view - the `<section id="…">` elements are
-  the contract.
+  the contract. Links to other pages are left alone, so a site with several
+  pages marks its current one itself.
 - `mw-navbar` without a size class collapses at `md`. With four to five links
   use `mw-navbar-medium`, with six or more `mw-navbar-large`.
 - The hero container becomes full-bleed only because it contains `mw-hero`; the
@@ -512,7 +521,7 @@ accordion FAQ.
 - `mw-reveal-stagger` goes on the grid (or `mw-columns-*`) and reveals every
   child as it scrolls in, the second and third of each three a beat later.
   `mw-reveal` on a single block reveals that block as one. Both are off under
-  `prefers-reduced-motion`. A page like this one loads the script, so Firefox -
+  `prefers-reduced-motion` and `mw-motion-off`. A page like this one loads the script, so Firefox -
   which has no scroll timelines - runs the same entrance off an observer;
   without the script the blocks stand in place, never invisible.
 - `mw-offer` on a card pushes the price row to the bottom of the body, so the

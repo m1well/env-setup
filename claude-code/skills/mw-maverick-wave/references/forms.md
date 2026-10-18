@@ -57,35 +57,41 @@ reactive form control.
   wrapper - it also works on `mw-checkbox-group`, `mw-radio-group` and
   `mw-slider-container`. On the two groups it adds the inset a field brings with
   it, so the rows do not sit flush against the border.
-- Native validation is styled too: a control that fails `required`, `type` or
-  `pattern` gets the same red border and halo through `:user-invalid`, and the
-  `mw-field-hint` beside it turns red. `:user-invalid` and not `:invalid`, so an
-  untouched empty field is not red on page load. Nothing has to be bound for
-  this - which is exactly why the classes still exist for the case below, where
-  the validator lives in the component rather than on the element.
+- The control itself carries the error too, three ways: `:user-invalid` (a
+  failed `required`, `type` or `pattern`), `aria-invalid="true"`, and Angular's
+  `ng-invalid ng-touched`. Each gives the same red border and halo, and the
+  `mw-field-hint` beside the control turns red. `:user-invalid` and not
+  `:invalid`, so an untouched empty field is not red on page load.
 - `mw-textarea` grows with its content (`field-sizing`) between 3 lines and
   60dvh, where the browser supports it.
 
-> **The framework does not style Angular's `ng-invalid` / `ng-touched` classes.**
-> Bind the framework classes to the control state yourself:
+> **Angular needs no binding for the red border.** A reactive form puts
+> `ng-invalid ng-touched` on the control, and the framework reads it like
+> `:user-invalid` - a validator that lives in TypeScript included. The message is
+> yours to render; point the control at it:
 >
 > ```html
-> <div
->   class="mw-field"
->   [class.mw-field-has-error]="email.invalid && email.touched"
-> >
+> <div class="mw-field">
 >   <label class="mw-field-label mw-required" for="email">Email</label>
->   <input id="email" type="email" class="mw-input" formControlName="email" />
+>   <input
+>     id="email"
+>     type="email"
+>     class="mw-input"
+>     formControlName="email"
+>     aria-describedby="email-error"
+>   />
 >   @if (email.hasError('required') && email.touched) {
->   <span class="mw-field-error">
+>   <span class="mw-field-error" id="email-error">
 >     <i class="fas fa-exclamation-circle"></i> Email is required.
 >   </span>
 >   }
 > </div>
 > ```
 >
-> The same applies to any other framework - React: `className={...}`, Vue:
-> `:class`. Nothing reacts to validation on its own.
+> Any other framework sets `aria-invalid="true"` on the control - React
+> `aria-invalid={...}`, Vue `:aria-invalid` - which tells a screen reader as well.
+> `mw-field-has-error` stays for a control the framework cannot see, such as a
+> custom component.
 
 ## Form layout
 
@@ -134,9 +140,14 @@ reactive form control.
 ```
 
 - Full width by default, `2px` border, focus ring in the primary colour.
-- `readonly` renders on a muted surface, `disabled` additionally as
-  `not-allowed`. Both are attribute driven - there is no readonly/disabled
-  class.
+- `readonly` and `disabled` share one opaque grey in both themes, clear on a
+  card and on the page alike. `readonly` keeps full-strength text - the value is
+  content - and the normal cursor; `disabled` mutes the text and shows
+  `not-allowed`. Both are attribute driven (`[readonly]`, `:disabled`) - there is
+  no readonly/disabled class. `--mw-form-elements-readonly-background` and
+  `--mw-form-elements-disabled-background` set the two tones separately.
+- The placeholder is the muted ink at full opacity: Firefox fades placeholders
+  by default, which took it below 4.5:1.
 - Date/time work as normal inputs (`type="date" | "time" | "datetime-local"`);
   the native picker indicator is styled.
 
@@ -169,6 +180,33 @@ identical while being typed and once it is rendered into a table.
 > comes back empty. `inputmode="decimal"` still brings up the numeric keypad on
 > mobile. Parsing the comma stays the application's job.
 
+## Tag field
+
+Tags and the input that adds them, in one box that looks like the field:
+
+```html
+<div class="mw-input mw-input-tags">
+  <div class="mw-tags">
+    <span class="mw-tags-item mw-tags-removable">
+      astro
+      <button
+        type="button"
+        class="mw-btn-mini mw-tags-remove"
+        aria-label="Remove astro"
+      >
+        <i class="fas fa-times"></i>
+      </button>
+    </span>
+    <input type="text" aria-label="Add tag" />
+  </div>
+</div>
+```
+
+- The bare `input` inside takes the free room and wraps under the tags; the box
+  gets the field's focus halo through `:focus-within`.
+- The tags keep dark ink on the field, which stays light in both themes.
+- Adding a tag on Enter and removing it is the application's job.
+
 ## Input group
 
 Prefix, suffix and buttons glued to the control:
@@ -197,6 +235,13 @@ a symbol (`@`, `https://`) or a short unit.
 ```
 
 Sizes: `mw-select-sm`, `mw-select-lg`.
+
+`mw-select-custom` draws the open list in the framework's look - light surface,
+border, shadow, a tick on the chosen option - where the browser supports
+`appearance: base-select` (Chrome 135+, Safari 27+). Everywhere else the native
+list opens; value, keyboard and form handling stay the select's either way.
+Keep options to plain text, since anything richer only renders where
+base-select does.
 
 ## Textarea
 
@@ -237,8 +282,10 @@ default. It draws a small triangle into the top left corner of the control.
 
 ## Checkbox
 
-The native input is hidden; `mw-checkbox-box` is the visible control, so the
-order of the three children matters.
+The native input is invisible but covers the whole row, behind the label
+content: VoiceOver finds it by touch, and a link inside the label stays
+clickable. `mw-checkbox-box` is the visible control, so the order of the three
+children matters.
 
 ```html
 <div class="mw-checkbox-group mw-checkbox-group-inline">
@@ -253,8 +300,15 @@ order of the three children matters.
 - Sizes: `mw-checkbox-sm`, `mw-checkbox-lg`
 - Colours: `mw-checkbox-primary`, `-secondary`, `-success`, `-warning`,
   `-danger`, `-info`
-- Disabled: `mw-checkbox-disabled` on the label **plus** the `disabled`
-  attribute on the input
+- Disabled: the `disabled` attribute on the input is enough - it is what
+  `control.disable()` sets. `mw-checkbox-disabled` on the label stays for
+  markup that cannot reach the input
+- Indeterminate: `input.indeterminate = true` (Angular `[indeterminate]`) draws
+  a bar - the select-all box of a partly selected table
+- Invalid: `aria-invalid="true"`, `ng-invalid ng-touched` or a failed native
+  `required` turn the box border red
+- Under forced colours the tick, the radio dot and the toggle keep system
+  colours, and keyboard focus becomes an outline
 - Group: `mw-checkbox-group` (column), `mw-checkbox-group-inline` (row)
 - With a heading and a description use `mw-checkbox-content` containing
   `mw-checkbox-header` + `mw-checkbox-label` - see the checkbox item list in
@@ -275,7 +329,8 @@ Same structure, with `mw-radio-button` as the visible control:
 ```
 
 Sizes `mw-radio-sm`, `-lg`; colours `mw-radio-primary`, `-secondary`,
-`-success`, `-warning`, `-danger`, `-info`; `mw-radio-disabled`; groups
+`-success`, `-warning`, `-danger`, `-info`; `disabled` on the input (or
+`mw-radio-disabled` on the label); invalid states as for the checkbox; groups
 `mw-radio-group`, `mw-radio-group-inline`.
 
 ## Toggle
@@ -291,8 +346,9 @@ Sizes `mw-radio-sm`, `-lg`; colours `mw-radio-primary`, `-secondary`,
 ```
 
 Sizes `mw-toggle-sm`, `-lg`; colours `mw-toggle-primary`, `-secondary`,
-`-success`, `-warning`, `-danger` (no `info` variant); `mw-toggle-disabled` plus
-the `disabled` attribute; groups `mw-toggle-group`, `mw-toggle-group-inline`.
+`-success`, `-warning`, `-danger` (no `info` variant); `disabled` on the input
+(or `mw-toggle-disabled` on the label); groups `mw-toggle-group`,
+`mw-toggle-group-inline`.
 
 ## Slider
 

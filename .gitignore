@@ -14,3 +14,11 @@ cli/.cli_private
 ### skills - only mine are tracked, everything else is somebody else's
 claude-code/skills/*
 !claude-code/skills/mw-*
+
+### private skills - mine, but not pushed
+claude-code/skills/mw-mw-astro/
+claude-code/skills/mw-social-media/
+
+### python bytecode - written by every run, differs per python version
+__pycache__/
+*.pyc
