@@ -20,6 +20,7 @@ brew "eza"                       # ls with git status / --tree
 brew "fd"                        # find replacement
 brew "ripgrep"                   # rg - fast recursive grep
 brew "jq"                        # JSON processor (newer than the /usr/bin/jq that ships with macOS)
+brew "yq"                        # YAML processor (mikefarah) - needed by finfo() for yaml files
 
 
 # --- git ---
