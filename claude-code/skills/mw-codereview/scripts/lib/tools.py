@@ -27,6 +27,8 @@ INSTALL = {'gitleaks': 'brew install gitleaks', 'osv-scanner': 'brew install osv
            'trivy': 'brew install trivy', 'semgrep': 'brew install semgrep', 'zizmor': 'brew install zizmor',
            'npm': 'install Node.js'}
 SKIP = r'(^|/)(node_modules|dist|build|target|out|coverage|\.angular|\.nx|\.gradle|\.git)/'
+DEPENDENCY_FILE = re.compile(r'(^|/)(build\.gradle(\.kts)?|settings\.gradle(\.kts)?|pom\.xml|gradle\.lockfile|'
+                             r'[\w-]+\.versions\.toml|package(-lock)?\.json|yarn\.lock|pnpm-lock\.yaml|Dockerfile[\w.-]*)$')
 SEV = {'critical': 'critical', 'high': 'high', 'error': 'high', 'moderate': 'medium', 'medium': 'medium',
        'warning': 'medium', 'low': 'low', 'info': 'low', 'informational': 'low', 'unknown': 'low', 'note': 'low'}
 
@@ -45,15 +47,26 @@ def _missing(name: str) -> dict:
 
 
 def run(repo: Repo, hits: Hits, stacks: dict, online: bool, workdir: Path, out: Path | None = None,
-        versions: dict | None = None) -> dict:
+        versions: dict | None = None, staged: dict[str, str] | None = None) -> dict:
+    """With `staged` (path -> status) only what the next commit can change: gitleaks reads the staged diff,
+    the dependency scanners run only when a build or lock file is staged, semgrep reads the staged files."""
     found = {'ids': {}, 'alias': {}}
-    status = {}
-    for name, call in (('gitleaks', lambda: gitleaks(repo, hits, workdir)),
+    status, skip = {}, {}
+    if staged is not None:
+        if not any(DEPENDENCY_FILE.search(f) for f in staged):
+            skip = dict.fromkeys(('osv-scanner', 'npm audit', 'trivy'), 'skipped (no dependency file staged)')
+        if not any('.github/workflows/' in f for f in staged):
+            skip['zizmor'] = 'skipped (no workflow staged)'
+    targets = None if staged is None else [repo.root / f for f, s in staged.items() if s != 'D']
+    for name, call in (('gitleaks', lambda: gitleaks(repo, hits, workdir, staged is not None)),
                        ('osv-scanner', lambda: osv(repo, hits, stacks, online, out, versions or {}, found)),
                        ('npm audit', lambda: npm_audit(repo, hits, stacks, online, found['alias'])),
                        ('trivy', lambda: trivy(repo, hits, online)),
-                       ('semgrep', lambda: semgrep(repo, hits, online)),
+                       ('semgrep', lambda: semgrep(repo, hits, online, targets)),
                        ('zizmor', lambda: zizmor(repo, hits, online))):
+        if name in skip:
+            status[name] = {'status': skip[name]}
+            continue
         start = len(hits.items)
         status[name] = call()
         _drop_ignored(repo, hits, start, status[name])
@@ -99,7 +112,7 @@ def _advisory(ids: list[str]) -> str | None:
     return next((i for prefix in ('CVE-', 'GHSA-') for i in ids if i.startswith(prefix)), ids[0] if ids else None)
 
 
-def gitleaks(repo: Repo, hits: Hits, workdir: Path) -> dict:
+def gitleaks(repo: Repo, hits: Hits, workdir: Path, staged: bool = False) -> dict:
     if not shutil.which('gitleaks'):
         return _missing('gitleaks')
     config = workdir / 'gitleaks.toml'
@@ -110,7 +123,8 @@ def gitleaks(repo: Repo, hits: Hits, workdir: Path) -> dict:
     seen, errors = {}, []
     for where, prefix, mode in targets:
         # the report goes to stdout, unredacted, so the value can be hashed without ever touching the disk
-        proc = _run(['gitleaks', mode, str(where), '--no-banner', '--exit-code', '0', '--log-level', 'error',
+        proc = _run(['gitleaks', mode, str(where), *(['--pre-commit', '--staged'] if staged and mode == 'git' else []),
+                     '--no-banner', '--exit-code', '0', '--log-level', 'error',
                      '--config', str(config), '--report-format', 'json', '--report-path', '-'], where, 900)
         if isinstance(proc, str):
             errors.append(proc)
@@ -135,7 +149,7 @@ def gitleaks(repo: Repo, hits: Hits, workdir: Path) -> dict:
                  **(secret_fields(first['Secret']) if first.get('Secret') else {}))
     if errors and not seen:
         return {'status': 'failed', 'detail': '; '.join(errors)[:200]}
-    mode = 'git history' if targets[0][2] == 'git' else 'working tree'
+    mode = 'working tree' if targets[0][2] == 'dir' else 'staged diff' if staged else 'git history'
     return {'status': 'ran', 'mode': mode + (f', {len(targets)} repos' if len(targets) > 1 else ''),
             'findings': len(seen)}
 
@@ -348,15 +362,17 @@ def trivy(repo: Repo, hits: Hits, online: bool) -> dict:
     return {'status': 'ran', 'findings': count}
 
 
-def semgrep(repo: Repo, hits: Hits, online: bool) -> dict:
+def semgrep(repo: Repo, hits: Hits, online: bool, targets: list[Path] | None = None) -> dict:
     if not shutil.which('semgrep'):
         return _missing('semgrep')
     if not online:
         return {'status': 'skipped (registry rules need --online)'}
+    if targets == []:
+        return {'status': 'skipped (nothing staged)'}
     proc = _run(['semgrep', 'scan', '--config', 'p/default', '--config', 'p/owasp-top-ten', '--json', '--metrics=off',
                  '--quiet',
-                 '--exclude', 'node_modules', '--exclude', 'dist', '--exclude', 'build', str(repo.root)],
-                repo.root, 900)
+                 '--exclude', 'node_modules', '--exclude', 'dist', '--exclude', 'build',
+                 *map(str, targets or [repo.root])], repo.root, 900)
     if isinstance(proc, str):
         return {'status': 'failed', 'detail': proc}
     try:

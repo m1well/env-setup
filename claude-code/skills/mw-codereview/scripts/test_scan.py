@@ -170,6 +170,44 @@ class SecretsAndArtifacts(unittest.TestCase):
         self.assertIn('api-key: Zq8***(32 chars)', text)
 
 
+class Staged(unittest.TestCase):
+    """A folder holding one repo, as a home repo setup has it: one new redirect staged, one new file left out."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.tmp = tempfile.TemporaryDirectory()
+        repo = Path(cls.tmp.name) / 'ws' / 'backend'
+        shutil.copytree(HERE / 'fixtures' / 'spring-checks' / 'backend', repo)
+        git = functools.partial(subprocess.run, cwd=repo, check=True)
+        git(['git', 'init', '-q'])
+        git(['git', 'add', '-A'])
+        git(['git', '-c', 'user.name=t', '-c', 'user.email=t@t', '-c', 'commit.gpgsign=false', 'commit', '-qm',
+             'init', '--no-verify'])
+        links = repo / 'src/main/kotlin/de/app/Links.kt'
+        lines = links.read_text(encoding='utf-8').split('\n')
+        lines[66:66] = ['    @GetMapping("/links/jump")', '    fun jump(@RequestParam to: String): String = "redirect:$to"', '']
+        links.write_text('\n'.join(lines), encoding='utf-8')
+        git(['git', 'add', '-A'])
+        (repo / 'src/main/kotlin/de/app/Extra.kt').write_text('package de.app\n', encoding='utf-8')
+        out = Path(cls.tmp.name) / 'out'
+        cls.digest = run(str(repo.parent), '--staged', '--no-tools', '--out', str(out))
+        cls.result = json.loads((out / 'scan.json').read_text(encoding='utf-8'))
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.tmp.cleanup()
+
+    def test_only_staged_lines_are_listed(self):
+        redirects = {(h['line'], h['staged']) for h in self.result['hits'] if h['check'] == 'SB-OPEN-REDIRECT'}
+        self.assertEqual({(63, 'file'), (66, 'file'), (68, 'line')}, redirects)
+        self.assertEqual({'backend/src/main/kotlin/de/app/Links.kt'},
+                         {h['file'] for h in self.result['hits'] if h['focus']})
+
+    def test_left_out_file_is_named(self):
+        self.assertEqual({'backend/src/main/kotlin/de/app/Extra.kt': 'new'}, self.result['meta']['focus']['left_out'])
+        self.assertIn('Extra.kt (new)', self.digest)
+
+
 class Baseline(unittest.TestCase):
     def test_decisions_and_findings_carry_over(self):
         fixture = str(HERE / 'fixtures' / 'spring-checks')

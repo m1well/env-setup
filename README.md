@@ -202,6 +202,8 @@ osv-scanner, trivy, semgrep and zizmor too. CVE floors and EOL dates sit in
 After a scanner change, run `python3 scripts/test_scan.py`: it scans every fixture in `scripts/fixtures/`
 and fails when a check hits more or less often than expected.
 
+`mw-stagereview` is the quick variant for what is staged: `/mw-stagereview [path]` runs `scan.py --staged`, verifies only the hits on staged lines, fixes without `git add` and asks nothing, so a dev agent can call it from a home repo.
+
 #### Brewfile ([link](/homebrew/Brewfile))
 
 A declarative list of my most important CLI tools, casks and fonts.

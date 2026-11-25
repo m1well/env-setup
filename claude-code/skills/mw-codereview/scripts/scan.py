@@ -2,10 +2,10 @@
 """mw-codereview scanner: finds what is worth reviewing in a Spring Boot and/or Angular repository.
 
     python3 scan.py [root] [--out DIR] [--online] [--resolve] [--baseline auto|none|OLD/scan.json]
-                    [--diff [BASE] | --focus DIR,DIR]
+                    [--diff [BASE] | --focus DIR,DIR | --staged]
     python3 scan.py --out DIR --show SB-SQL-CONCAT,NG-DOM-XSS | endpoints | routes | modules | projects | calls |
                                      entities | privacy | authz | hotspots | keycloak | owasp | tools |
-                                     changes | findings | decided
+                                     changes | touched | findings | decided
     python3 scan.py --out DIR --decide h12,h40,SB-NO-VALID discarded|accepted "reason"
     python3 scan.py [root] --cat FILE[:FROM-TO]
     python3 scan.py --list-checks
@@ -16,6 +16,8 @@
            findings and decisions of the findings.json next to it
 --diff     lists only hits in files changed against BASE (default: origin/HEAD, main or master), incl.
            uncommitted and untracked files; --focus does the same for directories
+--staged   lists only hits on the lines the next commit adds (git index), per repo when ROOT holds several;
+           hits elsewhere in the staged files: --show touched
 --decide   records a verdict for hits (ids or check ids) in DIR/findings.json; the next run carries it
 --cat      prints a file with every secret-like value masked - the only safe way to read config files
 """
@@ -75,6 +77,45 @@ def changes(repo: Repo, base: str) -> dict[str, str]:
         if repo.is_tracked(f) is False:
             out.setdefault(f, 'A')
     return out
+
+
+HUNK = re.compile(r'^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@')
+LEFT_OUT_EXT = SOURCE_EXT + ('.scss', '.sql', '.yml', '.yaml', '.properties', '.kts')
+
+
+def staged(repo: Repo) -> dict:
+    """What `git commit` would take: path -> A|M|D|R, the line ranges it adds, and what stays out of it."""
+    files, lines, worktree = {}, defaultdict(list), set()
+    for prefix in [''] if repo.git else [n + '/' for n in repo.nested]:
+        where = repo.root / prefix
+        git = ('-c', 'core.quotePath=false', 'diff', '--relative', '-M', '--no-ext-diff')
+        for row in repo._git(*git, '--cached', '--name-status', cwd=where).splitlines():
+            parts = row.split('\t')
+            if len(parts) >= 2:
+                files[prefix + parts[-1]] = parts[0][0]
+        current = None
+        for row in repo._git(*git, '--cached', '-U0', '--no-color', '--no-prefix', cwd=where).splitlines():
+            if row.startswith('+++ '):
+                current = None if row == '+++ /dev/null' else prefix + row[4:].rstrip('\t')
+            elif current and (m := HUNK.match(row)) and m[2] != '0':
+                start = int(m[1])
+                lines[current].append((start, start + int(m[2] or 1) - 1))
+        worktree |= {prefix + f for f in repo._git(*git, '--name-only', cwd=where).splitlines()}
+    modified = [f for f in sorted(worktree - set(files)) if f.endswith(LEFT_OUT_EXT)]
+    untracked = [f for f in repo.files if repo.is_tracked(f) is False and f.endswith(LEFT_OUT_EXT)]
+    return {'files': files, 'lines': dict(lines),
+            'partly': [f for f in sorted(worktree & set(files)) if f.endswith(LEFT_OUT_EXT)],
+            'left_out': {**dict.fromkeys(modified, 'modified'), **dict.fromkeys(untracked, 'new')}}
+
+
+def _staged_on(hit: dict, files: dict[str, str], lines: dict[str, list]) -> str | None:
+    """'line' when the hit sits on a line the commit adds, 'file' when it only shares a staged file."""
+    f, at = hit.get('file'), hit.get('line')
+    if files.get(f) == 'A' or (at and any(a <= at <= b for a, b in lines.get(f, ()))):
+        return 'line'
+    if f in files or any(x in files for x in hit.get('files') or []):
+        return 'file'
+    return None
 
 
 def _file_hashes(repo: Repo) -> dict[str, str]:
@@ -170,6 +211,7 @@ def scan(args) -> dict:
     started = time.time()
     root = Path(args.root).resolve()
     repo = Repo(root)
+    stage = staged(repo) if args.staged else None
     stacks = detect.detect(repo)
     hits = Hits()
     inventory = {}
@@ -210,7 +252,8 @@ def scan(args) -> dict:
     out.mkdir(parents=True, exist_ok=True)
     tool_status = {} if args.no_tools else tools.run(repo, hits, stacks, args.online,
                                                         Path(tempfile.mkdtemp(prefix='mw-codereview-')),
-                                                        out=out, versions=versions)
+                                                        out=out, versions=versions,
+                                                        staged=stage['files'] if stage else None)
 
     unique, seen = [], set()
     for h in hits.items:
@@ -241,10 +284,16 @@ def scan(args) -> dict:
         carried = carry(root, args.baseline, unique)
 
     focus, changed, base = {}, {}, None
-    if repo.git:
+    if stage:
+        changed, base = stage['files'], 'HEAD (staged)'
+    elif repo.git:
         base = _base(repo, args.diff)
         changed = changes(repo, base) if base else {}
-    if args.diff:
+    if stage:
+        files = {f for f, s in changed.items() if s != 'D'}
+        focus = {'label': 'staged', 'files': len(files), 'lines': stage['lines'], 'partly': stage['partly'],
+                 'left_out': stage['left_out']}
+    elif args.diff:
         files = {f for f, s in changed.items() if s != 'D'}
         focus = {'label': f'diff vs {base}' if base else 'diff (no base branch found)', 'files': len(files)}
     elif args.focus:
@@ -253,7 +302,11 @@ def scan(args) -> dict:
         focus = {'label': 'paths ' + ', '.join(dirs), 'files': len(files)}
     if focus:
         for h in unique:
-            h['focus'] = h.get('file') in files or any(f in files for f in h.get('files') or [])
+            if stage:
+                h['staged'] = _staged_on(h, changed, stage['lines'])
+                h['focus'] = h['staged'] == 'line'
+            else:
+                h['focus'] = h.get('file') in files or any(f in files for f in h.get('files') or [])
 
     spring_stack = stacks['spring']
     return {
@@ -408,6 +461,10 @@ def _inventory_lines(result: dict) -> list[str]:
     return out
 
 
+def _some(items: list[str], limit: int = 12) -> str:
+    return ', '.join(items[:limit]) + (f' ... (+{len(items) - limit})' if len(items) > limit else '')
+
+
 def _context_lines(result: dict) -> list[str]:
     meta, out = result['meta'], []
     ch = meta.get('changes') or {}
@@ -436,7 +493,19 @@ def _context_lines(result: dict) -> list[str]:
                    + f', {len(carried["decisions"])} decided hits'
                    + (f', /code-review ran on {", ".join(carried["reviewed_dirs"])}' if carried['reviewed_dirs'] else '')
                    + ' - --show findings, --show decided')
-    if meta.get('focus'):
+    focus = meta.get('focus') or {}
+    if focus.get('label') == 'staged':
+        on_line = sum(1 for h in result['hits'] if h.get('staged') == 'line')
+        on_file = sum(1 for h in result['hits'] if h.get('staged') == 'file')
+        out.append(f'focus    staged: {on_line} of {len(result["hits"])} hits on staged lines - only those are listed '
+                   f'below; {on_file} more on older lines of the staged files: --show touched' if ch.get('files')
+                   else 'focus    staged: nothing staged')
+        if focus['partly']:
+            out.append('         partly staged, line numbers come from the working tree and may be off: '
+                       + _some(focus['partly']))
+        if focus['left_out']:
+            out.append('         not staged: ' + _some([f'{f} ({kind})' for f, kind in focus['left_out'].items()]))
+    elif focus:
         inside = sum(1 for h in result['hits'] if h.get('focus'))
         out.append(f'focus    {meta["focus"]["label"]}: {meta["focus"]["files"]} files, {inside} of {len(result["hits"])} '
                    'hits inside - only those are listed below, the rest: --show <CHECK>')
@@ -514,7 +583,8 @@ def digest(result: dict, examples: int, out_dir: Path) -> str:
     if result['versions'].get('spring', {}).get('resolve'):
         lines.append('resolve  ' + result['versions']['spring']['resolve'])
     lines += _context_lines(result)
-    lines += _inventory_lines(result)
+    if (meta.get('focus') or {}).get('label') != 'staged':
+        lines += _inventory_lines(result)
     lines += _vuln_lines(shown)
     lines += _secret_lines(shown)
     sev = Counter(h['severity'] for h in shown)
@@ -694,8 +764,11 @@ def show(out_dir: Path, what: str) -> str:
             lines.append(f'{len(sources)} source files outside tests; decided hits do not count, new hits count double')
     elif what == 'changes':
         ch = data['meta'].get('changes') or {}
+        ranges = (data['meta'].get('focus') or {}).get('lines') or {}
         for f, s in sorted((ch.get('files') or {}).items()):
-            lines.append(f'{s}  {f}' + ('  [security]' if SECURITY_FILE.search(f) else ''))
+            lines.append(f'{s}  {f}' + ('  [security]' if SECURITY_FILE.search(f) else '')
+                         + ('  lines ' + ', '.join(f'{a}-{b}' if b > a else str(a) for a, b in ranges[f])
+                            if ranges.get(f) else ''))
     elif what == 'findings':
         c = data.get('carried') or {}
         for f in c.get('findings', []):
@@ -724,7 +797,7 @@ def show(out_dir: Path, what: str) -> str:
     else:
         wanted = set(what.split(','))
         for h in data['hits']:
-            if h['check'] in wanted or h['id'] in wanted:
+            if h['check'] in wanted or h['id'] in wanted or (what == 'touched' and h.get('staged') == 'file'):
                 lines.append(f'{h["id"]:>5} [{h["severity"]}] {h["check"]} {h.get("file")}:{h.get("line")}  {h["evidence"]}'
                              + (f'   ({h["note"]})' if h.get('note') else '')
                              + (f'\n        files: {", ".join(h["files"])}' if h.get('files') else '')
@@ -736,7 +809,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('root', nargs='?', default='.')
     parser.add_argument('--out', help='output folder for scan.json (default: <root>/docs/mw-codereview-<date>, '
-                                      'with --diff or --focus a folder in the temp directory)')
+                                      'with --diff, --focus or --staged a folder in the temp directory)')
     parser.add_argument('--online', action='store_true', help='let the external scanners use the network')
     parser.add_argument('--resolve', action='store_true', help='resolve the JVM dependency tree with Gradle/Maven')
     parser.add_argument('--no-tools', action='store_true', help='skip the external scanners')
@@ -744,9 +817,11 @@ def main():
                         help='auto (default), none, or the scan.json of an earlier run to mark new and resolved hits')
     parser.add_argument('--examples', type=int, default=6, help='locations shown per check below high')
     parser.add_argument('--show', help='print one or more checks, endpoints, routes or tools from scan.json')
-    parser.add_argument('--diff', nargs='?', const='auto', metavar='BASE',
-                        help='list only hits in files changed against BASE (default origin/HEAD, main or master)')
-    parser.add_argument('--focus', metavar='DIR,DIR', help='list only hits in these directories')
+    scope = parser.add_mutually_exclusive_group()
+    scope.add_argument('--diff', nargs='?', const='auto', metavar='BASE',
+                       help='list only hits in files changed against BASE (default origin/HEAD, main or master)')
+    scope.add_argument('--focus', metavar='DIR,DIR', help='list only hits in these directories')
+    scope.add_argument('--staged', action='store_true', help='list only hits on the lines staged for the next commit')
     parser.add_argument('--decide', nargs=3, metavar=('IDS', 'VERDICT', 'REASON'),
                         help='record discarded|accepted for hit ids or check ids in --out/findings.json')
     parser.add_argument('--cat', metavar='FILE[:FROM-TO]', help='print a file with secret values masked')
@@ -763,7 +838,7 @@ def main():
                               int(m.group(3)) if m.group(3) else None))
         return
     session = Path(tempfile.gettempdir()) / f'mw-codereview-{Path(args.root).resolve().name}-{dt.date.today():%Y%m%d}'
-    out_dir = Path(args.out or (session if args.diff or args.focus else
+    out_dir = Path(args.out or (session if args.diff or args.focus or args.staged else
                                 Path(args.root) / 'docs' / f'mw-codereview-{dt.date.today():%Y%m%d}'))
     if args.show:
         print(show(out_dir.resolve(), args.show))
@@ -772,7 +847,7 @@ def main():
         print(decide(out_dir.resolve(), *args.decide))
         return
     args.out = str(out_dir)
-    if args.baseline == 'none':
+    if args.baseline == 'none' or args.staged:
         args.baseline = None
     result = scan(args)
     (out_dir / 'scan.json').write_text(json.dumps(result, indent=1, ensure_ascii=False, default=str), encoding='utf-8')

@@ -183,6 +183,48 @@ timer() {
   fi
 }
 
+# keep the mac active for N minutes (default 60) - "keep -b N" runs it in the background, "keep stop" ends it
+keep() {
+  if [[ ${1} == stop ]] ; then
+    pkill -f 'keep-loop [0-9]+$' && echo "stopped" || echo "nothing running"
+    return 0
+  fi
+
+  local background=false
+  if [[ ${1} == -b ]] ; then
+    background=true
+    shift
+  fi
+
+  local minutes=${1:-60}
+
+  if [[ ! ${minutes} =~ ^[0-9]+$ ]] || (( minutes == 0 )) ; then
+    echo "error: minutes have to be a positive integer - e.g. keep 90 or keep -b 90"
+    return 1
+  fi
+
+  # 1px mouse move and back - only real HID input resets the idle time Teams reads, power assertions do not
+  # exported instead of passed as argument, so the "keep-loop N" command line below stays matchable for keep stop
+  local -x KEEP_JIGGLE='ObjC.import("CoreGraphics");
+    const p = $.CGEventGetLocation($.CGEventCreate(null));
+    const move = (x, y) => $.CGEventPost($.kCGHIDEventTap,
+      $.CGEventCreateMouseEvent(null, $.kCGEventMouseMoved, {x: x, y: y}, $.kCGMouseButtonLeft));
+    move(p.x + 1, p.y); move(p.x, p.y);'
+
+  # own process with "keep-loop N" in its command line, so keep stop can find it without killing the interactive shell
+  local loop='while (( SECONDS < $1 * 60 )) ; do osascript -l JavaScript -e "${KEEP_JIGGLE}" >/dev/null ; sleep 60 ; done'
+  local end_time; end_time=$(date -v+${minutes}M +%H:%M)
+
+  if ${background} ; then
+    nohup zsh -c "${loop}" keep-loop "${minutes}" >/dev/null 2>&1 </dev/null &!
+    echo "active in background until ${end_time} - stop with keep stop"
+  else
+    echo "active until ${end_time} - stop with ctrl+c or keep stop"
+    zsh -c "${loop}" keep-loop "${minutes}"
+    echo "done"
+  fi
+}
+
 # sync a file or folder into a backup folder without some dev build folders/files
 backup_sync() {
   if [ $# -ne 2 ] ; then
